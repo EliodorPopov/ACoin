@@ -23,6 +23,7 @@ class Modal{
       title: Text(name),
       onTap: (){
         Navigator.pop(context);
+        Navigator.of(context).pushNamed("/EarningsPage");
         action();
       },
     );
