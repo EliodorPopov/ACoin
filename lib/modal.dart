@@ -8,9 +8,9 @@ class Modal{
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              _createTile(context, 'Message', Icons.message, _action1),
-              _createTile(context, 'Take Photo', Icons.camera_alt, _action2),
-              _createTile(context, 'My Images', Icons.photo_library, _action3),
+              _createTile(context, 'Add Earnings', Icons.monetization_on, _action1),
+              _createTile(context, 'Add Expenses', Icons.money_off, _action2),
+              _createTile(context, 'View Graphs', Icons.graphic_eq, _action3),
             ],
           );
         }
