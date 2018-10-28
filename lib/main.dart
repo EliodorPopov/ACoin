@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'dashboard.dart';
+>>>>>>> f4af9d5fac250217be4500834137033a88ead841
 
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -20,10 +25,25 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.lime,
       ),
       home: new MyHomePage(title: 'Welcome to ACoin'),
+=======
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Eliodor',
+      theme: new ThemeData(
+        primarySwatch: Colors.indigo,
+        //fontFamily: 'Pacifico',
+      ),
+      home: new Dashboard(title: 'Dashboard'),
+      
+      
+>>>>>>> f4af9d5fac250217be4500834137033a88ead841
     );
   }
 }
 
+<<<<<<< HEAD
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -107,3 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+=======
+
+>>>>>>> f4af9d5fac250217be4500834137033a88ead841
