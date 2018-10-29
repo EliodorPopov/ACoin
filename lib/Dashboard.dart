@@ -5,7 +5,7 @@ import 'package:firstflut/buttonMenu.dart';
 class Dashboard extends StatelessWidget {
   Dashboard({Key key, this.title}) : super(key: key);
   final String title;
-  Modal modal = new Modal();
+  final Modal modal = new Modal();
 
   List<charts.Series<LinearSales, String>> spendingsData() {
     final data = [
@@ -18,8 +18,8 @@ class Dashboard extends StatelessWidget {
     return [
       new charts.Series<LinearSales, String>(
         id: 'Sales',
-        domainFn: (LinearSales sales, _) => sales.year,
-        measureFn: (LinearSales sales, _) => sales.sales,
+        domainFn: (LinearSales sales, _) => sales.type,
+        measureFn: (LinearSales sales, _) => sales.percent,
         data: data,
       )
     ];
@@ -34,8 +34,9 @@ class Dashboard extends StatelessWidget {
       body: new Center(
         child: new ListView(
           children: <Widget>[
-            buildCard(context),
-            buildCard(context),
+            buildCardProgress(context),
+            buildCardTwo(context),
+            buildCardEarnings(context),
             buildCard(context),
           ],
         ),
@@ -50,23 +51,23 @@ class Dashboard extends StatelessWidget {
   Padding buildCard(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-        child: new InkWell(
-          onDoubleTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (c) => buildSpendingsPage()),
-              ),
-          child: Card(
-            child: Column(children: [
-              Text("Spendings"),
-              new Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
-                color: Colors.white,
-                constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-                child: PieOutsideLabelChart(spendingsData()),
-              ),
-            ]),
-          ),
+      child: new InkWell(
+        onDoubleTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+            ),
+        child: Card(
+          child: Column(children: [
+            Text("Spendings"),
+            new Container(
+              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+              color: Colors.white,
+              constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
+              child: PieOutsideLabelChart(spendingsData()),
+            ),
+          ]),
         ),
+      ),
     );
   }
 
@@ -78,36 +79,139 @@ class Dashboard extends StatelessWidget {
         title: new Text("Spendings"),
       ),
       body: new Center(
-        child: Text("spendings"),
+        child: Text("Here you will see your transaction history"),
       ),
     );
   }
 
-  
-}
+  Padding buildCardTwo(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: new InkWell(
+        onDoubleTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+            ),
+        child: Card(
+            child: Container(
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                color: Colors.white,
+                constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                child: Row(
+                  children: [
+                    new Column(
+                      children: [
+                        new Text("Expenses:"),
+                        new Text(
+                            "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    new Container(
+                      child: PieOutsideLabelChart(spendingsData()),
+                      constraints:
+                          BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                      alignment: Alignment.centerRight,
+                    )
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ))),
+      ),
+    );
+  }
 
-class DonutPieChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
-  final bool animate;
+  Padding buildCardEarnings(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: new InkWell(
+        onDoubleTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+            ),
+        child: Card(
+            child: Container(
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                color: Colors.white,
+                constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  children: [
+                    new Container(
+                      child: HorizontalBarLabelChart(spendingsData()),
+                      constraints:
+                          BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                      alignment: Alignment.centerLeft,
+                    ),
+                    new Column(
+                      children: [
+                        new Text("Income:"),
+                        new Text(
+                            "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    )
+                  ],
+                  //mainAxisAlignment: MainAxisAlignment.start,
+                ))),
+      ),
+    );
+  }
 
-  DonutPieChart(this.seriesList, {this.animate});
-
-  @override
-  Widget build(BuildContext context) {
-    return new charts.PieChart(seriesList,
-        animate: animate,
-        // Configure the width of the pie slices to 60px. The remaining space in
-        // the chart will be left as a hole in the center.
-        defaultRenderer: new charts.ArcRendererConfig(arcWidth: 150));
+  Padding buildCardProgress(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: new Card(
+        child: new Container(
+          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+          color: Colors.white,
+          constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
+          alignment: Alignment.centerLeft,
+          child: new Column(children: [
+            new Text(
+              "How much you spent this month:\n",
+            ),
+            new Container(
+              child: new LinearProgressIndicator(
+                value: 0.6,
+                backgroundColor: Colors.amber,
+                valueColor: null,
+              ),
+              padding: EdgeInsets.all(5.0),
+            ),
+            new Row(
+              children: [
+                new Container(
+                  child: Text("1400 lei"),
+                  padding: EdgeInsets.all(5.0),
+                  alignment: Alignment.centerLeft,
+                  constraints: BoxConstraints(maxWidth: 160.0),
+                  
+                ),
+                new Container(
+                  child: Text("2000 lei"),
+                  //padding: EdgeInsets.only(left:170.0),
+                  alignment: Alignment.centerRight,
+                  width: 160.0,
+                ),
+              ],
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 }
 
+
+
 /// Sample linear data type.
 class LinearSales {
-  final String year;
-  final int sales;
+  final String type;
+  final int percent;
 
-  LinearSales(this.year, this.sales);
+  LinearSales(this.type, this.percent);
 }
 
 class PieOutsideLabelChart extends StatelessWidget {
@@ -120,17 +224,6 @@ class PieOutsideLabelChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return new charts.PieChart(seriesList,
         animate: animate,
-
-        // Add an [ArcLabelDecorator] configured to render labels outside of the
-        // arc with a leader line.
-        //
-        // Text style for inside / outside can be controlled independently by
-        // setting [insideLabelStyleSpec] and [outsideLabelStyleSpec].
-        //
-        // Example configuring different styles for inside/outside:
-        //       new charts.ArcLabelDecorator(
-        //          insideLabelStyleSpec: new charts.TextStyleSpec(...),
-        //          outsideLabelStyleSpec: new charts.TextStyleSpec(...)),
         defaultRenderer: new charts.ArcRendererConfig(
           arcRendererDecorators: [
             new charts.ArcLabelDecorator(
@@ -138,5 +231,25 @@ class PieOutsideLabelChart extends StatelessWidget {
           ],
           startAngle: 1 / 5 * 3.1415,
         ));
+  }
+}
+
+class HorizontalBarLabelChart extends StatelessWidget {
+  final List<charts.Series> seriesList;
+  final bool animate;
+
+  HorizontalBarLabelChart(this.seriesList, {this.animate});
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.BarChart(
+      seriesList,
+      animate: animate,
+      vertical: false,
+      barRendererDecorator: new charts.BarLabelDecorator<String>(),
+      // Hide domain axis.
+      domainAxis:
+          new charts.OrdinalAxisSpec(renderSpec: new charts.NoneRenderSpec()),
+    );
   }
 }
