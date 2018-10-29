@@ -35,7 +35,7 @@ class Dashboard extends StatelessWidget {
         child: new ListView(
           children: <Widget>[
             buildCardProgress(context),
-            buildCardTwo(context),
+            buildCardSpendings(context),
             buildCardEarnings(context),
             buildCard(context),
           ],
@@ -84,7 +84,7 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Padding buildCardTwo(BuildContext context) {
+  Padding buildCardSpendings(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new InkWell(
@@ -92,31 +92,39 @@ class Dashboard extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (c) => buildSpendingsPage()),
             ),
-        child: Card(
-            child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
-                color: Colors.white,
-                constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                child: Row(
-                  children: [
-                    new Column(
-                      children: [
-                        new Text("Expenses:"),
-                        new Text(
-                            "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                    ),
-                    new Container(
-                      child: PieOutsideLabelChart(spendingsData()),
-                      constraints:
-                          BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                      alignment: Alignment.centerRight,
-                    )
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.center,
-                ))),
+        child: Card( 
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 200.0, maxWidth: 180.0),
+            child: Row(
+              children: [
+                new Container(
+                  child: new Column(
+                    children: [
+                      new Text("Spendings:\n",
+                          style: TextStyle(fontSize: 20.0)),
+                      new Text(
+                          "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  constraints: BoxConstraints(maxWidth: 110.0),
+                ),
+                new Expanded(
+                  child: new Container(
+                    child: PieOutsideLabelChart(spendingsData()),
+                    //constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                    alignment: Alignment.centerRight,
+                  ),
+                  
+                ),
+              ],
+              //mainAxisAlignment: MainAxisAlignment.start,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -145,7 +153,7 @@ class Dashboard extends StatelessWidget {
                     ),
                     new Column(
                       children: [
-                        new Text("Income:"),
+                        new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
                         new Text(
                             "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
                       ],
@@ -182,18 +190,18 @@ class Dashboard extends StatelessWidget {
             ),
             new Row(
               children: [
-                new Container(
-                  child: Text("1400 lei"),
-                  padding: EdgeInsets.all(5.0),
-                  alignment: Alignment.centerLeft,
-                  constraints: BoxConstraints(maxWidth: 160.0),
-                  
+                new Expanded(
+                  child: new Container(
+                    child: Text("1400 lei"),
+                    padding: EdgeInsets.all(5.0),
+                  ),
                 ),
-                new Container(
-                  child: Text("2000 lei"),
-                  //padding: EdgeInsets.only(left:170.0),
-                  alignment: Alignment.centerRight,
-                  width: 160.0,
+                new Expanded(
+                  child: new Container(
+                    child: Text("2000 lei"),
+                    padding: EdgeInsets.all(5.0),
+                    alignment: Alignment.centerRight,
+                  ),
                 ),
               ],
             ),
@@ -203,8 +211,6 @@ class Dashboard extends StatelessWidget {
     );
   }
 }
-
-
 
 /// Sample linear data type.
 class LinearSales {
