@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:firstflut/buttonMenu.dart';
+import 'buildExpensesPage.dart';
+import 'buildIncomePage.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -90,7 +92,7 @@ class Dashboard extends StatelessWidget {
       child: new InkWell(
         onDoubleTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+              MaterialPageRoute(builder: (c) => new BuildExpensesPage(title: "expenses")),
             ),
         child: Card( 
           child: Container(
@@ -135,7 +137,7 @@ class Dashboard extends StatelessWidget {
       child: new InkWell(
         onDoubleTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+              MaterialPageRoute(builder: (c) => BuildIncomePage(title:"Income")),
             ),
         child: Card(
             child: Container(
