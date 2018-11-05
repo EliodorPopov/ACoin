@@ -44,9 +44,11 @@ class _AddEarningPageState extends State<AddEarningPage> {
               ),
               DateTimePickerFormField(
                 format: dateFormat,
+                initialValue: DateTime.now(),
+                editable: false,
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
-                initialValue: _date,
+                
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Source:'),

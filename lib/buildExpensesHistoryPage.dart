@@ -46,7 +46,7 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
               subtitle: Text(i.value.toString() + " MDL " + dateFormat.format(i.date)),
             );
             //}
-          }).toList(growable: true),
+          }).toList(),
         ),
       ),
     );

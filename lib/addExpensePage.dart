@@ -43,9 +43,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
               ),
               DateTimePickerFormField(
                 format: dateFormat,
+                initialValue: _date,
+                editable: false,
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
-                initialValue: _date,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
