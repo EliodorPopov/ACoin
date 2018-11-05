@@ -16,9 +16,6 @@ class MyApp extends StatelessWidget {
         //fontFamily: 'Pacifico',
       ),
       home: new Dashboard(title: 'Dashboard'),
-      
     );
   }
 }
-
-

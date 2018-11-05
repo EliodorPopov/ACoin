@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:firstflut/buttonMenu.dart';
-import 'buildExpensesPage.dart';
-import 'buildIncomePage.dart';
+import './buildExpensesHistoryPage.dart';
+import './buildIncomeHistoryPage.dart';
 import './db_context.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({Key key, this.title}) : super(key: key);
   final String title;
   final Modal modal = new Modal();
-  
-  
+
   List<charts.Series<LinearSales, String>> spendingsData() {
     final data = [
       new LinearSales('Rent', 25),
@@ -42,7 +41,6 @@ class Dashboard extends StatelessWidget {
             buildCardSpendings(context),
             buildCardEarnings(context),
             buildCard(context),
-            
           ],
         ),
       ),
@@ -95,14 +93,16 @@ class Dashboard extends StatelessWidget {
       child: new InkWell(
         onDoubleTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (c) => new BuildExpensesPage(title: "expenses")),
+              MaterialPageRoute(
+                  builder: (c) =>
+                      new BuildExpensesHistoryPage(title: "Spendings history")),
             ),
-        child: Card( 
+        child: Card(
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             color: Colors.white,
             constraints: BoxConstraints(maxHeight: 250.0, maxWidth: 200.0),
-            
+
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -120,26 +120,21 @@ class Dashboard extends StatelessWidget {
                   constraints: BoxConstraints(maxWidth: 300.0),
                 ),
                 new Expanded(
-                  
                   child: new Container(
                     child: PieOutsideLabelChart(spendingsData()),
-                    constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                    constraints:
+                        BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                     alignment: Alignment.centerRight,
-                    
                   ),
                   flex: 3,
                 ),
-                
               ],
               //mainAxisAlignment: MainAxisAlignment.end,
-              
             ),
             //alignment: Alignment.centerRight,
           ),
         ),
-        
       ),
-      
     );
   }
 
@@ -149,7 +144,8 @@ class Dashboard extends StatelessWidget {
       child: new InkWell(
         onDoubleTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (c) => BuildIncomePage(title:"Income")),
+              MaterialPageRoute(
+                  builder: (c) => BuildIncomeHistoryPage(title: "Income")),
             ),
         child: Card(
             child: Container(
@@ -165,15 +161,18 @@ class Dashboard extends StatelessWidget {
                           BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                       alignment: Alignment.centerLeft,
                     ),
-                    new Expanded(child: new Column(
-                      children: [
-                        new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
-                        new Text(
-                            "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
-                      ],
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                    ),)
+                    new Expanded(
+                      child: new Column(
+                        children: [
+                          new Text("Income:\n",
+                              style: TextStyle(fontSize: 20.0)),
+                          new Text(
+                              "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
+                        ],
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                    )
                   ],
                   //mainAxisAlignment: MainAxisAlignment.start,
                 ))),

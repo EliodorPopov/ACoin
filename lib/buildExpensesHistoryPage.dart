@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import './db_context.dart';
-import './expenses.dart';
+import './expense.dart';
+import 'package:intl/intl.dart';
 
-class BuildExpensesPage extends StatefulWidget {
-  BuildExpensesPage({Key key, this.title}) : super(key: key);
+class BuildExpensesHistoryPage extends StatefulWidget {
+  BuildExpensesHistoryPage({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _BuildExpensesPageState createState() => new _BuildExpensesPageState();
+  _BuildExpensesHistoryPageState createState() =>
+      new _BuildExpensesHistoryPageState();
 }
 
-class _BuildExpensesPageState extends State<BuildExpensesPage> {
+class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
+  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
 
   @override
   initState() {
@@ -26,8 +29,6 @@ class _BuildExpensesPageState extends State<BuildExpensesPage> {
     });
   }
 
-  var increment=0;
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -37,34 +38,17 @@ class _BuildExpensesPageState extends State<BuildExpensesPage> {
       body: new Center(
         child: new ListView(
           children: _expenses.map((i) {
-            print(i.name);
-            
             return ListTile(
               title: Text(
                 i.name,
                 textScaleFactor: 3.0,
               ),
-              subtitle: Text(i.value.toString() + "  " + i.date.toString()),
+              subtitle: Text(i.value.toString() + " MDL " + dateFormat.format(i.date)),
             );
             //}
-          }).toList(), 
+          }).toList(growable: true),
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () {addExpense();},
-        tooltip: 'Increment',
-        child: new Icon(Icons.add), 
-      ),
     );
-  }
-
-  addExpense() {
-    this._context.updateTableRaw("test "+increment.toString(), 800, DateTime.now());
-    _context.readExpense().then((list) {
-      setState(() {
-        _expenses = list;
-        increment++;
-      });
-    }); 
   }
 }

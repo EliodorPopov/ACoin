@@ -1,5 +1,5 @@
-import './recurrent_income.dart';
-import './expenses.dart';
+import './income.dart';
+import './expense.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -83,10 +83,10 @@ class DbContext {
     });
   }
 
-  Future<List<RecurrentIncome>> read() async {
+  Future<List<Income>> read() async {
     var database = await db;
     var incomes = await database.query(incomeTable);
-    return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
+    return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
   Future<List<Expense>> readExpense() async {
@@ -95,13 +95,13 @@ class DbContext {
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<RecurrentIncome>> readIncome() async {
+  Future<List<Income>> readIncome() async {
     var database = await db;
     var incomes = await database.query(incomeTable);
-    return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
+    return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
-  Future<dynamic> toggle(RecurrentIncome income) async {
+  Future<dynamic> toggle(Income income) async {
     var database = await db;
     await database.update(incomeTable, income.toMap(),
         where: 'id = ?', whereArgs: [income.id]);

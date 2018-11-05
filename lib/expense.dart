@@ -12,10 +12,6 @@ class Expense {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-      "value": value,
-      "date": date.millisecondsSinceEpoch
-    };
+    return {"name": name, "value": value, "date": date.millisecondsSinceEpoch};
   }
 }

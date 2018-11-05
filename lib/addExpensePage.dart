@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class ExpensesPage extends StatefulWidget {
-  ExpensesPage({Key key, this.title}) : super(key: key);
+class AddExpensePage extends StatefulWidget {
+  AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _ExpensesPageState createState() => new _ExpensesPageState();
+  _AddExpensePageState createState() => new _AddExpensePageState();
 }
 
-class _ExpensesPageState extends State<ExpensesPage> {
+class _AddExpensePageState extends State<AddExpensePage> {
   final formKey = GlobalKey<FormState>();
   String _name, _value;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");

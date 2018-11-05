@@ -1,4 +1,4 @@
-class RecurrentIncome {
+class Income {
   int id;
   String name;
   int value;
@@ -6,7 +6,7 @@ class RecurrentIncome {
   DateTime date;
   bool isEnabled;
 
-  RecurrentIncome.fromMap(Map<String, dynamic> map) {
+  Income.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
     value = map['value'];

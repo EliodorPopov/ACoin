@@ -3,15 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'db_context.dart';
 
-class EarningsPage extends StatefulWidget {
-  EarningsPage({Key key, this.title}) : super(key: key);
+class AddEarningPage extends StatefulWidget {
+  AddEarningPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _EarningsPageState createState() => new _EarningsPageState();
+  _AddEarningPageState createState() => new _AddEarningPageState();
 }
 
-class _EarningsPageState extends State<EarningsPage> {
+class _AddEarningPageState extends State<AddEarningPage> {
   final formKey = GlobalKey<FormState>();
   String _name, _source, _value;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
@@ -47,7 +47,6 @@ class _EarningsPageState extends State<EarningsPage> {
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
                 initialValue: _date,
-                
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Source:'),
