@@ -33,9 +33,10 @@ class _BuildIncomePageState extends State<BuildIncomePage> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
+
       ),
       body: new Center(
-        child: new ListView(
+        child: new ListView(  
           children: _incomes.map((i) {
             print(i.isEnabled);
             return ListTile(
@@ -43,40 +44,45 @@ class _BuildIncomePageState extends State<BuildIncomePage> {
                 i.name,
                 textScaleFactor: 3.0,
               ),
-              subtitle: Text(i.value.toString()+" Date: "+i.date.toString()),
+              subtitle:
+                  Text(i.value.toString() + " Date: " + i.date.toString()),
               trailing: Switch(
                 value: i.isEnabled,
                 onChanged: (v) => toggleIncome(v, i),
               ),
             );
             //}
-          }).toList(), 
+          }).toList(),
+
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () {addIncome();},
+        onPressed: () {
+          addIncome();
+        },
         tooltip: 'Increment',
-        child: new Icon(Icons.add), 
+        child: new Icon(Icons.add),
       ),
+      // persistentFooterButtons: <Widget>[new FlatButton(onPressed: ()=> _context.deleteTables(), child: Text("delete"),), ],
     );
+
   }
 
   addIncome() {
     increment++;
-    this._context.updateIncomeTable("test "+increment.toString(), 10*increment, "source", DateTime.now(), true);
+    this._context.updateIncomeTable("test " + increment.toString(),
+        10 * increment, "source", DateTime.now(), true);
     _context.readIncome().then((list) {
       setState(() {
         _incomes = list;
       });
     });
-
   }
+
   toggleIncome(bool value, RecurrentIncome item) {
     this._context.toggle(item);
     setState(() {
       item.isEnabled = value;
     });
-    
   }
-
 }

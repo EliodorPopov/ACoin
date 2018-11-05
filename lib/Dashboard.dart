@@ -3,6 +3,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:firstflut/buttonMenu.dart';
 import 'buildExpensesPage.dart';
 import 'buildIncomePage.dart';
+import './db_context.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -40,6 +41,7 @@ class Dashboard extends StatelessWidget {
             buildCardSpendings(context),
             buildCardEarnings(context),
             buildCard(context),
+            
           ],
         ),
       ),
@@ -98,8 +100,10 @@ class Dashboard extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 200.0, maxWidth: 180.0),
+            constraints: BoxConstraints(maxHeight: 250.0, maxWidth: 200.0),
+            
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 new Container(
                   child: new Column(
@@ -109,25 +113,32 @@ class Dashboard extends StatelessWidget {
                       new Text(
                           "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
                     ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.center,
                   ),
-                  constraints: BoxConstraints(maxWidth: 110.0),
+                  constraints: BoxConstraints(maxWidth: 300.0),
                 ),
                 new Expanded(
+                  
                   child: new Container(
                     child: PieOutsideLabelChart(spendingsData()),
-                    //constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                    constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                     alignment: Alignment.centerRight,
+                    
                   ),
-                  
+                  flex: 3,
                 ),
+                
               ],
-              //mainAxisAlignment: MainAxisAlignment.start,
+              //mainAxisAlignment: MainAxisAlignment.end,
+              
             ),
+            //alignment: Alignment.centerRight,
           ),
         ),
+        
       ),
+      
     );
   }
 
@@ -153,7 +164,7 @@ class Dashboard extends StatelessWidget {
                           BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                       alignment: Alignment.centerLeft,
                     ),
-                    new Column(
+                    new Expanded(child: new Column(
                       children: [
                         new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
                         new Text(
@@ -161,7 +172,7 @@ class Dashboard extends StatelessWidget {
                       ],
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
-                    )
+                    ),)
                   ],
                   //mainAxisAlignment: MainAxisAlignment.start,
                 ))),

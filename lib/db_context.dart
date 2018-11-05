@@ -112,4 +112,10 @@ class DbContext {
     await database.update(recurrentIncomeTable, income.toMap(),
         where: 'id = ?', whereArgs: [income.id]);
   }
+
+  Future<void> deleteTables() async{
+    var database = await db;
+    await database.query('''delete table $recurrentIncomeTable''');
+  }
+  
 }
