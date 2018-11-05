@@ -26,19 +26,19 @@ class DbContext {
     return db;
   }
 
-  final String recurrentIncomeTable = "RecurrentIncome";
+  final String incomeTable = "IncomeTable";
   final String expensesTable = "ExpensesTable";
 
   Future<void> onCreate(Database db, int version) async {
     await db.execute('''
-        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
+        CREATE TABLE $incomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
         ''');
 
     await db.execute('''
         CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER)
       ''');
 
-    await db.insert(recurrentIncomeTable, {
+    await db.insert(incomeTable, {
       "name": "bursa1",
       "value": 850,
       "source": "utm2",
@@ -49,12 +49,6 @@ class DbContext {
     await db.insert(expensesTable, {
       "name": "drinks",
       "value": 1000,
-      "date": DateTime.now().millisecondsSinceEpoch,
-    });
-
-    await db.insert(expensesTable, {
-      "name": "food",
-      "value": 2000,
       "date": DateTime.now().millisecondsSinceEpoch,
     });
   }
@@ -80,7 +74,7 @@ class DbContext {
 
   Future<void> updateIncomeTable(String name, int value, String source, DateTime date, bool isEnabled) async {
     var database = await db;
-    await database.insert(recurrentIncomeTable, {
+    await database.insert(incomeTable, {
       "name": name,
       "value": value,
       "source": source,
@@ -91,7 +85,7 @@ class DbContext {
 
   Future<List<RecurrentIncome>> read() async {
     var database = await db;
-    var incomes = await database.query(recurrentIncomeTable);
+    var incomes = await database.query(incomeTable);
     return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
 
@@ -103,19 +97,14 @@ class DbContext {
 
   Future<List<RecurrentIncome>> readIncome() async {
     var database = await db;
-    var incomes = await database.query(recurrentIncomeTable);
+    var incomes = await database.query(incomeTable);
     return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
 
   Future<dynamic> toggle(RecurrentIncome income) async {
     var database = await db;
-    await database.update(recurrentIncomeTable, income.toMap(),
+    await database.update(incomeTable, income.toMap(),
         where: 'id = ?', whereArgs: [income.id]);
-  }
-
-  Future<void> deleteTables() async{
-    var database = await db;
-    await database.query('''delete table $recurrentIncomeTable''');
   }
   
 }

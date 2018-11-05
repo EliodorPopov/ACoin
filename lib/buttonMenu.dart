@@ -10,7 +10,7 @@ class Modal{
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              _createTile(context, 'Add Earnings', Icons.monetization_on, _action1),
+              _createTile(context, 'Add Income', Icons.monetization_on, _action1),
               _createTile(context, 'Add Expenses', Icons.money_off, _action2),
               _createTile(context, 'View Graphs', Icons.data_usage, _action3),
             ],
@@ -31,12 +31,12 @@ class Modal{
 
   _action1(BuildContext context){
      Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (c)=> EarningsPage(title: "EarningsPage")));
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> EarningsPage(title: "Add Income")));
   }
 
   _action2(BuildContext context){
      Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (c)=> ExpensesPage(title: "ExpensesPage")));
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> ExpensesPage(title: "Add Expense")));
   }
 
   _action3(BuildContext context){

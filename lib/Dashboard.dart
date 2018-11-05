@@ -9,7 +9,8 @@ class Dashboard extends StatelessWidget {
   Dashboard({Key key, this.title}) : super(key: key);
   final String title;
   final Modal modal = new Modal();
-
+  
+  
   List<charts.Series<LinearSales, String>> spendingsData() {
     final data = [
       new LinearSales('Rent', 25),
