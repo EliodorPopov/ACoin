@@ -12,7 +12,10 @@ class MyApp extends StatelessWidget {
       title: 'ACoin',
       theme:  ThemeData.light().copyWith(
           inputDecorationTheme:
-              InputDecorationTheme(border: OutlineInputBorder())
+              InputDecorationTheme(
+                border: OutlineInputBorder(),
+                
+              )
       ),
       home: new MyHomePage(title: 'ACoin'),
          );

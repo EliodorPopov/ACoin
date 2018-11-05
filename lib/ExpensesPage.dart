@@ -15,11 +15,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
   DateTime date;
 
   @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         appBar: new AppBar(
           title: new Text(widget.title),
-          
         ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -31,19 +29,21 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     ),
                     onSaved: (input) => _name = input,
                   ),
+                  SizedBox(height: 12.0),
                   TextFormField(
                     decoration: InputDecoration(
                         labelText: 'Value:'
                     ),
                     onSaved: (input) => _value = input,
                   ),
-                  
+                  SizedBox(height: 12.0),               
                    DateTimePickerFormField(
               format: dateFormat,
-              decoration: InputDecoration(labelText: 'Date'),
-              onChanged: (dt) => setState(() => date = dt),
+              decoration: InputDecoration(labelText: 'Date'
+              ),
+              onChanged: (dt) => setState(() => date = dt)
             ),
-                  
+                  SizedBox(height: 12.0),
                   TextFormField(
                     decoration: InputDecoration(
                         labelText: 'Source:'
@@ -56,9 +56,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton(
+                        child: FlatButton(
                           onPressed: _submit,
                           child: Text('Submit'),
+                           shape: BeveledRectangleBorder(
+                           borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                          ),
                         ),
                       )
                     ],
@@ -67,9 +70,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
               ),
             ),
           );
-  }
+  
 
   void _submit(){
       print(_name);
     }
-  }
+} 
