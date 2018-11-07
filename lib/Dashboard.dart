@@ -1,3 +1,4 @@
+import 'package:firstflut/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:firstflut/buttonMenu.dart';
@@ -5,10 +6,32 @@ import './buildExpensesHistoryPage.dart';
 import './buildIncomeHistoryPage.dart';
 import './db_context.dart';
 
-class Dashboard extends StatelessWidget {
+
+class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
+
   final String title;
+
+  @override
+  _DashboardState createState() =>
+      new _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
   final Modal modal = new Modal();
+  DbContext _context;
+  List<Expense> _expenses = new List<Expense>();
+
+  @override
+  initState() {
+    super.initState();
+    _context = new DbContext();
+    _context.readExpense().then((list) {
+      setState(() {
+        _expenses = list;
+      });
+    });
+  }
 
   List<charts.Series<LinearSales, String>> spendingsData() {
     final data = [
@@ -28,11 +51,34 @@ class Dashboard extends StatelessWidget {
     ];
   }
 
+  List<charts.Series<Expense, String>> spendingsDataDB() {
+    // final data = [
+    //   new LinearSales('Rent', 25),
+    //   new LinearSales('Food', 50),
+    //   new LinearSales('Entertainment', 70),
+    //   new LinearSales('Drinks', 25),
+    // ];
+
+    var data = [];
+    for (int i = 0; i < _expenses.length; i++) {
+      data.add(new Expense(_expenses[i].name, _expenses[i].value));
+    }
+
+    return [
+      new charts.Series<Expense, String>(
+        id: 'Sales',
+        domainFn: (Expense sales, _) => sales.name,
+        measureFn: (Expense sales, _) => sales.value,
+        data: data,
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(title),
+        title: new Text(widget.title),
       ),
       body: new Center(
         child: new ListView(
