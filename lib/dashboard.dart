@@ -1,11 +1,10 @@
+import 'package:firstflut/buildExpensesHistoryPage.dart';
+import 'package:firstflut/buildIncomeHistoryPage.dart';
+import 'package:firstflut/buttonMenu.dart';
+import 'package:firstflut/db_context.dart';
 import 'package:firstflut/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:firstflut/buttonMenu.dart';
-import './buildExpensesHistoryPage.dart';
-import './buildIncomeHistoryPage.dart';
-import './db_context.dart';
-
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -13,12 +12,11 @@ class Dashboard extends StatefulWidget {
   final String title;
 
   @override
-  _DashboardState createState() =>
-      new _DashboardState();
+  _DashboardState createState() => new _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
-  final Modal modal = new Modal();
+  Modal modal;
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
 
@@ -26,6 +24,11 @@ class _DashboardState extends State<Dashboard> {
   initState() {
     super.initState();
     _context = new DbContext();
+    modal = new Modal(onExpenseAdded: loadExpenses);
+    loadExpenses();
+  }
+
+  void loadExpenses() {
     _context.readExpense().then((list) {
       setState(() {
         _expenses = list;
@@ -35,10 +38,7 @@ class _DashboardState extends State<Dashboard> {
 
   List<charts.Series<LinearSales, String>> spendingsData() {
     final data = [
-      new LinearSales('Rent', 25),
-      new LinearSales('Food', 50),
-      new LinearSales('Entertainment', 70),
-      new LinearSales('Drinks', 25),
+      new LinearSales('Test', 170),
     ];
 
     return [
@@ -52,25 +52,12 @@ class _DashboardState extends State<Dashboard> {
   }
 
   List<charts.Series<Expense, String>> spendingsDataDB() {
-    // final data = [
-    //   new LinearSales('Rent', 25),
-    //   new LinearSales('Food', 50),
-    //   new LinearSales('Entertainment', 70),
-    //   new LinearSales('Drinks', 25),
-    // ];
-
-    var data = [];
-    for (int i = 0; i < _expenses.length; i++) {
-      data.add(new Expense(_expenses[i].name, _expenses[i].value));
-    }
-
     return [
       new charts.Series<Expense, String>(
-        id: 'Sales',
-        domainFn: (Expense sales, _) => sales.name,
-        measureFn: (Expense sales, _) => sales.value,
-        data: data,
-      )
+          id: 'Sales',
+          domainFn: (Expense sales, _) => sales.name,
+          measureFn: (Expense sales, _) => sales.value ?? 0,
+          data: _expenses)
     ];
   }
 
@@ -138,11 +125,10 @@ class _DashboardState extends State<Dashboard> {
       padding: const EdgeInsets.all(10.0),
       child: new InkWell(
         onDoubleTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (c) =>
-                      new BuildExpensesHistoryPage(title: "Spendings history")),
-            ),
+            context,
+            MaterialPageRoute(
+                builder: (c) =>
+                    new BuildExpensesHistoryPage(title: "Spendings history"))),
         child: Card(
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
@@ -167,7 +153,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 new Expanded(
                   child: new Container(
-                    child: PieOutsideLabelChart(spendingsData()),
+                    child: PieOutsideLabelChart(spendingsDataDB()),
                     constraints:
                         BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                     alignment: Alignment.centerRight,
@@ -202,7 +188,12 @@ class _DashboardState extends State<Dashboard> {
                 child: Row(
                   children: [
                     new Container(
-                      child: HorizontalBarLabelChart(spendingsData()),
+                      child: _expenses.length >
+                              0 //I've put here the spendings series instead of income just to show that it loads from db
+                          ? HorizontalBarLabelChart(
+                              spendingsDataDB()) // but it seems that widget has some problems with rendering when the series is empty
+                          : new Text(
+                              "...loading"), //so instead of rendering empty chart replace it with placeholder while data is loaded
                       constraints:
                           BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                       alignment: Alignment.centerLeft,

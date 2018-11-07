@@ -1,7 +1,7 @@
+import 'package:firstflut/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'db_context.dart';
 
 class AddEarningPage extends StatefulWidget {
   AddEarningPage({Key key, this.title}) : super(key: key);
@@ -48,7 +48,6 @@ class _AddEarningPageState extends State<AddEarningPage> {
                 editable: false,
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
-                
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Source:'),

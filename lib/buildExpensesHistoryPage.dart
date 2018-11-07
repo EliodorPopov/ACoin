@@ -1,6 +1,6 @@
+import 'package:firstflut/db_context.dart';
+import 'package:firstflut/expense.dart';
 import 'package:flutter/material.dart';
-import './db_context.dart';
-import './expense.dart';
 import 'package:intl/intl.dart';
 
 class BuildExpensesHistoryPage extends StatefulWidget {
@@ -43,7 +43,8 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
                 i.name,
                 textScaleFactor: 3.0,
               ),
-              subtitle: Text(i.value.toString() + " MDL " + dateFormat.format(i.date)),
+              subtitle: Text(
+                  i.value.toString() + " MDL " + dateFormat.format(i.date)),
             );
             //}
           }).toList(),

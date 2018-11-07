@@ -1,7 +1,7 @@
+import 'package:firstflut/db_context.dart';
+import 'package:firstflut/income.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import './db_context.dart';
-import './income.dart';
 
 class BuildIncomeHistoryPage extends StatefulWidget {
   BuildIncomeHistoryPage({Key key, this.title}) : super(key: key);
@@ -44,7 +44,8 @@ class _BuildIncomeHistoryPageState extends State<BuildIncomeHistoryPage> {
                 i.name,
                 textScaleFactor: 3.0,
               ),
-              subtitle: Text(i.value.toString() + " MDL " + dateFormat.format(i.date)),
+              subtitle: Text(
+                  i.value.toString() + " MDL " + dateFormat.format(i.date)),
               trailing: Switch(
                 value: i.isEnabled,
                 onChanged: (v) => toggleIncome(v, i),
