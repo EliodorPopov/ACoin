@@ -1,5 +1,7 @@
+import 'package:firstflut/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
+
+//import 'buildExpensesPage.dart';
 
 void main() => runApp(new MyApp());
 
@@ -15,10 +17,6 @@ class MyApp extends StatelessWidget {
         //fontFamily: 'Pacifico',
       ),
       home: new Dashboard(title: 'Dashboard'),
-      
-      
     );
   }
 }
-
-
