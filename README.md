@@ -14,7 +14,7 @@ A new Flutter Amdaris-UTM Project.
 ## Tabelul RecurrentIncome
 
 | id (int) 		  | name (String) 		| value (int) 				| source (String)      | date (int) | isEnable (bool)  |
-|-----------------|---------------------|---------------------------|-----------------|-------------------|
+|-----------------|---------------------|---------------------------|----------------------|-------------------------------|
 | Id of the tuple | Name of the expense | Value of the expense(MDL) | source of the income | date       | is it recurrent? |
 
 
