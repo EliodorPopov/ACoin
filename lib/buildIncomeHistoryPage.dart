@@ -1,5 +1,5 @@
+import 'package:firstflut/RecurrentIncome.dart';
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/income.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -15,7 +15,7 @@ class BuildIncomeHistoryPage extends StatefulWidget {
 
 class _BuildIncomeHistoryPageState extends State<BuildIncomeHistoryPage> {
   DbContext _context;
-  List<Income> _incomes = new List<Income>();
+  List<RecurrentIncome> _incomes = new List<RecurrentIncome>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
 
   @override
@@ -58,7 +58,7 @@ class _BuildIncomeHistoryPageState extends State<BuildIncomeHistoryPage> {
     );
   }
 
-  toggleIncome(bool value, Income item) {
+  toggleIncome(bool value, RecurrentIncome item) {
     this._context.toggle(item);
     setState(() {
       item.isEnabled = value;

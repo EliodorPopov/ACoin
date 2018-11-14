@@ -2,7 +2,7 @@ import 'package:firstflut/buildExpensesHistoryPage.dart';
 import 'package:firstflut/buildIncomeHistoryPage.dart';
 import 'package:firstflut/buttonMenu.dart';
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/expense.dart';
+import 'package:firstflut/Expense.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
