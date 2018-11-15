@@ -1,12 +1,14 @@
 import 'package:firstflut/addEarningPage.dart';
 import 'package:firstflut/addExpensePage.dart';
+import 'package:firstflut/addIncomePage.dart';
 import 'package:flutter/material.dart';
 
 class Modal {
-  VoidCallback onEarningAdded;
+  VoidCallback onRecurrentIncomeAdded;
   VoidCallback onExpenseAdded;
+  VoidCallback onIncomeAdded;
 
-  Modal({this.onEarningAdded, this.onExpenseAdded});
+  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});
 
   mainBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -16,8 +18,9 @@ class Modal {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _createTile(
-                  context, 'Add Income', Icons.monetization_on, _addEarning),
+                  context, 'Add Recurrent Income', Icons.monetization_on, _addRecurrentIncome),
               _createTile(context, 'Add Expense', Icons.money_off, _addExpense),
+              _createTile(context, 'Add Income', Icons.money_off, _addIncome),
             ],
           );
         });
@@ -34,12 +37,21 @@ class Modal {
     );
   }
 
-  _addEarning(BuildContext context) {
+  _addRecurrentIncome(BuildContext context) {
     var route =
-        MaterialPageRoute(builder: (c) => AddEarningPage(title: "Add Income"));
+        MaterialPageRoute(builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
     Navigator.pop(context);
     Navigator.push(context, route).then((_) {
-      if (onEarningAdded != null) onEarningAdded();
+      if (onRecurrentIncomeAdded != null) onRecurrentIncomeAdded(); 
+    });
+  }
+
+  _addIncome(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
+    Navigator.pop(context);
+    Navigator.push(context, route).then((_) {
+      if (onIncomeAdded != null) onIncomeAdded();
     });
   }
 
@@ -52,4 +64,4 @@ class Modal {
       if (onExpenseAdded != null) onExpenseAdded();
     });
   }
-}
+} 

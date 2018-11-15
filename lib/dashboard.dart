@@ -1,8 +1,11 @@
+import 'package:firstflut/Income.dart';
+import 'package:firstflut/RecurrentIncome.dart';
 import 'package:firstflut/buildExpensesHistoryPage.dart';
+import 'package:firstflut/buildRecurrentIncomeHistoryPage.dart';
 import 'package:firstflut/buildIncomeHistoryPage.dart';
 import 'package:firstflut/buttonMenu.dart';
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/expense.dart';
+import 'package:firstflut/Expense.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
@@ -19,13 +22,21 @@ class _DashboardState extends State<Dashboard> {
   Modal modal;
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
+  List<Income> _incomes = new List<Income>();
+  List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
 
   @override
   initState() {
     super.initState();
     _context = new DbContext();
-    modal = new Modal(onExpenseAdded: loadExpenses);
+    modal = new Modal(
+      onExpenseAdded: loadExpenses,
+      onIncomeAdded: loadIncome,
+      onRecurrentIncomeAdded: loadRecurrentIncome
+    );
+    loadRecurrentIncome();
     loadExpenses();
+    loadIncome();
   }
 
   void loadExpenses() {
@@ -36,28 +47,49 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  List<charts.Series<LinearSales, String>> spendingsData() {
-    final data = [
-      new LinearSales('Test', 170),
-    ];
-
-    return [
-      new charts.Series<LinearSales, String>(
-        id: 'Sales',
-        domainFn: (LinearSales sales, _) => sales.type,
-        measureFn: (LinearSales sales, _) => sales.percent,
-        data: data,
-      )
-    ];
+  void loadIncome() {
+    _context.readIncome().then((list) {
+      setState(() {
+        _incomes = list;
+      });
+    });
   }
 
-  List<charts.Series<Expense, String>> spendingsDataDB() {
+  void loadRecurrentIncome() {
+    _context.readRecurrentIncome().then((list) {
+      setState(() {
+        _recurrentIncomes = list;
+      });
+    });
+  }
+
+  List<charts.Series<Expense, String>> expensesListDB() {
     return [
       new charts.Series<Expense, String>(
           id: 'Sales',
           domainFn: (Expense sales, _) => sales.name,
           measureFn: (Expense sales, _) => sales.value ?? 0,
           data: _expenses)
+    ];
+  }
+
+  List<charts.Series<Income, String>> incomesListDB() {
+    return [
+      new charts.Series<Income, String>(
+          id: 'Sales',
+          domainFn: (Income sales, _) => sales.name,
+          measureFn: (Income sales, _) => sales.value ?? 0,
+          data: _incomes)
+    ];
+  }
+
+  List<charts.Series<RecurrentIncome, String>> recurrentIncomesListDB() {
+    return [
+      new charts.Series<RecurrentIncome, String>(
+          id: 'Sales',
+          domainFn: (RecurrentIncome sales, _) => sales.name,
+          measureFn: (RecurrentIncome sales, _) => sales.value ?? 0,
+          data: _recurrentIncomes)
     ];
   }
 
@@ -71,9 +103,9 @@ class _DashboardState extends State<Dashboard> {
         child: new ListView(
           children: <Widget>[
             buildCardProgress(context),
-            buildCardSpendings(context),
-            buildCardEarnings(context),
-            buildCard(context),
+            buildCardExpenses(context),
+            buildCardRecurrentIncome(context),
+            buildCardIncome(context),
           ],
         ),
       ),
@@ -84,23 +116,29 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Padding buildCard(BuildContext context) {
+  Padding buildCardIncome(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
 
               context,
-              MaterialPageRoute(builder: (c) => buildSpendingsPage()),
+              MaterialPageRoute(
+                  builder: (c) =>
+                      BuildIncomeHistoryPage(title: "Income History")),
             ),
         child: Card(
           child: Column(children: [
-            Text("Spendings"),
+            Text("Incomes"),
             new Container(
               margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
               color: Colors.white,
               constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-              child: PieOutsideLabelChart(spendingsData()),
+              child: _incomes.length >
+                      0 //I've put here the spendings series instead of income just to show that it loads from db
+                  ? PieOutsideLabelChart(
+                      incomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
+                  : new Text("No Data"),
             ),
           ]),
         ),
@@ -108,20 +146,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget buildSpendingsPage() {
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new Text("Spendings"),
-      ),
-      body: new Center(
-        child: Text("Here you will see your transaction history"),
-      ),
-    );
-  }
-
-  Padding buildCardSpendings(BuildContext context) {
+  Padding buildCardExpenses(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
@@ -129,7 +154,7 @@ class _DashboardState extends State<Dashboard> {
             context,
             MaterialPageRoute(
                 builder: (c) =>
-                    new BuildExpensesHistoryPage(title: "Spendings history"))),
+                    new BuildExpensesHistoryPage(title: "Expenses history"))),
         child: Card(
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
@@ -142,7 +167,7 @@ class _DashboardState extends State<Dashboard> {
                 new Container(
                   child: new Column(
                     children: [
-                      new Text("Spendings:\n",
+                      new Text("Expenses:\n",
                           style: TextStyle(fontSize: 20.0)),
                       new Text(
                           "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
@@ -154,7 +179,11 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 new Expanded(
                   child: new Container(
-                    child: PieOutsideLabelChart(spendingsDataDB()),
+                    child: _expenses.length >
+                            0 //I've put here the spendings series instead of income just to show that it loads from db
+                        ? PieOutsideLabelChart(
+                            expensesListDB()) // but it seems that widget has some problems with rendering when the series is empty
+                        : new Text("...loading"),
                     constraints:
                         BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                     alignment: Alignment.centerRight,
@@ -171,14 +200,15 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Padding buildCardEarnings(BuildContext context) {
+  Padding buildCardRecurrentIncome(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (c) => BuildIncomeHistoryPage(title: "Income")),
+                  builder: (c) =>
+                      BuildRecurrentIncomeHistoryPage(title: "Income")),
             ),
         child: Card(
             child: Container(
@@ -189,10 +219,10 @@ class _DashboardState extends State<Dashboard> {
                 child: Row(
                   children: [
                     new Container(
-                      child: _expenses.length >
+                      child: _recurrentIncomes.length >
                               0 //I've put here the spendings series instead of income just to show that it loads from db
                           ? HorizontalBarLabelChart(
-                              spendingsDataDB()) // but it seems that widget has some problems with rendering when the series is empty
+                              recurrentIncomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
                           : new Text(
                               "...loading"), //so instead of rendering empty chart replace it with placeholder while data is loaded
                       constraints:

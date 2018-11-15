@@ -4,7 +4,6 @@ class Income {
   int value;
   String source;
   DateTime date;
-  bool isEnabled;
 
   Income.fromMap(Map<String, dynamic> map) {
     id = map['id'];
@@ -12,7 +11,6 @@ class Income {
     value = map['value'];
     source = map['source'];
     date = new DateTime.fromMillisecondsSinceEpoch(map['date']);
-    isEnabled = map['isEnabled'] == 1;
   }
 
   Map<String, dynamic> toMap() {
@@ -21,7 +19,6 @@ class Income {
       "value": value,
       "source": source,
       "date": date.millisecondsSinceEpoch,
-      "isEnabled": isEnabled
     };
   }
 }

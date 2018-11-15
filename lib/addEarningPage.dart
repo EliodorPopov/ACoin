@@ -88,7 +88,7 @@ class _AddEarningPageState extends State<AddEarningPage> {
       formKey.currentState.save();
 
       print(_name);
-      _context.updateIncomeTable(
+      _context.updateRecurrentIncomeTable(
           _name, int.tryParse(_value), _source, _date, true);
       _showAlert();
     }
