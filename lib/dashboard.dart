@@ -87,8 +87,9 @@ class _DashboardState extends State<Dashboard> {
   Padding buildCard(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: new InkWell(
-        onDoubleTap: () => Navigator.push(
+      child: new GestureDetector(
+        onTap: () => Navigator.push(
+
               context,
               MaterialPageRoute(builder: (c) => buildSpendingsPage()),
             ),
@@ -123,8 +124,8 @@ class _DashboardState extends State<Dashboard> {
   Padding buildCardSpendings(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: new InkWell(
-        onDoubleTap: () => Navigator.push(
+      child: new GestureDetector(
+        onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (c) =>
@@ -173,8 +174,8 @@ class _DashboardState extends State<Dashboard> {
   Padding buildCardEarnings(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: new InkWell(
-        onDoubleTap: () => Navigator.push(
+      child: new GestureDetector(
+        onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (c) => BuildIncomeHistoryPage(title: "Income")),
