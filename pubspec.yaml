@@ -1,4 +1,4 @@
-name: acoin
+name: firstflut
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -19,11 +19,18 @@ dependencies:
     
 
 
+  sqflite: any
+  charts_flutter: ^0.4.0
+  path_provider: ^0.4.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   datetime_picker_formfield: ^0.1.6
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 8b2652a213748d64e31f7b2ee7d7f26752eaad92
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -44,6 +51,10 @@ flutter:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+  
+
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
@@ -67,6 +78,10 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-  #
+  fonts:
+    - family: Pacifico
+      fonts:
+        - asset: fonts/Pacifico.ttf
+          weight: 700
   # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages

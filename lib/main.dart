@@ -1,11 +1,19 @@
+<<<<<<< HEAD
 
 import 'package:acoin/modal.dart';
 import 'package:flutter/material.dart';
 
+=======
+import 'package:firstflut/dashboard.dart';
+import 'package:flutter/material.dart';
+
+//import 'buildExpensesPage.dart';
+>>>>>>> 8b2652a213748d64e31f7b2ee7d7f26752eaad92
 
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
+<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -53,6 +61,19 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () =>  modal.mainBottomSheet(context),
         child: new Icon(Icons.add),
       ),
+=======
+  // This widget is the root of your application.
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Eliodor',
+      theme: new ThemeData(
+        primarySwatch: Colors.indigo,
+        //fontFamily: 'Pacifico',
+      ),
+      home: new Dashboard(title: 'Dashboard'),
+>>>>>>> 8b2652a213748d64e31f7b2ee7d7f26752eaad92
     );
   }
 }
