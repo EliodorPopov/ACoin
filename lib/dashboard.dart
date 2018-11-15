@@ -89,6 +89,7 @@ class _DashboardState extends State<Dashboard> {
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
+
               context,
               MaterialPageRoute(builder: (c) => buildSpendingsPage()),
             ),

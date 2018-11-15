@@ -33,6 +33,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               TextFormField(
                 decoration: InputDecoration(labelText: 'Name:'),
                 onSaved: (input) => _name = input,
+
                 validator: (input) {
                   if(input.length == 0){return 'Adaugati Valoare';}
                   else{
