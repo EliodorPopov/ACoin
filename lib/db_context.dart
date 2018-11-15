@@ -1,5 +1,6 @@
 import 'package:firstflut/RecurrentIncome.dart';
 import 'package:firstflut/Expense.dart';
+import 'package:firstflut/Income.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -28,6 +29,7 @@ class DbContext {
 
   final String recurrentIncomeTable = "RecurrentIncomeTable";
   final String expensesTable = "ExpensesTable";
+  final String incomeTable = "IncomeTable";
 
   Future<void> onCreate(Database db, int version) async {
     await db.execute('''
@@ -36,6 +38,10 @@ class DbContext {
 
     await db.execute('''
         CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER)
+      ''');
+
+    await db.execute('''
+        CREATE TABLE $incomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER)
       ''');
 
     await db.insert(recurrentIncomeTable, {
@@ -53,17 +59,8 @@ class DbContext {
     });
   }
 
-  Future<void> updateTable() async {
-    var database = await db;
-    await database.insert(expensesTable, {
-      "name": "entertainment3",
-      "value": 3000,
-      "date": DateTime.now().millisecondsSinceEpoch,
-    });
-    print("actioned");
-  }
 
-  Future<void> updateTableRaw(String name, int value, DateTime date) async {
+  Future<void> updateExpenseTable(String name, int value, DateTime date) async {
     var database = await db;
     await database.insert(expensesTable, {
       "name": name,
@@ -72,7 +69,8 @@ class DbContext {
     });
   }
 
-  Future<void> updateIncomeTable(String name, int value, String source, DateTime date, bool isEnabled) async {
+  Future<void> updateRecurrentIncomeTable(String name, int value, String source,
+      DateTime date, bool isEnabled) async {
     var database = await db;
     await database.insert(recurrentIncomeTable, {
       "name": name,
@@ -83,11 +81,23 @@ class DbContext {
     });
   }
 
-  Future<List<RecurrentIncome>> read() async {
+  Future<void> updateIncomeTable(String name, int value, String source,
+      DateTime date) async {
     var database = await db;
-    var incomes = await database.query(recurrentIncomeTable);
-    return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
+    await database.insert(incomeTable, {
+      "name": name,
+      "value": value,
+      "source": source,
+      "date": date.millisecondsSinceEpoch,
+    });
   }
+
+  Future<List<RecurrentIncome>> readRecurrentIncome() async {
+    var database = await db;
+    var recurrentIncomes = await database.query(recurrentIncomeTable);
+    return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
+  }
+
 
   Future<List<Expense>> readExpense() async {
     var database = await db;
@@ -95,10 +105,10 @@ class DbContext {
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<RecurrentIncome>> readIncome() async {
+  Future<List<Income>> readIncome() async { 
     var database = await db;
-    var incomes = await database.query(recurrentIncomeTable);
-    return incomes.map((m) => RecurrentIncome.fromMap(m)).toList();
+    var incomes = await database.query(incomeTable);
+    return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
   Future<dynamic> toggle(RecurrentIncome income) async {
@@ -106,5 +116,4 @@ class DbContext {
     await database.update(recurrentIncomeTable, income.toMap(),
         where: 'id = ?', whereArgs: [income.id]);
   }
-  
 }

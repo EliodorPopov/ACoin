@@ -72,7 +72,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
       formKey.currentState.save();
 
       print(_name);
-      _context.updateTableRaw(_name, int.tryParse(_value), _date);
+      _context.updateExpenseTable(_name, int.tryParse(_value), _date);
       _showAlert();
     }
   }

@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class AddEarningPage extends StatefulWidget {
-  AddEarningPage({Key key, this.title}) : super(key: key);
+class AddIncomePage extends StatefulWidget {
+  AddIncomePage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _AddEarningPageState createState() => new _AddEarningPageState();
+  _AddIncomePageState createState() => new _AddIncomePageState();
 }
 
-class _AddEarningPageState extends State<AddEarningPage> {
+class _AddIncomePageState extends State<AddIncomePage> {
   final formKey = GlobalKey<FormState>();
   String _name, _source, _value;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
@@ -78,8 +78,8 @@ class _AddEarningPageState extends State<AddEarningPage> {
       formKey.currentState.save();
 
       print(_name);
-      _context.updateRecurrentIncomeTable(
-          _name, int.tryParse(_value), _source, _date, true);
+      _context.updateIncomeTable(
+          _name, int.tryParse(_value), _source, _date);
       _showAlert();
     }
   }
