@@ -33,7 +33,18 @@ class _AddExpensePageState extends State<AddExpensePage> {
               TextFormField(
                 decoration: InputDecoration(labelText: 'Name:'),
                 onSaved: (input) => _name = input,
-                validator: (input) => input.isEmpty ? 'enter value' : null,
+
+                validator: (input) {
+                  if(input.length == 0){return 'Adaugati Valoare';}
+                  else{
+                  var check = true;
+                  for(int i=0;i<input.length;i++){
+                    if((input[i]=='0') || (input[i]=='1') || (input[i]=='2')|| (input[i]=='3')|| (input[i]=='4')|| (input[i]=='5')|| (input[i]=='6')|| (input[i]=='7')|| (input[i]=='8')|| (input[i]=='9'))
+                    {check = false;}
+                  }
+                  if(!check) {return 'Numele nu poate contine cifre...';}
+                  }
+                }
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Value:'),
