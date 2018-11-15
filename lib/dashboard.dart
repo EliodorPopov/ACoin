@@ -34,7 +34,7 @@ class _DashboardState extends State<Dashboard> {
       onIncomeAdded: loadIncome,
       onRecurrentIncomeAdded: loadRecurrentIncome
     );
-    loadExpenses();
+    loadRecurrentIncome();
     loadExpenses();
     loadIncome();
   }
