@@ -2,9 +2,6 @@
 
 A new Flutter Amdaris-UTM Project.
 
-<<<<<<< HEAD
-# Andrew is here!
-=======
 # Arhitecura bazei de date:
 
 ## Tabelul Expenses:
@@ -27,4 +24,3 @@ A new Flutter Amdaris-UTM Project.
 |-----------------|---------------------|---------------------------|-----------------|-------------------|
 | Id of the tuple | Name of the expense | Value of the expense(MDL) | source of the income | date       |
 
->>>>>>> 8b2652a213748d64e31f7b2ee7d7f26752eaad92

@@ -26,11 +26,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   datetime_picker_formfield: ^0.1.6
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> 8b2652a213748d64e31f7b2ee7d7f26752eaad92
+  splashscreen: ^1.1.0
+  flutter_speed_dial:
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
