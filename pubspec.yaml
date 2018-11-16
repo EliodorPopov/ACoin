@@ -17,6 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
     
+   
 
 
   sqflite: any
@@ -27,6 +28,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   datetime_picker_formfield: ^0.1.6
   splashscreen: ^1.1.0
+  
   flutter_speed_dial:
     
 dev_dependencies:
@@ -39,6 +41,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -46,10 +49,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
-  
+  assets:
+    - graphics/
+     
 
 
 
