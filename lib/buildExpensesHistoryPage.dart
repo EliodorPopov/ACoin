@@ -40,7 +40,7 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
           children: _expenses.map((i) {
             return ListTile(
               title: Text(
-                i.name,
+                i.name + " ["+ i.category + "]",
                 textScaleFactor: 3.0,
               ),
               subtitle: Text(

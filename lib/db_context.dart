@@ -37,7 +37,7 @@ class DbContext {
         ''');
 
     await db.execute('''
-        CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER)
+        CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER, category TEXT)
       ''');
 
     await db.execute('''
@@ -56,16 +56,18 @@ class DbContext {
       "name": "drinks",
       "value": 1000,
       "date": DateTime.now().millisecondsSinceEpoch,
+      "category": "personal",
     });
   }
 
 
-  Future<void> updateExpenseTable(String name, int value, DateTime date) async {
+  Future<void> updateExpenseTable(String name, int value, DateTime date, String category) async {
     var database = await db;
     await database.insert(expensesTable, {
       "name": name,
       "value": value,
       "date": date.millisecondsSinceEpoch,
+      "category": category,
     });
   }
 

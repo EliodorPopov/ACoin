@@ -121,7 +121,6 @@ class _DashboardState extends State<Dashboard> {
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
-
               context,
               MaterialPageRoute(
                   builder: (c) =>
@@ -291,14 +290,6 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
-}
-
-/// Sample linear data type.
-class LinearSales {
-  final String type;
-  final int percent;
-
-  LinearSales(this.type, this.percent);
 }
 
 class PieOutsideLabelChart extends StatelessWidget {
