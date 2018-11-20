@@ -37,7 +37,7 @@ class DbContext {
         ''');
 
     await db.execute('''
-        CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER)
+        CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER, category TEXT)
       ''');
 
     await db.execute('''
@@ -52,20 +52,30 @@ class DbContext {
       "isEnabled": true
     });
 
+    await db.insert(incomeTable, {
+      "name": "initial",
+      "value": 1000,
+      "source": "source",
+      "date": DateTime.now().millisecondsSinceEpoch,
+    });
+
+
     await db.insert(expensesTable, {
       "name": "drinks",
       "value": 1000,
       "date": DateTime.now().millisecondsSinceEpoch,
+      "category": "personal",
     });
   }
 
-
-  Future<void> updateExpenseTable(String name, int value, DateTime date) async {
+  Future<void> updateExpenseTable(
+      String name, int value, DateTime date, String category) async {
     var database = await db;
     await database.insert(expensesTable, {
       "name": name,
       "value": value,
       "date": date.millisecondsSinceEpoch,
+      "category": category,
     });
   }
 
@@ -81,8 +91,8 @@ class DbContext {
     });
   }
 
-  Future<void> updateIncomeTable(String name, int value, String source,
-      DateTime date) async {
+  Future<void> updateIncomeTable(
+      String name, int value, String source, DateTime date) async {
     var database = await db;
     await database.insert(incomeTable, {
       "name": name,
@@ -98,14 +108,13 @@ class DbContext {
     return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
 
-
   Future<List<Expense>> readExpense() async {
     var database = await db;
     var expenses = await database.query(expensesTable);
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<Income>> readIncome() async { 
+  Future<List<Income>> readIncome() async {
     var database = await db;
     var incomes = await database.query(incomeTable);
     return incomes.map((m) => Income.fromMap(m)).toList();
@@ -115,5 +124,28 @@ class DbContext {
     var database = await db;
     await database.update(recurrentIncomeTable, income.toMap(),
         where: 'id = ?', whereArgs: [income.id]);
+  }
+
+  Future<void> editExpense(
+      int id, String name, int value, DateTime date, String category) async {
+    var database = await db;
+    int date2 = date.millisecondsSinceEpoch;
+    await database.execute('''
+      update $expensesTable 
+      set name = '$name',
+          value = $value,
+          date = $date2,
+          category = '$category'
+      where id = $id
+
+    ''');
+  }
+
+  Future<void> deleteExpense(int id)async{
+    var database = await db;
+    await database.execute('''
+      delete from $expensesTable
+      where id = $id
+    ''');
   }
 }

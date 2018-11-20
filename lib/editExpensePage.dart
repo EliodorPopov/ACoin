@@ -5,15 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class AddExpensePage extends StatefulWidget {
-  AddExpensePage({Key key, this.title}) : super(key: key);
+class EditExpensePage extends StatefulWidget {
+  EditExpensePage(
+      {Key key,
+      this.title,
+      this.dbId,
+      this.dbName,
+      this.dbValue,
+      this.dbDate,
+      this.dbCategory})
+      : super(key: key);
+  final int dbId, dbValue;
+  final String dbName, dbCategory;
+  final DateTime dbDate;
   final String title;
 
   @override
-  _AddExpensePageState createState() => new _AddExpensePageState();
+  _EditExpensePageState createState() => new _EditExpensePageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class _EditExpensePageState extends State<EditExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
   String _name, _value, _category, _newCategory;
@@ -28,9 +39,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
   @override
   initState() {
     super.initState();
-    bool isTrue = true;
+    bool isTrue =true;
     _context = new DbContext();
-    _context.readExpense().then((list) {
+     _context.readExpense().then((list) {
       setState(() {
         _expenses = list;
         _expenses.forEach((e) {
@@ -59,6 +70,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
             children: <Widget>[
               TextFormField(
                   decoration: InputDecoration(labelText: 'Name:'),
+                  initialValue: widget.dbName,
                   onSaved: (input) => _name = input,
                   validator: (input) {
                     if (input.length == 0) {
@@ -96,7 +108,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     //isEmpty: _color == '',
                     child: new DropdownButtonHideUnderline(
                       child: new DropdownButton<String>(
-                        value: _category,
+                        value: widget.dbCategory,
+
                         isDense: true,
                         onChanged: (e) {
                           if (e == "Add Category") {
@@ -123,6 +136,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 },
               ),
               TextFormField(
+                initialValue: widget.dbValue.toString(),
                 decoration: InputDecoration(labelText: 'Value:'),
                 onSaved: (input) => _value = input,
                 keyboardType: TextInputType.number,
@@ -130,7 +144,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               ),
               DateTimePickerFormField(
                 format: dateFormat,
-                initialValue: _date,
+                initialValue: widget.dbDate,
                 editable: false,
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
@@ -144,13 +158,21 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       onPressed: _submit,
                       child: Text('Submit'),
                     ),
-                  )
+                  ),
+                  
                 ],
               ),
             ],
           ),
         ),
       ),
+      floatingActionButton: new FloatingActionButton(
+        child: Icon(Icons.delete_sweep),
+        backgroundColor: Colors.red,
+        onPressed: _submitDelete,
+        
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat ,
     );
   }
 
@@ -159,12 +181,56 @@ class _AddExpensePageState extends State<AddExpensePage> {
       formKey.currentState.save();
 
       print(_name);
-      _context.updateExpenseTable(
-          _name, int.tryParse(_value), _date, _category);
+      _context.editExpense(
+          widget.dbId, _name, int.tryParse(_value), _date, _category);
+      // _context.updateExpenseTable(
+      //     _name, int.tryParse(_value), _date, _category);
       _showAlert();
     }
   }
 
+  void _submitDelete(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Are you sure you want to delete ?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: new Text('No!')),
+                  new FlatButton(
+                   onPressed: () {
+                     _context.deleteExpense(widget.dbId);
+                    _deletedConfirm();
+                    
+                  },
+                  child: new Text('Yes!')), 
+                  
+            ],
+          );
+        });
+  }
+  void _deletedConfirm(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text("Deleted!"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  child: new Text('OK!'))
+            ],
+          );
+        });
+  }
   void _showAlert() {
     showDialog(
         context: context,
@@ -190,9 +256,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           return AlertDialog(
             title: Text("Add Category"),
             contentPadding: EdgeInsets.all(10.0),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            content: Column(mainAxisSize: MainAxisSize.min, children: [
               Form(
                 key: formKey2,
                 child: TextFormField(
