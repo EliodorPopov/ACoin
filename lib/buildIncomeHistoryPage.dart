@@ -1,5 +1,4 @@
 import 'package:firstflut/Income.dart';
-import 'package:firstflut/RecurrentIncome.dart';
 import 'package:firstflut/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -1,13 +1,18 @@
 import 'package:firstflut/Income.dart';
 import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/addEarningPage.dart';
+import 'package:firstflut/addExpensePage.dart';
+import 'package:firstflut/addIncomePage.dart';
 import 'package:firstflut/buildExpensesHistoryPage.dart';
 import 'package:firstflut/buildRecurrentIncomeHistoryPage.dart';
 import 'package:firstflut/buildIncomeHistoryPage.dart';
-import 'package:firstflut/buttonMenu.dart';
+//  import 'package:firstflut/buttonMenu.dart';
 import 'package:firstflut/db_context.dart';
 import 'package:firstflut/Expense.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/rendering.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -18,7 +23,9 @@ class Dashboard extends StatefulWidget {
   _DashboardState createState() => new _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+  ScrollController _scrollController;
+  bool _dialVisible = true;
   Modal modal;
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
@@ -27,6 +34,34 @@ class _DashboardState extends State<Dashboard> {
   int currentBalance;
   int totalIncomes;
   int totalExpenses;
+
+  _addRecurrentIncome(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
+    Navigator.pop(context);
+    Navigator.push(context, route).then((_) {
+      if (modal.onRecurrentIncomeAdded != null) modal.onRecurrentIncomeAdded(); 
+    });
+  }
+
+  _addIncome(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
+    Navigator.pop(context);
+    Navigator.push(context, route).then((_) {
+      if (modal.onIncomeAdded != null) modal.onIncomeAdded();
+    });
+  }
+
+  _addExpense(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddExpensePage(title: "Add Expense"));
+
+    Navigator.pop(context);
+    Navigator.push(context, route).then((_) {
+      if (modal.onExpenseAdded != null) modal.onExpenseAdded();
+    });
+  }
 
   @override
   initState() {
@@ -40,6 +75,10 @@ class _DashboardState extends State<Dashboard> {
     loadExpenses();
     loadIncome();
     calculateBalance();
+     _scrollController = ScrollController()
+      ..addListener(() {
+        _setDialVisible(_scrollController.position.userScrollDirection == ScrollDirection.forward);
+      });
   }
 
   void calculateBalance() {
@@ -59,6 +98,52 @@ class _DashboardState extends State<Dashboard> {
     });
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
+  }
+    
+  
+
+  _setDialVisible(bool value) {
+    setState(() {
+      _dialVisible = value;
+    });
+  }
+ 
+  _renderSpeedDial() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      // child: Icon(Icons.add),
+      onOpen: () => print('OPENING DIAL'),
+      onClose: () => print('DIAL CLOSED'),
+      visible: _dialVisible,
+      curve: Curves.bounceIn,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.monetization_on, color: Colors.white),
+          backgroundColor: Colors.greenAccent,
+          onTap: () => _addRecurrentIncome(context),
+          label: 'Add Recurrent Income',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.greenAccent,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.account_balance_wallet, color: Colors.white),
+          backgroundColor: Colors.green,
+          onTap: () => _addIncome(context),
+          label: 'Add Income',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.greenAccent,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.money_off, color: Colors.white),
+          backgroundColor: Colors.red,
+          onTap: () => _addExpense(context),
+          label: 'Add Expense',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.redAccent,
+        ),
+      ],
+    );
   }
 
   void loadExpenses() {
@@ -131,13 +216,7 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () {
-          modal.mainBottomSheet(context);
-          calculateBalance();
-        },
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: _renderSpeedDial(), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -360,3 +439,10 @@ class HorizontalBarLabelChart extends StatelessWidget {
     );
   }
 }
+
+class Modal {
+  VoidCallback onRecurrentIncomeAdded;
+  VoidCallback onExpenseAdded;
+  VoidCallback onIncomeAdded;
+
+  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});}
