@@ -24,19 +24,41 @@ class _DashboardState extends State<Dashboard> {
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
+  int currentBalance;
+  int totalIncomes;
+  int totalExpenses;
 
   @override
   initState() {
     super.initState();
     _context = new DbContext();
     modal = new Modal(
-      onExpenseAdded: loadExpenses,
-      onIncomeAdded: loadIncome,
-      onRecurrentIncomeAdded: loadRecurrentIncome
-    );
+        onExpenseAdded: loadExpenses,
+        onIncomeAdded: loadIncome,
+        onRecurrentIncomeAdded: loadRecurrentIncome);
     loadRecurrentIncome();
     loadExpenses();
     loadIncome();
+    calculateBalance();
+  }
+
+  void calculateBalance() {
+    currentBalance = 0;
+    totalExpenses = 0;
+    totalIncomes = 0;
+    _expenses.forEach((e) {
+      totalExpenses += e.value;
+    });
+    _incomes.forEach((e) {
+      totalIncomes += e.value;
+    });
+    _recurrentIncomes.forEach((e) {
+      if (e.isEnabled) {
+        totalIncomes += e.value;
+      }
+    });
+    currentBalance = totalIncomes - totalExpenses;
+    print(currentBalance);
   }
 
   void loadExpenses() {
@@ -110,7 +132,10 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () => modal.mainBottomSheet(context),
+        onPressed: () {
+          modal.mainBottomSheet(context);
+          calculateBalance();
+        },
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -166,8 +191,7 @@ class _DashboardState extends State<Dashboard> {
                 new Container(
                   child: new Column(
                     children: [
-                      new Text("Expenses:\n",
-                          style: TextStyle(fontSize: 20.0)),
+                      new Text("Expenses:\n", style: TextStyle(fontSize: 20.0)),
                       new Text(
                           "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
                     ],
@@ -250,42 +274,47 @@ class _DashboardState extends State<Dashboard> {
   Padding buildCardProgress(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: new Card(
-        child: new Container(
-          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-          color: Colors.white,
-          constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
-          alignment: Alignment.centerLeft,
-          child: new Column(children: [
-            new Text(
-              "How much you spent this month:\n",
-            ),
-            new Container(
-              child: new LinearProgressIndicator(
-                value: 0.6,
-                backgroundColor: Colors.amber,
-                valueColor: null,
+      child: new GestureDetector(
+        onTap: ()=> initState(),
+        child: Card(
+          child: new Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
+            alignment: Alignment.centerLeft,
+            child: new Column(children: [
+              new Text(
+                "How much you spent this month:\n",
               ),
-              padding: EdgeInsets.all(5.0),
-            ),
-            new Row(
-              children: [
-                new Expanded(
-                  child: new Container(
-                    child: Text("1400 lei"),
-                    padding: EdgeInsets.all(5.0),
-                  ),
+              new Container(
+                child: new LinearProgressIndicator(
+                  value: totalIncomes > totalExpenses
+                      ? totalExpenses / totalIncomes
+                      : 1.0,
+                  backgroundColor: Colors.amber,
+                  valueColor: null,
                 ),
-                new Expanded(
-                  child: new Container(
-                    child: Text("2000 lei"),
-                    padding: EdgeInsets.all(5.0),
-                    alignment: Alignment.centerRight,
+                padding: EdgeInsets.all(5.0),
+              ),
+              new Row(
+                children: [
+                  new Expanded(
+                    child: new Container(
+                      child: Text(totalExpenses.toString()),
+                      padding: EdgeInsets.all(5.0),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ]),
+                  new Expanded(
+                    child: new Container(
+                      child: Text(totalIncomes.toString()),
+                      padding: EdgeInsets.all(5.0),
+                      alignment: Alignment.centerRight,
+                    ),
+                  ),
+                ],
+              ),
+            ]),
+          ),
         ),
       ),
     );
