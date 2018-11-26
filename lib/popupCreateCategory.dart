@@ -1,4 +1,3 @@
-import 'package:firstflut/db_context.dart';
 import 'package:flutter/material.dart';
 
 class PopupCreateCategory {
@@ -57,6 +56,9 @@ class PopupCreateCategory {
       },
     );
 
-    if (_addedCategory != "") return  _addedCategory; else return "nothing";
+    if (_addedCategory != "")
+      return _addedCategory;
+    else
+      return "nothing";
   }
 }

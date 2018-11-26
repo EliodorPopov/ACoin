@@ -3,6 +3,7 @@ import 'package:firstflut/addExpensePage.dart';
 import 'package:firstflut/addIncomePage.dart';
 import 'package:flutter/material.dart';
 
+// TODO Is this still used? remove perhaps
 class Modal {
   VoidCallback onRecurrentIncomeAdded;
   VoidCallback onExpenseAdded;

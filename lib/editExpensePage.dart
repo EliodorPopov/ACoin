@@ -1,10 +1,11 @@
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:firstflut/db_context.dart';
-//import 'package:firstflut/popupCreateCategory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
+// TODO lots of code repetition, try to merge add page and edit page, or at least parts of it
 class EditExpensePage extends StatefulWidget {
   EditExpensePage(
       {Key key,
@@ -39,13 +40,13 @@ class _EditExpensePageState extends State<EditExpensePage> {
   @override
   initState() {
     super.initState();
-    bool isTrue =true;
+    bool isTrue = true;
     _context = new DbContext();
-     _context.readExpense().then((list) {
+    _context.readExpense().then((list) {
       setState(() {
         _expenses = list;
         _expenses.forEach((e) {
-          _categories.forEach((f){
+          _categories.forEach((f) {
             if (f == e.category) isTrue = false;
           });
           if (isTrue) _categories.add(e.category);
@@ -78,6 +79,10 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     } else {
                       var check = true;
                       for (int i = 0; i < input.length; i++) {
+                        // TODO needs rework, try using, change all the places with similar code
+                        // inputFormatters: [
+                        //   WhitelistingTextInputFormatter(RegExp("[a-zA-Z]")),
+                        // ]
                         if ((input[i] == '0') ||
                             (input[i] == '1') ||
                             (input[i] == '2') ||
@@ -109,7 +114,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     child: new DropdownButtonHideUnderline(
                       child: new DropdownButton<String>(
                         value: widget.dbCategory,
-
                         isDense: true,
                         onChanged: (e) {
                           if (e == "Add Category") {
@@ -159,7 +163,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                       child: Text('Submit'),
                     ),
                   ),
-                  
                 ],
               ),
             ],
@@ -170,9 +173,8 @@ class _EditExpensePageState extends State<EditExpensePage> {
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
         onPressed: _submitDelete,
-        
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat ,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -189,7 +191,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
     }
   }
 
-  void _submitDelete(){
+  void _submitDelete() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -201,19 +203,18 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     Navigator.pop(context);
                   },
                   child: new Text('No!')),
-                  new FlatButton(
-                   onPressed: () {
-                     _context.deleteExpense(widget.dbId);
+              new FlatButton(
+                  onPressed: () {
+                    _context.deleteExpense(widget.dbId);
                     _deletedConfirm();
-                    
                   },
-                  child: new Text('Yes!')), 
-                  
+                  child: new Text('Yes!')),
             ],
           );
         });
   }
-  void _deletedConfirm(){
+
+  void _deletedConfirm() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -231,6 +232,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
           );
         });
   }
+
   void _showAlert() {
     showDialog(
         context: context,

@@ -32,20 +32,32 @@ class _AddEarningPageState extends State<AddEarningPage> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name:'),
-                onSaved: (input) => _name = input,
-                validator: (input) {
-                  if(input.length == 0){return 'Adaugati Valoare';}
-                  else{
-                  var check = true;
-                  for(int i=0;i<input.length;i++){
-                    if((input[i]=='0') || (input[i]=='1') || (input[i]=='2')|| (input[i]=='3')|| (input[i]=='4')|| (input[i]=='5')|| (input[i]=='6')|| (input[i]=='7')|| (input[i]=='8')|| (input[i]=='9'))
-                    {check = false;}
-                  }
-                  if(!check) {return 'Numele nu poate contine cifre...';}
-                  }
-                }
-              ),
+                  decoration: InputDecoration(labelText: 'Name:'),
+                  onSaved: (input) => _name = input,
+                  validator: (input) {
+                    if (input.length == 0) {
+                      return 'Adaugati Valoare';
+                    } else {
+                      var check = true;
+                      for (int i = 0; i < input.length; i++) {
+                        if ((input[i] == '0') ||
+                            (input[i] == '1') ||
+                            (input[i] == '2') ||
+                            (input[i] == '3') ||
+                            (input[i] == '4') ||
+                            (input[i] == '5') ||
+                            (input[i] == '6') ||
+                            (input[i] == '7') ||
+                            (input[i] == '8') ||
+                            (input[i] == '9')) {
+                          check = false;
+                        }
+                      }
+                      if (!check) {
+                        return 'Numele nu poate contine cifre...';
+                      }
+                    }
+                  }),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Value: (MDL)'),
                 onSaved: (input) => _value = input,
@@ -87,28 +99,10 @@ class _AddEarningPageState extends State<AddEarningPage> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
 
-      print(_name);
       _context.updateRecurrentIncomeTable(
           _name, int.tryParse(_value), _source, _date, true);
-      _showAlert();
-    }
-  }
 
-  void _showAlert() {
-    showDialog(
-        context: this.context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text("Information submitted!"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: new Text('OK!'))
-            ],
-          );
-        });
+      Navigator.pop(context, true);
+    }
   }
 }
