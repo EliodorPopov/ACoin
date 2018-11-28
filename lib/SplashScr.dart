@@ -10,7 +10,7 @@ class _SplashScrState extends State<SplashScr> {
   @override
   Widget build(BuildContext context) {
     return new SplashScreen(
-      seconds: 5,
+      seconds: 2,
       navigateAfterSeconds: new MyApp(),
       title: new Text('Welcome to ACoin',
       style: new TextStyle(
@@ -18,7 +18,7 @@ class _SplashScrState extends State<SplashScr> {
         fontSize: 30.0,
         color: Colors.white
       ),),
-      image: new Image.network('https://i.imgur.com/0vfdi3O.png'),
+      image:  new Image( image: AssetImage('graphics/AcoinLogo.png')),
       backgroundColor: Colors.indigo,
       styleTextUnderTheLoader: new TextStyle(),
       photoSize: 100.0,
