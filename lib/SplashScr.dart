@@ -1,6 +1,7 @@
 import 'package:firstflut/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
+
 class SplashScr extends StatefulWidget {
   @override
   _SplashScrState createState() => new _SplashScrState();
@@ -18,7 +19,7 @@ class _SplashScrState extends State<SplashScr> {
         fontSize: 30.0,
         color: Colors.white
       ),),
-      image: new Image.network('https://i.imgur.com/0vfdi3O.png'),
+      image: new Image.asset('images/wallet.png'),
       backgroundColor: Colors.indigo,
       styleTextUnderTheLoader: new TextStyle(),
       photoSize: 100.0,

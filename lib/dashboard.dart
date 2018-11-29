@@ -36,11 +36,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int totalExpenses;
 
   _addRecurrentIncome(BuildContext context) {
-    var route =
-        MaterialPageRoute(builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
+    var route = MaterialPageRoute(
+        builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
     Navigator.pop(context);
     Navigator.push(context, route).then((_) {
-      if (modal.onRecurrentIncomeAdded != null) modal.onRecurrentIncomeAdded(); 
+      if (modal.onRecurrentIncomeAdded != null) modal.onRecurrentIncomeAdded();
+
     });
   }
 
@@ -50,6 +51,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     Navigator.pop(context);
     Navigator.push(context, route).then((_) {
       if (modal.onIncomeAdded != null) modal.onIncomeAdded();
+      setState(() {
+              
+            });
     });
   }
 
@@ -75,9 +79,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     loadExpenses();
     loadIncome();
     calculateBalance();
-     _scrollController = ScrollController()
+    _scrollController = ScrollController()
       ..addListener(() {
-        _setDialVisible(_scrollController.position.userScrollDirection == ScrollDirection.forward);
+        _setDialVisible(_scrollController.position.userScrollDirection ==
+            ScrollDirection.forward);
       });
   }
 
@@ -99,22 +104,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
   }
-    
-  
 
   _setDialVisible(bool value) {
     setState(() {
       _dialVisible = value;
     });
   }
- 
+
   _renderSpeedDial() {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22.0),
       // child: Icon(Icons.add),
       onOpen: () => print('OPENING DIAL'),
-      onClose: () => print('DIAL CLOSED'),
+      onClose: () {
+        print('DIAL CLOSED');
+        calculateBalance();
+      },
       visible: _dialVisible,
       curve: Curves.bounceIn,
       children: [
@@ -216,7 +222,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           ],
         ),
       ),
-      floatingActionButton: _renderSpeedDial(), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton:
+          _renderSpeedDial(), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -354,7 +361,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
-        onTap: ()=> initState(),
+        onTap: () => initState(),
         child: Card(
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
@@ -445,4 +452,5 @@ class Modal {
   VoidCallback onExpenseAdded;
   VoidCallback onIncomeAdded;
 
-  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});}
+  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});
+}

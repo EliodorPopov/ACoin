@@ -282,7 +282,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     _category = _newCategory;
                     _newCategory = null;
                     Navigator.pop(context);
-                    setState(() {});
                     //return _addedCategory;
                     //Navigator.pop(context);
                     //return _addedCategory;
