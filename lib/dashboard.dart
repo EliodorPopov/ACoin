@@ -1,13 +1,18 @@
-import 'package:firstflut/Income.dart';
-import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/income.dart';
+import 'package:firstflut/recurrentIncome.dart';
+import 'package:firstflut/addEarningPage.dart';
+import 'package:firstflut/addExpensePage.dart';
+import 'package:firstflut/addIncomePage.dart';
 import 'package:firstflut/buildExpensesHistoryPage.dart';
 import 'package:firstflut/buildRecurrentIncomeHistoryPage.dart';
 import 'package:firstflut/buildIncomeHistoryPage.dart';
-import 'package:firstflut/buttonMenu.dart';
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flushbar/flushbar.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -18,25 +23,145 @@ class Dashboard extends StatefulWidget {
   _DashboardState createState() => new _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
-  Modal modal;
+class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+  ScrollController _scrollController;
+  bool _dialVisible = true;
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
+  int currentBalance;
+  int totalIncomes;
+  int totalExpenses;
+
+  void _showSuccessSnackBar() {
+    Flushbar(flushbarPosition: FlushbarPosition.TOP)
+      ..message = 'Information submitted!'
+      ..icon = Icon(
+        Icons.done,
+        size: 28.0,
+        color: Colors.green,
+      )
+      ..duration = Duration(seconds: 2)
+      ..leftBarIndicatorColor = Colors.green
+      ..show(context);
+  }
+
+  _addRecurrentIncome(BuildContext context) {
+    var route = MaterialPageRoute<bool>(
+        builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
+
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful == true) {
+        loadRecurrentIncome();
+        _showSuccessSnackBar();
+      }
+    });
+  }
+
+  _addIncome(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
+
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful == true) {
+        loadIncome();
+        _showSuccessSnackBar();
+      }
+    });
+  }
+
+  _addExpense(BuildContext context) {
+    var route =
+        MaterialPageRoute(builder: (c) => AddExpensePage(title: "Add Expense"));
+
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful == true) {
+        loadExpenses();
+        _showSuccessSnackBar();
+      }
+    });
+  }
 
   @override
   initState() {
     super.initState();
+
     _context = new DbContext();
-    modal = new Modal(
-      onExpenseAdded: loadExpenses,
-      onIncomeAdded: loadIncome,
-      onRecurrentIncomeAdded: loadRecurrentIncome
-    );
+
     loadRecurrentIncome();
     loadExpenses();
     loadIncome();
+    calculateBalance();
+
+    _scrollController = ScrollController()
+      ..addListener(() {
+        _setDialVisible(_scrollController.position.userScrollDirection ==
+            ScrollDirection.forward);
+      });
+  }
+
+  void calculateBalance() {
+    currentBalance = 0;
+    totalExpenses = 0;
+    totalIncomes = 0;
+    _expenses.forEach((e) {
+      totalExpenses += e.value;
+    });
+    _incomes.forEach((e) {
+      totalIncomes += e.value;
+    });
+    _recurrentIncomes.forEach((e) {
+      if (e.isEnabled) {
+        totalIncomes += e.value;
+      }
+    });
+    currentBalance = totalIncomes - totalExpenses;
+    print(currentBalance);
+  }
+
+  _setDialVisible(bool value) {
+    setState(() {
+      _dialVisible = value;
+    });
+  }
+
+  _renderSpeedDial() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      // child: Icon(Icons.add),
+      onOpen: () => print('OPENING DIAL'),
+      onClose: () => print('DIAL CLOSED'),
+      visible: _dialVisible,
+      curve: Curves.bounceIn,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.monetization_on, color: Colors.white),
+          backgroundColor: Colors.greenAccent,
+          onTap: () => _addRecurrentIncome(context),
+          label: 'Add Recurrent Income',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.greenAccent,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.account_balance_wallet, color: Colors.white),
+          backgroundColor: Colors.green,
+          onTap: () => _addIncome(context),
+          label: 'Add Income',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.green,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.money_off, color: Colors.white),
+          backgroundColor: Colors.red,
+          onTap: () => _addExpense(context),
+          label: 'Add Expense',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.redAccent,
+        ),
+      ],
+    );
   }
 
   void loadExpenses() {
@@ -109,10 +234,8 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () => modal.mainBottomSheet(context),
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton:
+          _renderSpeedDial(), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -121,7 +244,6 @@ class _DashboardState extends State<Dashboard> {
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
-
               context,
               MaterialPageRoute(
                   builder: (c) =>
@@ -134,8 +256,7 @@ class _DashboardState extends State<Dashboard> {
               margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
               color: Colors.white,
               constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-              child: _incomes.length >
-                      0 //I've put here the spendings series instead of income just to show that it loads from db
+              child: _incomes.length > 0
                   ? PieOutsideLabelChart(
                       incomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
                   : new Text("No Data"),
@@ -167,8 +288,7 @@ class _DashboardState extends State<Dashboard> {
                 new Container(
                   child: new Column(
                     children: [
-                      new Text("Expenses:\n",
-                          style: TextStyle(fontSize: 20.0)),
+                      new Text("Expenses:\n", style: TextStyle(fontSize: 20.0)),
                       new Text(
                           "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
                     ],
@@ -251,54 +371,51 @@ class _DashboardState extends State<Dashboard> {
   Padding buildCardProgress(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: new Card(
-        child: new Container(
-          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-          color: Colors.white,
-          constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
-          alignment: Alignment.centerLeft,
-          child: new Column(children: [
-            new Text(
-              "How much you spent this month:\n",
-            ),
-            new Container(
-              child: new LinearProgressIndicator(
-                value: 0.6,
-                backgroundColor: Colors.amber,
-                valueColor: null,
+      child: new GestureDetector(
+        // onTap: () => initState(), // TODO do not call manually initState, this is lifecycle event
+        child: Card(
+          child: new Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
+            alignment: Alignment.centerLeft,
+            child: new Column(children: [
+              new Text(
+                "How much you spent this month:\n",
               ),
-              padding: EdgeInsets.all(5.0),
-            ),
-            new Row(
-              children: [
-                new Expanded(
-                  child: new Container(
-                    child: Text("1400 lei"),
-                    padding: EdgeInsets.all(5.0),
-                  ),
+              new Container(
+                child: new LinearProgressIndicator(
+                  value: totalIncomes > totalExpenses
+                      ? totalExpenses / totalIncomes
+                      : 1.0,
+                  backgroundColor: Colors.amber,
+                  valueColor: null,
                 ),
-                new Expanded(
-                  child: new Container(
-                    child: Text("2000 lei"),
-                    padding: EdgeInsets.all(5.0),
-                    alignment: Alignment.centerRight,
+                padding: EdgeInsets.all(5.0),
+              ),
+              new Row(
+                children: [
+                  new Expanded(
+                    child: new Container(
+                      child: Text(totalExpenses.toString()),
+                      padding: EdgeInsets.all(5.0),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ]),
+                  new Expanded(
+                    child: new Container(
+                      child: Text(totalIncomes.toString()),
+                      padding: EdgeInsets.all(5.0),
+                      alignment: Alignment.centerRight,
+                    ),
+                  ),
+                ],
+              ),
+            ]),
+          ),
         ),
       ),
     );
   }
-}
-
-/// Sample linear data type.
-class LinearSales {
-  final String type;
-  final int percent;
-
-  LinearSales(this.type, this.percent);
 }
 
 class PieOutsideLabelChart extends StatelessWidget {

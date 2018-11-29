@@ -1,9 +1,9 @@
-import 'package:firstflut/Income.dart';
-import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/income.dart';
 import 'package:firstflut/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// TODO remove build from name of class
 class BuildIncomeHistoryPage extends StatefulWidget {
   BuildIncomeHistoryPage({Key key, this.title}) : super(key: key);
 
@@ -14,6 +14,7 @@ class BuildIncomeHistoryPage extends StatefulWidget {
       new _BuildIncomeHistoryPageState();
 }
 
+// TODO remove build from name of class
 class _BuildIncomeHistoryPageState extends State<BuildIncomeHistoryPage> {
   DbContext _context;
   List<Income> _incomes = new List<Income>();
@@ -25,7 +26,7 @@ class _BuildIncomeHistoryPageState extends State<BuildIncomeHistoryPage> {
     _context = new DbContext();
     _context.readIncome().then((list) {
       setState(() {
-        _incomes = list; 
+        _incomes = list;
       });
     });
   }
