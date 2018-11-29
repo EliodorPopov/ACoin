@@ -1,5 +1,5 @@
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:firstflut/editEarningPage.dart';
 import 'package:firstflut/editExpensePage.dart';
 import 'package:flutter/material.dart';

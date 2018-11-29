@@ -17,6 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
     
+   
 
 
   sqflite: any
@@ -26,11 +27,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   datetime_picker_formfield: ^0.1.6
-  splashscreen: ^1.1.0 
-  flutter_speed_dial:
+  splashscreen: ^1.1.0
+  flutter_speed_dial: ^1.0.9
+  flushbar: ^1.1.2
     
 dev_dependencies:
-  flutter_test:
+  flutter_test: 
     sdk: flutter
 
 
@@ -39,6 +41,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -47,9 +50,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/wallet.png
-  #  - images/a_dot_ham.jpeg
-  
+    - images/ 
+     
 
 
 

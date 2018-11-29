@@ -1,5 +1,5 @@
 import 'package:firstflut/RecurrentIncome.dart';
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:firstflut/Income.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';

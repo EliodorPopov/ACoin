@@ -1,4 +1,4 @@
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:firstflut/db_context.dart';
 //import 'package:firstflut/popupCreateCategory.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +46,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
         _expenses = list;
         _expenses.forEach((e) {
           _categories.forEach((f){
-            if (f == e.category) isTrue = false;
+            if (f == e.category) isTrue = false; 
           });
           if (isTrue) _categories.add(e.category);
           isTrue = true;

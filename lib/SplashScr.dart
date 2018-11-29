@@ -11,22 +11,22 @@ class _SplashScrState extends State<SplashScr> {
   @override
   Widget build(BuildContext context) {
     return new SplashScreen(
-      seconds: 5,
-      navigateAfterSeconds: new MyApp(),
-      title: new Text('Welcome to ACoin',
-      style: new TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 30.0,
-        color: Colors.white
-      ),),
-      image: new Image.asset('images/wallet.png'),
-      backgroundColor: Colors.indigo,
-      styleTextUnderTheLoader: new TextStyle(),
-      photoSize: 100.0,
-      loaderColor: Colors.white
-    );
+        seconds: 1,
+        navigateAfterSeconds: new MyApp(),
+        title: new Text(
+          'Welcome to ACoin',
+          style: new TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 30.0, color: Colors.white),
+        ),
+        image: new Image( image: AssetImage('images/wallet.png')),
+        backgroundColor: Colors.indigo,
+        styleTextUnderTheLoader: new TextStyle(),
+        photoSize: 100.0,
+        loaderColor: Colors.white);
   }
 }
+
+// TODO move to separate file
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 

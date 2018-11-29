@@ -1,4 +1,4 @@
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
 import 'package:firstflut/db_context.dart';
 //import 'package:firstflut/popupCreateCategory.dart';
 import 'package:flutter/material.dart';
