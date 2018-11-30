@@ -78,27 +78,9 @@ class _AddIncomePageState extends State<AddIncomePage> {
       formKey.currentState.save();
 
       print(_name);
-      _context.updateIncomeTable(
-          _name, int.tryParse(_value), _source, _date);
-      _showAlert();
-    }
-  }
+      _context.updateIncomeTable(_name, int.tryParse(_value), _source, _date);
 
-  void _showAlert() {
-    showDialog(
-        context: this.context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text("Information submitted!"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: new Text('OK!'))
-            ],
-          );
-        });
+      Navigator.pop(context, true);
+    }
   }
 }

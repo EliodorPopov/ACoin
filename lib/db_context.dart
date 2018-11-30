@@ -1,6 +1,6 @@
-import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/recurrentIncome.dart';
 import 'package:firstflut/expense.dart';
-import 'package:firstflut/Income.dart';
+import 'package:firstflut/income.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -58,7 +58,6 @@ class DbContext {
       "source": "source",
       "date": DateTime.now().millisecondsSinceEpoch,
     });
-
 
     await db.insert(expensesTable, {
       "name": "drinks",
@@ -141,7 +140,7 @@ class DbContext {
     ''');
   }
 
-  Future<void> deleteExpense(int id)async{
+  Future<void> deleteExpense(int id) async {
     var database = await db;
     await database.execute('''
       delete from $expensesTable

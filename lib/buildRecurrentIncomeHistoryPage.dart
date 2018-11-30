@@ -1,8 +1,9 @@
-import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/recurrentIncome.dart';
 import 'package:firstflut/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// TODO remove build from name of class
 class BuildRecurrentIncomeHistoryPage extends StatefulWidget {
   BuildRecurrentIncomeHistoryPage({Key key, this.title}) : super(key: key);
 
@@ -13,7 +14,9 @@ class BuildRecurrentIncomeHistoryPage extends StatefulWidget {
       new _BuildRecurrentIncomeHistoryPageState();
 }
 
-class _BuildRecurrentIncomeHistoryPageState extends State<BuildRecurrentIncomeHistoryPage> {
+// TODO remove build from name of class
+class _BuildRecurrentIncomeHistoryPageState
+    extends State<BuildRecurrentIncomeHistoryPage> {
   DbContext _context;
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
@@ -24,7 +27,7 @@ class _BuildRecurrentIncomeHistoryPageState extends State<BuildRecurrentIncomeHi
     _context = new DbContext();
     _context.readRecurrentIncome().then((list) {
       setState(() {
-        _recurrentIncomes = list; 
+        _recurrentIncomes = list;
       });
     });
   }

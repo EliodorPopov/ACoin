@@ -1,18 +1,18 @@
-import 'package:firstflut/Income.dart';
-import 'package:firstflut/RecurrentIncome.dart';
+import 'package:firstflut/income.dart';
+import 'package:firstflut/recurrentIncome.dart';
 import 'package:firstflut/addEarningPage.dart';
 import 'package:firstflut/addExpensePage.dart';
 import 'package:firstflut/addIncomePage.dart';
 import 'package:firstflut/buildExpensesHistoryPage.dart';
 import 'package:firstflut/buildRecurrentIncomeHistoryPage.dart';
 import 'package:firstflut/buildIncomeHistoryPage.dart';
-//  import 'package:firstflut/buttonMenu.dart';
 import 'package:firstflut/db_context.dart';
 import 'package:firstflut/expense.dart';
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flushbar/flushbar.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
@@ -26,7 +26,6 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   ScrollController _scrollController;
   bool _dialVisible = true;
-  Modal modal;
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
@@ -35,13 +34,28 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int totalIncomes;
   int totalExpenses;
 
+  void _showSuccessSnackBar() {
+    Flushbar(flushbarPosition: FlushbarPosition.TOP)
+      ..message = 'Information submitted!'
+      ..icon = Icon(
+        Icons.done,
+        size: 28.0,
+        color: Colors.green,
+      )
+      ..duration = Duration(seconds: 2)
+      ..leftBarIndicatorColor = Colors.green
+      ..show(context);
+  }
+
   _addRecurrentIncome(BuildContext context) {
     var route = MaterialPageRoute(
         builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
     Navigator.pop(context);
-    Navigator.push(context, route).then((_) {
-      if (modal.onRecurrentIncomeAdded != null) modal.onRecurrentIncomeAdded();
-
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful) {
+        loadRecurrentIncome();
+        _showSuccessSnackBar();
+      }
     });
   }
 
@@ -49,11 +63,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     var route =
         MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
     Navigator.pop(context);
-    Navigator.push(context, route).then((_) {
-      if (modal.onIncomeAdded != null) modal.onIncomeAdded();
-      setState(() {
-              
-            });
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful) {
+        loadIncome();
+        _showSuccessSnackBar();
+      }
     });
   }
 
@@ -61,20 +75,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     var route =
         MaterialPageRoute(builder: (c) => AddExpensePage(title: "Add Expense"));
 
-    Navigator.pop(context);
-    Navigator.push(context, route).then((_) {
-      if (modal.onExpenseAdded != null) modal.onExpenseAdded();
+    Navigator.push(context, route).then((isSuccessful) {
+      if (isSuccessful == true) {
+        loadExpenses();
+        _showSuccessSnackBar();
+      }
     });
   }
 
   @override
   initState() {
     super.initState();
+
     _context = new DbContext();
-    modal = new Modal(
-        onExpenseAdded: loadExpenses,
-        onIncomeAdded: loadIncome,
-        onRecurrentIncomeAdded: loadRecurrentIncome);
+
     loadRecurrentIncome();
     loadExpenses();
     loadIncome();
@@ -138,7 +152,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           onTap: () => _addIncome(context),
           label: 'Add Income',
           labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.greenAccent,
+          labelBackgroundColor: Colors.green,
         ),
         SpeedDialChild(
           child: Icon(Icons.money_off, color: Colors.white),
@@ -244,8 +258,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
               color: Colors.white,
               constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-              child: _incomes.length >
-                      0 //I've put here the spendings series instead of income just to show that it loads from db
+              child: _incomes.length > 0
                   ? PieOutsideLabelChart(
                       incomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
                   : new Text("No Data"),

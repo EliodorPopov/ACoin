@@ -5,6 +5,7 @@ import 'package:firstflut/editExpensePage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// TODO remove build from name of class
 class BuildExpensesHistoryPage extends StatefulWidget {
   BuildExpensesHistoryPage({Key key, this.title}) : super(key: key);
 
@@ -15,6 +16,7 @@ class BuildExpensesHistoryPage extends StatefulWidget {
       new _BuildExpensesHistoryPageState();
 }
 
+// TODO remove build from name of class
 class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
@@ -45,8 +47,14 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
               onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (c) =>
-                            EditExpensePage(title: "edit expense", dbId: i.id, dbCategory: i.category, dbDate: i.date, dbName: i.name, dbValue: i.value,)),
+                        builder: (c) => EditExpensePage(
+                              title: "edit expense",
+                              dbId: i.id,
+                              dbCategory: i.category,
+                              dbDate: i.date,
+                              dbName: i.name,
+                              dbValue: i.value,
+                            )),
                   ),
               child: ListTile(
                 title: Text(

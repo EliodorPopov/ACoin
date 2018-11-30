@@ -18,7 +18,7 @@ class _SplashScrState extends State<SplashScr> {
           style: new TextStyle(
               fontWeight: FontWeight.bold, fontSize: 30.0, color: Colors.white),
         ),
-        image: new Image( image: AssetImage('images/wallet.png')),
+        image: new Image(image: AssetImage('images/wallet.png')),
         backgroundColor: Colors.indigo,
         styleTextUnderTheLoader: new TextStyle(),
         photoSize: 100.0,

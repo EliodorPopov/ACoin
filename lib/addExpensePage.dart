@@ -1,6 +1,5 @@
 import 'package:firstflut/expense.dart';
 import 'package:firstflut/db_context.dart';
-//import 'package:firstflut/popupCreateCategory.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -22,7 +21,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
   DbContext _context;
   List<String> _categories = new List<String>();
-  //List<String> _test = <String>['test', 'test2', 'test3'];
   List<Expense> _expenses = new List<Expense>();
 
   @override
@@ -34,7 +32,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
       setState(() {
         _expenses = list;
         _expenses.forEach((e) {
-          _categories.forEach((f){
+          _categories.forEach((f) {
             if (f == e.category) isTrue = false;
           });
           if (isTrue) _categories.add(e.category);
@@ -161,26 +159,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
       print(_name);
       _context.updateExpenseTable(
           _name, int.tryParse(_value), _date, _category);
-      _showAlert();
-    }
-  }
 
-  void _showAlert() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text("Information submitted!"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: new Text('OK!'))
-            ],
-          );
-        });
+      Navigator.pop(context, true);
+    }
   }
 
   void _createCategory() {
@@ -190,9 +171,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           return AlertDialog(
             title: Text("Add Category"),
             contentPadding: EdgeInsets.all(10.0),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            content: Column(mainAxisSize: MainAxisSize.min, children: [
               Form(
                 key: formKey2,
                 child: TextFormField(
