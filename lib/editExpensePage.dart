@@ -46,8 +46,8 @@ class _EditExpensePageState extends State<EditExpensePage> {
       setState(() {
         _expenses = list;
         _expenses.forEach((e) {
-          _categories.forEach((f) {
-            if (f == e.category) isTrue = false;
+          _categories.forEach((f){
+            if (f == e.category) isTrue = false; 
           });
           if (isTrue) _categories.add(e.category);
           isTrue = true;
@@ -284,7 +284,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     _category = _newCategory;
                     _newCategory = null;
                     Navigator.pop(context);
-                    setState(() {});
                     //return _addedCategory;
                     //Navigator.pop(context);
                     //return _addedCategory;

@@ -48,11 +48,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   _addRecurrentIncome(BuildContext context) {
-    var route = MaterialPageRoute<bool>(
+    var route = MaterialPageRoute(
         builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
-
+    Navigator.pop(context);
     Navigator.push(context, route).then((isSuccessful) {
-      if (isSuccessful == true) {
+      if (isSuccessful) {
         loadRecurrentIncome();
         _showSuccessSnackBar();
       }
@@ -62,9 +62,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   _addIncome(BuildContext context) {
     var route =
         MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
-
+    Navigator.pop(context);
     Navigator.push(context, route).then((isSuccessful) {
-      if (isSuccessful == true) {
+      if (isSuccessful) {
         loadIncome();
         _showSuccessSnackBar();
       }
@@ -93,7 +93,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     loadExpenses();
     loadIncome();
     calculateBalance();
-
     _scrollController = ScrollController()
       ..addListener(() {
         _setDialVisible(_scrollController.position.userScrollDirection ==
@@ -132,7 +131,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       animatedIconTheme: IconThemeData(size: 22.0),
       // child: Icon(Icons.add),
       onOpen: () => print('OPENING DIAL'),
-      onClose: () => print('DIAL CLOSED'),
+      onClose: () {
+        print('DIAL CLOSED');
+        calculateBalance();
+      },
       visible: _dialVisible,
       curve: Curves.bounceIn,
       children: [
@@ -372,7 +374,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
-        // onTap: () => initState(), // TODO do not call manually initState, this is lifecycle event
+        onTap: () => initState(),
         child: Card(
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
@@ -456,4 +458,12 @@ class HorizontalBarLabelChart extends StatelessWidget {
           new charts.OrdinalAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
   }
+}
+
+class Modal {
+  VoidCallback onRecurrentIncomeAdded;
+  VoidCallback onExpenseAdded;
+  VoidCallback onIncomeAdded;
+
+  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});
 }

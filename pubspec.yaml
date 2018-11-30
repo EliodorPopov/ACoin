@@ -28,16 +28,11 @@ dependencies:
   cupertino_icons: ^0.1.2
   datetime_picker_formfield: ^0.1.6
   splashscreen: ^1.1.0
-<<<<<<< HEAD
-  flutter_speed_dial: ^1.0.9
+  flutter_speed_dial: ^1.0.9 
   flushbar: ^1.1.2
-=======
-  
-  flutter_speed_dial:
->>>>>>> bdd7ee0e1a500704cbf1ba906a8c7bccfa2ec203
     
 dev_dependencies:
-  flutter_test:
+  flutter_test: 
     sdk: flutter
 
 
@@ -54,16 +49,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-<<<<<<< HEAD
-  # assets:
-  #  - images/a_dot_burr.jpeg 
-  #  - images/a_dot_ham.jpeg
-  
-=======
   assets:
-    - graphics/
+    - images/ 
      
->>>>>>> bdd7ee0e1a500704cbf1ba906a8c7bccfa2ec203
 
 
 
