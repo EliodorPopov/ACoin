@@ -1,6 +1,6 @@
-import 'package:firstflut/addEarningPage.dart';
-import 'package:firstflut/addExpensePage.dart';
-import 'package:firstflut/addIncomePage.dart';
+import 'package:firstflut/addearningPage.dart';
+import 'package:firstflut/addexpensePage.dart';
+import 'package:firstflut/addincomePage.dart';
 import 'package:flutter/material.dart';
 
 // TODO Is this still used? remove perhaps
