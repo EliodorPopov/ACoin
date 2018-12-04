@@ -1,8 +1,11 @@
 import 'package:firstflut/db_context.dart';
-import 'package:firstflut/Expense.dart';
+import 'package:firstflut/expense.dart';
+import 'package:firstflut/editEarningPage.dart';
+import 'package:firstflut/editExpensePage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// TODO remove build from name of class
 class BuildExpensesHistoryPage extends StatefulWidget {
   BuildExpensesHistoryPage({Key key, this.title}) : super(key: key);
 
@@ -13,6 +16,7 @@ class BuildExpensesHistoryPage extends StatefulWidget {
       new _BuildExpensesHistoryPageState();
 }
 
+// TODO remove build from name of class
 class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
@@ -22,6 +26,7 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
+    //_context.editExpense(1, 'test2', 999, DateTime.now(), 'testcat');
     _context.readExpense().then((list) {
       setState(() {
         _expenses = list;
@@ -38,13 +43,27 @@ class _BuildExpensesHistoryPageState extends State<BuildExpensesHistoryPage> {
       body: new Center(
         child: new ListView(
           children: _expenses.map((i) {
-            return ListTile(
-              title: Text(
-                i.name,
-                textScaleFactor: 3.0,
+            return GestureDetector(
+              onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (c) => EditExpensePage(
+                              title: "edit expense",
+                              dbId: i.id,
+                              dbCategory: i.category,
+                              dbDate: i.date,
+                              dbName: i.name,
+                              dbValue: i.value,
+                            )),
+                  ),
+              child: ListTile(
+                title: Text(
+                  i.name + " [" + i.category + "]",
+                  textScaleFactor: 2.0,
+                ),
+                subtitle: Text(
+                    i.value.toString() + " MDL " + dateFormat.format(i.date)),
               ),
-              subtitle: Text(
-                  i.value.toString() + " MDL " + dateFormat.format(i.date)),
             );
             //}
           }).toList(),
