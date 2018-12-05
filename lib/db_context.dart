@@ -1,17 +1,14 @@
-import 'package:firstflut/recurrentIncome.dart';
-import 'package:firstflut/expense.dart';
-import 'package:firstflut/income.dart';
+import 'package:acoin/recurrentIncome.dart';
+import 'package:acoin/expense.dart';
+import 'package:acoin/income.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DbContext {
   Future<Database> _db;
-
   static final DbContext _instance = new DbContext._internal();
-
   factory DbContext() => _instance;
-
   DbContext._internal();
 
   Future<Database> get db {
@@ -78,27 +75,25 @@ class DbContext {
     });
   }
 
-  Future<void> updateRecurrentIncomeTable(String name, int value, String source,
-      DateTime date, bool isEnabled) async {
+  Future<void> updateIncomeTable(String name, int value, String source,
+      DateTime date, bool isRecurrent) async {
     var database = await db;
-    await database.insert(recurrentIncomeTable, {
-      "name": name,
-      "value": value,
-      "source": source,
-      "date": date.millisecondsSinceEpoch,
-      "isEnabled": isEnabled
-    });
-  }
-
-  Future<void> updateIncomeTable(
-      String name, int value, String source, DateTime date) async {
-    var database = await db;
-    await database.insert(incomeTable, {
-      "name": name,
-      "value": value,
-      "source": source,
-      "date": date.millisecondsSinceEpoch,
-    });
+    if (isRecurrent) {
+      await database.insert(recurrentIncomeTable, {
+        "name": name,
+        "value": value,
+        "source": source,
+        "date": date.millisecondsSinceEpoch,
+        "isEnabled": true
+      });
+    } else {
+      await database.insert(incomeTable, {
+        "name": name,
+        "value": value,
+        "source": source,
+        "date": date.millisecondsSinceEpoch,
+      });
+    }
   }
 
   Future<List<RecurrentIncome>> readRecurrentIncome() async {
@@ -136,7 +131,21 @@ class DbContext {
           date = $date2,
           category = '$category'
       where id = $id
+    ''');
+  }
 
+  Future<void> editIncome(int id, String name, int value, DateTime date,
+      String source, bool isRecurrent) async {
+    var database = await db;
+    int date2 = date.millisecondsSinceEpoch;
+    final String table = isRecurrent ? recurrentIncomeTable : incomeTable;
+    await database.execute('''
+      update $table 
+      set name = '$name',
+          value = $value,
+          date = $date2,
+          source = '$source'
+      where id = $id
     ''');
   }
 
@@ -144,6 +153,15 @@ class DbContext {
     var database = await db;
     await database.execute('''
       delete from $expensesTable
+      where id = $id
+    ''');
+  }
+
+  Future<void> deleteIncome(int id, bool isRecurrent) async {
+    var database = await db;
+    final String table = isRecurrent ? recurrentIncomeTable : incomeTable;
+    await database.execute('''
+      delete from $table
       where id = $id
     ''');
   }

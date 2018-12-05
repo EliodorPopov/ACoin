@@ -1,13 +1,13 @@
-import 'package:firstflut/income.dart';
-import 'package:firstflut/recurrentIncome.dart';
-import 'package:firstflut/addEarningPage.dart';
-import 'package:firstflut/addExpensePage.dart';
-import 'package:firstflut/addIncomePage.dart';
-import 'package:firstflut/buildExpensesHistoryPage.dart';
-import 'package:firstflut/buildRecurrentIncomeHistoryPage.dart';
-import 'package:firstflut/buildIncomeHistoryPage.dart';
-import 'package:firstflut/db_context.dart';
-import 'package:firstflut/expense.dart';
+import 'package:acoin/expense.dart';
+import 'package:acoin/income.dart';
+import 'package:acoin/recurrentIncome.dart';
+import 'package:acoin/addExpensePage.dart';
+import 'package:acoin/addIncomePage.dart';
+import 'package:acoin/expensesHistoryPage.dart';
+import 'package:acoin/incomeHistoryPage.dart';
+import 'package:acoin/recurrentIncomeHistoryPage.dart';
+import 'package:acoin/db_context.dart';
+import 'package:acoin/slide_left_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -16,7 +16,6 @@ import 'package:flushbar/flushbar.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key key, this.title}) : super(key: key);
-
   final String title;
 
   @override
@@ -30,9 +29,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
-  int currentBalance;
-  int totalIncomes;
-  int totalExpenses;
+  int currentBalance = 0;
+  int totalIncomes = 0;
+  int totalExpenses = 0;
 
   void _showSuccessSnackBar() {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -49,23 +48,24 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   _addRecurrentIncome(BuildContext context) {
     var route = MaterialPageRoute(
-        builder: (c) => AddEarningPage(title: "Add Recurrent Income"));
-    Navigator.pop(context);
-    Navigator.push(context, route).then((isSuccessful) {
+        builder: (c) =>
+            AddIncomePage(title: "Add Recurrent Income", isRecurrent: true));
+    Navigator.push(context, route).then((isSuccessful) async {
       if (isSuccessful) {
-        loadRecurrentIncome();
+        await loadRecurrentIncome();
+        calculateBalance();
         _showSuccessSnackBar();
       }
     });
   }
 
   _addIncome(BuildContext context) {
-    var route =
-        MaterialPageRoute(builder: (c) => AddIncomePage(title: "Add Income"));
-    Navigator.pop(context);
-    Navigator.push(context, route).then((isSuccessful) {
+    var route = MaterialPageRoute(
+        builder: (c) => AddIncomePage(title: "Add Income", isRecurrent: false));
+    Navigator.push(context, route).then((isSuccessful) async {
       if (isSuccessful) {
-        loadIncome();
+        await loadIncome();
+        calculateBalance();
         _showSuccessSnackBar();
       }
     });
@@ -74,10 +74,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   _addExpense(BuildContext context) {
     var route =
         MaterialPageRoute(builder: (c) => AddExpensePage(title: "Add Expense"));
-
-    Navigator.push(context, route).then((isSuccessful) {
+    Navigator.push(context, route).then((isSuccessful) async {
       if (isSuccessful == true) {
-        loadExpenses();
+        await loadExpenses();
+        calculateBalance();
         _showSuccessSnackBar();
       }
     });
@@ -86,21 +86,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   @override
   initState() {
     super.initState();
-
     _context = new DbContext();
-
-    loadRecurrentIncome();
-    loadExpenses();
-    loadIncome();
     calculateBalance();
     _scrollController = ScrollController()
-      ..addListener(() {
-        _setDialVisible(_scrollController.position.userScrollDirection ==
-            ScrollDirection.forward);
-      });
+      ..addListener(
+        () {
+          _setDialVisible(_scrollController.position.userScrollDirection ==
+              ScrollDirection.forward);
+        },
+      );
   }
 
-  void calculateBalance() {
+  void calculateBalance() async {
+    await loadRecurrentIncome();
+    await loadExpenses();
+    await loadIncome();
     currentBalance = 0;
     totalExpenses = 0;
     totalIncomes = 0;
@@ -166,24 +166,24 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     );
   }
 
-  void loadExpenses() {
-    _context.readExpense().then((list) {
+  Future<Null> loadExpenses() {
+    return _context.readExpense().then((list) {
       setState(() {
         _expenses = list;
       });
     });
   }
 
-  void loadIncome() {
-    _context.readIncome().then((list) {
+  Future<Null> loadIncome() {
+    return _context.readIncome().then((list) {
       setState(() {
         _incomes = list;
       });
     });
   }
 
-  void loadRecurrentIncome() {
-    _context.readRecurrentIncome().then((list) {
+  Future<Null> loadRecurrentIncome() {
+    return _context.readRecurrentIncome().then((list) {
       setState(() {
         _recurrentIncomes = list;
       });
@@ -193,10 +193,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<charts.Series<Expense, String>> expensesListDB() {
     return [
       new charts.Series<Expense, String>(
-          id: 'Sales',
-          domainFn: (Expense sales, _) => sales.name,
-          measureFn: (Expense sales, _) => sales.value ?? 0,
-          data: _expenses)
+        id: 'Sales',
+        domainFn: (Expense sales, _) => sales.name,
+        measureFn: (Expense sales, _) => sales.value ?? 0,
+        data: _expenses,
+        colorFn: (_, __) => charts.MaterialPalette.lime.shadeDefault,
+      )
     ];
   }
 
@@ -229,6 +231,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       body: new Center(
         child: new ListView(
           children: <Widget>[
+            buildCardBalance(context),
             buildCardProgress(context),
             buildCardExpenses(context),
             buildCardRecurrentIncome(context),
@@ -236,8 +239,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           ],
         ),
       ),
-      floatingActionButton:
-          _renderSpeedDial(), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: _renderSpeedDial(),
     );
   }
 
@@ -247,23 +249,26 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       child: new GestureDetector(
         onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (c) =>
-                      BuildIncomeHistoryPage(title: "Income History")),
-            ),
+              SlideLeftRoute(
+                  widget: IncomeHistoryPage(title: "Income History")),
+            ).then((context) async {
+              await loadIncome();
+              calculateBalance();
+            }),
         child: Card(
-          child: Column(children: [
-            Text("Incomes"),
-            new Container(
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
-              color: Colors.white,
-              constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-              child: _incomes.length > 0
-                  ? PieOutsideLabelChart(
-                      incomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
-                  : new Text("No Data"),
-            ),
-          ]),
+          child: Column(
+            children: [
+              Text("Incomes"),
+              new Container(
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                color: Colors.white,
+                constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
+                child: _incomes.length > 0
+                    ? PieOutsideLabelChart(incomesListDB())
+                    : new Text("No Data"),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -274,16 +279,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (c) =>
-                    new BuildExpensesHistoryPage(title: "Expenses history"))),
+              context,
+              SlideLeftRoute(
+                widget: ExpensesHistoryPage(title: "Expenses history"),
+              ),
+            ).then((context) async {
+              await loadExpenses();
+              calculateBalance();
+            }),
         child: Card(
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             color: Colors.white,
             constraints: BoxConstraints(maxHeight: 250.0, maxWidth: 200.0),
-
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -301,11 +309,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 ),
                 new Expanded(
                   child: new Container(
-                    child: _expenses.length >
-                            0 //I've put here the spendings series instead of income just to show that it loads from db
-                        ? PieOutsideLabelChart(
-                            expensesListDB()) // but it seems that widget has some problems with rendering when the series is empty
-                        : new Text("...loading"),
+                    child: _expenses.length > 0
+                        ? PieOutsideLabelChart(expensesListDB())
+                        : new Text(
+                            "no data",
+                            style: TextStyle(fontSize: 20.0),
+                          ),
                     constraints:
                         BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
                     alignment: Alignment.centerRight,
@@ -313,9 +322,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   flex: 3,
                 ),
               ],
-              //mainAxisAlignment: MainAxisAlignment.end,
             ),
-            //alignment: Alignment.centerRight,
           ),
         ),
       ),
@@ -328,44 +335,46 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       child: new GestureDetector(
         onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (c) =>
-                      BuildRecurrentIncomeHistoryPage(title: "Income")),
-            ),
+              SlideLeftRoute(
+                  widget: RecurrentIncomeHistoryPage(title: "Income")),
+            ).then((context) async {
+              await loadRecurrentIncome();
+              calculateBalance();
+            }),
         child: Card(
-            child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                color: Colors.white,
-                constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  children: [
-                    new Container(
-                      child: _recurrentIncomes.length >
-                              0 //I've put here the spendings series instead of income just to show that it loads from db
-                          ? HorizontalBarLabelChart(
-                              recurrentIncomesListDB()) // but it seems that widget has some problems with rendering when the series is empty
-                          : new Text(
-                              "...loading"), //so instead of rendering empty chart replace it with placeholder while data is loaded
-                      constraints:
-                          BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                      alignment: Alignment.centerLeft,
-                    ),
-                    new Expanded(
-                      child: new Column(
-                        children: [
-                          new Text("Income:\n",
-                              style: TextStyle(fontSize: 20.0)),
-                          new Text(
-                              "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
-                        ],
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                      ),
-                    )
-                  ],
-                  //mainAxisAlignment: MainAxisAlignment.start,
-                ))),
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                new Container(
+                  child: _recurrentIncomes.length > 0
+                      ? HorizontalBarLabelChart(recurrentIncomesListDB())
+                      : new Text(
+                          "no data",
+                          style: TextStyle(fontSize: 20.0),
+                        ),
+                  constraints:
+                      BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+                  alignment: Alignment.centerLeft,
+                ),
+                new Expanded(
+                  child: new Column(
+                    children: [
+                      new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
+                      new Text(
+                          "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -374,45 +383,88 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: new GestureDetector(
-        onTap: () => initState(),
         child: Card(
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
             constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
             alignment: Alignment.centerLeft,
-            child: new Column(children: [
-              new Text(
-                "How much you spent this month:\n",
-              ),
-              new Container(
-                child: new LinearProgressIndicator(
-                  value: totalIncomes > totalExpenses
-                      ? totalExpenses / totalIncomes
-                      : 1.0,
-                  backgroundColor: Colors.amber,
-                  valueColor: null,
+            child: new Column(
+              children: [
+                new Text(
+                  "How much you spent this month:\n",
                 ),
-                padding: EdgeInsets.all(5.0),
-              ),
-              new Row(
-                children: [
-                  new Expanded(
-                    child: new Container(
-                      child: Text(totalExpenses.toString()),
-                      padding: EdgeInsets.all(5.0),
-                    ),
+                new Container(
+                  child: new LinearProgressIndicator(
+                    value: totalIncomes > totalExpenses
+                        ? totalExpenses / totalIncomes
+                        : 1.0,
+                    backgroundColor: Colors.amber,
+                    valueColor: null,
                   ),
-                  new Expanded(
-                    child: new Container(
-                      child: Text(totalIncomes.toString()),
-                      padding: EdgeInsets.all(5.0),
-                      alignment: Alignment.centerRight,
+                  padding: EdgeInsets.all(5.0),
+                ),
+                new Row(
+                  children: [
+                    new Expanded(
+                      child: new Container(
+                        child: Text(totalExpenses.toString()),
+                        padding: EdgeInsets.all(5.0),
+                      ),
                     ),
+                    new Expanded(
+                      child: new Container(
+                        child: Text(totalIncomes.toString()),
+                        padding: EdgeInsets.all(5.0),
+                        alignment: Alignment.centerRight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding buildCardBalance(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: GestureDetector(
+        child: Card(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Container(
+                    child: Text(
+                      "Balance",
+                      textScaleFactor: 2.0,
+                    ),
+                    padding: EdgeInsets.all(5.0),
                   ),
-                ],
-              ),
-            ]),
+                ),
+                Expanded(
+                  child: Container(
+                    child: Text(
+                      currentBalance.toString(),
+                      textScaleFactor: 2.0,
+                      style: TextStyle(
+                          color:
+                              currentBalance > 0 ? Colors.green : Colors.red),
+                    ),
+                    padding: EdgeInsets.all(5.0),
+                    alignment: Alignment.centerRight,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -423,7 +475,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 class PieOutsideLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;
   final bool animate;
-
   PieOutsideLabelChart(this.seriesList, {this.animate});
 
   @override
@@ -435,7 +486,7 @@ class PieOutsideLabelChart extends StatelessWidget {
             new charts.ArcLabelDecorator(
                 labelPosition: charts.ArcLabelPosition.auto),
           ],
-          startAngle: 1 / 5 * 3.1415,
+          startAngle: 0.5,
         ));
   }
 }
@@ -443,7 +494,6 @@ class PieOutsideLabelChart extends StatelessWidget {
 class HorizontalBarLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;
   final bool animate;
-
   HorizontalBarLabelChart(this.seriesList, {this.animate});
 
   @override
@@ -453,17 +503,8 @@ class HorizontalBarLabelChart extends StatelessWidget {
       animate: animate,
       vertical: false,
       barRendererDecorator: new charts.BarLabelDecorator<String>(),
-      // Hide domain axis.
       domainAxis:
           new charts.OrdinalAxisSpec(renderSpec: new charts.NoneRenderSpec()),
     );
   }
-}
-
-class Modal {
-  VoidCallback onRecurrentIncomeAdded;
-  VoidCallback onExpenseAdded;
-  VoidCallback onIncomeAdded;
-
-  Modal({this.onRecurrentIncomeAdded, this.onExpenseAdded, this.onIncomeAdded});
 }
