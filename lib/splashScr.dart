@@ -1,4 +1,4 @@
-import 'package:firstflut/dashboard.dart';
+import 'package:acoin/myApp.dart';
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
 
@@ -23,22 +23,5 @@ class _SplashScrState extends State<SplashScr> {
         styleTextUnderTheLoader: new TextStyle(),
         photoSize: 100.0,
         loaderColor: Colors.white);
-  }
-}
-
-// TODO move to separate file
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Eliodor',
-      theme: new ThemeData(
-        primarySwatch: Colors.indigo,
-        //fontFamily: 'Pacifico',
-      ),
-      home: new Dashboard(title: 'Dashboard'),
-    );
   }
 }
