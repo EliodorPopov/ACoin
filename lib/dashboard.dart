@@ -96,6 +96,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               ScrollDirection.forward);
         },
       );
+
   }
 
   void calculateBalance() async {
@@ -119,6 +120,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
   }
+
 
   _setDialVisible(bool value) {
     setState(() {
@@ -183,6 +185,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     });
   }
 
+
   Future<Null> loadRecurrentIncome() {
     return _context.readRecurrentIncome().then((list) {
       setState(() {
@@ -190,6 +193,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       });
     });
   }
+
 
   List<charts.Series<Expense, String>> expensesListDB() {
     return [
@@ -206,6 +210,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<charts.Series<Income, String>> incomesListDB() {
     return [
       new charts.Series<Income, String>(
+
           id: 'Sales',
           domainFn: (Income sales, _) => sales.name,
           measureFn: (Income sales, _) => sales.value ?? 0,
@@ -217,6 +222,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return [
       new charts.Series<RecurrentIncome, String>(
           id: 'Sales',
+
           domainFn: (RecurrentIncome sales, _) => sales.name,
           measureFn: (RecurrentIncome sales, _) => sales.value ?? 0,
           data: _recurrentIncomes)
@@ -238,6 +244,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardRecurrentIncome(context),
             buildCardIncome(context),
             buildCardGoal(context),
+
           ],
         ),
       ),
@@ -474,7 +481,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 }
 
-
 Padding buildCardGoal(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
@@ -514,6 +520,7 @@ Padding buildCardGoal(BuildContext context) {
       ),
     );
 }
+
 
 class PieOutsideLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;

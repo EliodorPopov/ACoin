@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+
+
   sqflite: any
   charts_flutter: ^0.4.0
   path_provider: ^0.4.1
@@ -20,6 +22,7 @@ dependencies:
   flutter_speed_dial: ^1.0.9 
   flushbar: ^1.1.2
   validate: any
+
     
 dev_dependencies:
   flutter_test: 

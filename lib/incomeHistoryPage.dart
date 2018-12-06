@@ -83,6 +83,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                   ),
                   subtitle: Text(
                     i.value.toString() + " MDL " + dateFormat.format(i.date)),
+
                 ),
               );
             },

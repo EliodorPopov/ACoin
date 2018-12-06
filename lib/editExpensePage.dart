@@ -77,6 +77,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                     } else {
                       if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
                         return 'Numele nu poate contine alte caractere decit litere...';
+
                       }
                     }
                   }),

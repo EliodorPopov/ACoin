@@ -42,6 +42,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
                         return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }
+
                 },
               ),
               TextFormField(
