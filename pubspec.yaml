@@ -1,0 +1,39 @@
+name: acoin
+description: Amdaris-UTM Project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+
+  flutter:
+    sdk: flutter
+
+  sqflite: any
+  charts_flutter: ^0.4.0
+  path_provider: ^0.4.1
+  cupertino_icons: ^0.1.2
+  datetime_picker_formfield: ^0.1.6
+  splashscreen: ^1.1.0
+  flutter_speed_dial: ^1.0.9 
+  flushbar: ^1.1.2
+  validate: any
+    
+dev_dependencies:
+  flutter_test: 
+    sdk: flutter
+
+flutter:
+  
+  uses-material-design: true
+
+  assets:
+    - images/ 
+
+  fonts:
+    - family: Pacifico
+      fonts:
+        - asset: fonts/Pacifico.ttf
+          weight: 700

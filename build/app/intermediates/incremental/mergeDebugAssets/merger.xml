@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config=":path_provider"><source path="C:\src\acoin\build\path_provider\intermediates\packagedAssets\debug"/></dataSet><dataSet config=":sqflite"><source path="C:\src\acoin\build\sqflite\intermediates\packagedAssets\debug"/></dataSet><dataSet config="main"><source path="C:\src\acoin\android\app\src\main\assets"/><source path="C:\src\acoin\build\app\generated\assets\shaders\debug"/></dataSet><dataSet config="debug"><source path="C:\src\acoin\android\app\src\debug\assets"/></dataSet></merger>
