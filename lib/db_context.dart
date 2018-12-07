@@ -29,6 +29,7 @@ class DbContext {
   final String incomeTable = "IncomeTable";
 
   Future<void> onCreate(Database db, int version) async {
+    //CHANGE VALUES TO FLOAT
     await db.execute('''
         CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
         ''');
@@ -40,27 +41,30 @@ class DbContext {
     await db.execute('''
         CREATE TABLE $incomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER)
       ''');
+    await db.execute('''
+        
+    ''');
 
     await db.insert(recurrentIncomeTable, {
-      "name": "bursa1",
+      "name": "mock Recurrent Income",
       "value": 850,
-      "source": "utm2",
+      "source": "mock Source",
       "date": DateTime.now().millisecondsSinceEpoch,
       "isEnabled": true
     });
 
     await db.insert(incomeTable, {
-      "name": "initial",
+      "name": "mock Income",
       "value": 1000,
-      "source": "source",
+      "source": "mock Source",
       "date": DateTime.now().millisecondsSinceEpoch,
     });
 
     await db.insert(expensesTable, {
-      "name": "drinks",
+      "name": "mock Expense",
       "value": 1000,
       "date": DateTime.now().millisecondsSinceEpoch,
-      "category": "personal",
+      "category": "mock Category",
     });
   }
 
