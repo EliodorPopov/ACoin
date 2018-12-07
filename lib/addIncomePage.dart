@@ -1,11 +1,12 @@
-import 'package:firstflut/db_context.dart';
+import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class AddIncomePage extends StatefulWidget {
-  AddIncomePage({Key key, this.title}) : super(key: key);
+  AddIncomePage({Key key, this.title, this.isRecurrent}) : super(key: key);
   final String title;
+  final bool isRecurrent;
 
   @override
   _AddIncomePageState createState() => new _AddIncomePageState();
@@ -16,7 +17,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
   String _name, _source, _value;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
-
   DbContext _context = new DbContext();
 
   @override
@@ -34,7 +34,16 @@ class _AddIncomePageState extends State<AddIncomePage> {
               TextFormField(
                 decoration: InputDecoration(labelText: 'Name:'),
                 onSaved: (input) => _name = input,
-                validator: (input) => input.isEmpty ? 'enter value' : null,
+                validator: (input) {
+                  if (input.length == 0) {
+                    return 'Adaugati Valoare';
+                  } else {
+                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
+                        return 'Numele nu poate contine alte caractere decit litere...';
+                      }
+                    }
+
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Value: (MDL)'),
@@ -76,10 +85,8 @@ class _AddIncomePageState extends State<AddIncomePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-
-      print(_name);
-      _context.updateIncomeTable(_name, int.tryParse(_value), _source, _date);
-
+      _context.addIncome(
+          _name, int.tryParse(_value), _source, _date, widget.isRecurrent);
       Navigator.pop(context, true);
     }
   }

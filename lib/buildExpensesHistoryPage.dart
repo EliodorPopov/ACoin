@@ -1,7 +1,7 @@
-import 'package:firstflut/db_context.dart';
-import 'package:firstflut/expense.dart';
-import 'package:firstflut/editEarningPage.dart';
-import 'package:firstflut/editExpensePage.dart';
+import 'package:acoin/db_context.dart';
+import 'package:acoin/expense.dart';
+import 'package:acoin/editEarningPage.dart';
+import 'package:acoin/editExpensePage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
