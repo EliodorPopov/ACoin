@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:acoin/addNewGoalPage.dart';
 
-class goalsPage extends StatefulWidget {
-  goalsPage({Key key}) : super(key: key);
+class GoalsPage extends StatefulWidget {
+  GoalsPage({Key key}) : super(key: key);
 
   @override
-  _goalsPageState createState() => new _goalsPageState();
+  _GoalsPageState createState() => new _GoalsPageState();
 }
 
-class _goalsPageState extends State<goalsPage> {
+class _GoalsPageState extends State<GoalsPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
