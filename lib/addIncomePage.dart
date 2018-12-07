@@ -85,7 +85,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.updateIncomeTable(
+      _context.addIncome(
           _name, int.tryParse(_value), _source, _date, widget.isRecurrent);
       Navigator.pop(context, true);
     }

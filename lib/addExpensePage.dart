@@ -129,7 +129,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.updateExpenseTable(
+      _context.addExpense(
           _name, int.tryParse(_value), _date, _category);
       Navigator.pop(context, true);
     }
