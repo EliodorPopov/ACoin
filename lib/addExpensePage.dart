@@ -2,7 +2,6 @@ import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-
 class AddExpensePage extends StatefulWidget {
   AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -52,23 +51,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
                     } else {
-                      var check = true;
-                      for (int i = 0; i < input.length; i++) {
-                        if ((input[i] == '0') ||
-                            (input[i] == '1') ||
-                            (input[i] == '2') ||
-                            (input[i] == '3') ||
-                            (input[i] == '4') ||
-                            (input[i] == '5') ||
-                            (input[i] == '6') ||
-                            (input[i] == '7') ||
-                            (input[i] == '8') ||
-                            (input[i] == '9')) {
-                          check = false;
-                        }
-                      }
-                      if (!check) {
-                        return 'Numele nu poate contine cifre...';
+
+                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
+                        return 'Numele nu poate contine alte caractere decit litere...';
+
                       }
                     }
                   }),
