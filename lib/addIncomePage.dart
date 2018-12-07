@@ -38,25 +38,11 @@ class _AddIncomePageState extends State<AddIncomePage> {
                   if (input.length == 0) {
                     return 'Adaugati Valoare';
                   } else {
-                    var check = true;
-                    for (int i = 0; i < input.length; i++) {
-                      if ((input[i] == '0') ||
-                          (input[i] == '1') ||
-                          (input[i] == '2') ||
-                          (input[i] == '3') ||
-                          (input[i] == '4') ||
-                          (input[i] == '5') ||
-                          (input[i] == '6') ||
-                          (input[i] == '7') ||
-                          (input[i] == '8') ||
-                          (input[i] == '9')) {
-                        check = false;
+                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
+                        return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }
-                    if (!check) {
-                      return 'Numele nu poate contine cifre...';
-                    }
-                  }
+
                 },
               ),
               TextFormField(

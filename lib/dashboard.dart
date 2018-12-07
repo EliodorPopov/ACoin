@@ -10,6 +10,7 @@ import 'package:acoin/db_context.dart';
 import 'package:acoin/slide_left_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:acoin/goalsPage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flushbar/flushbar.dart';
@@ -95,6 +96,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               ScrollDirection.forward);
         },
       );
+
   }
 
   void calculateBalance() async {
@@ -118,6 +120,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
   }
+
 
   _setDialVisible(bool value) {
     setState(() {
@@ -182,6 +185,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     });
   }
 
+
   Future<Null> loadRecurrentIncome() {
     return _context.readRecurrentIncome().then((list) {
       setState(() {
@@ -189,6 +193,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       });
     });
   }
+
 
   List<charts.Series<Expense, String>> expensesListDB() {
     return [
@@ -205,6 +210,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<charts.Series<Income, String>> incomesListDB() {
     return [
       new charts.Series<Income, String>(
+
           id: 'Sales',
           domainFn: (Income sales, _) => sales.name,
           measureFn: (Income sales, _) => sales.value ?? 0,
@@ -216,6 +222,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return [
       new charts.Series<RecurrentIncome, String>(
           id: 'Sales',
+
           domainFn: (RecurrentIncome sales, _) => sales.name,
           measureFn: (RecurrentIncome sales, _) => sales.value ?? 0,
           data: _recurrentIncomes)
@@ -236,6 +243,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardExpenses(context),
             buildCardRecurrentIncome(context),
             buildCardIncome(context),
+            buildCardGoal(context),
+
           ],
         ),
       ),
@@ -471,6 +480,47 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     );
   }
 }
+
+Padding buildCardGoal(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: GestureDetector(
+        child: Card(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+            color: Colors.white,
+            constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
+            alignment: Alignment.centerLeft,
+            child: new GestureDetector(
+              onTap: (){
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => goalsPage()));
+                        },
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Container(
+                    child: Text(
+                      "Your Goals",
+                      textScaleFactor: 2.0,
+                    ),
+                    padding: EdgeInsets.all(5.0),
+                  ),
+                ),
+                Expanded(
+                  child: new Container(
+                    child: Icon(Icons.assignment_turned_in),
+                    padding: EdgeInsets.fromLTRB(5.0, 12.0, 12.0, 12.0),
+                  ),
+                ),
+              ],
+            ),
+           ),
+          ),
+        ),
+      ),
+    );
+}
+
 
 class PieOutsideLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;
