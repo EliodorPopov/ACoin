@@ -55,7 +55,6 @@ class DbContext {
         CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
     ''');
 
-
     await db.insert(recurrentIncomeTable, {
       "name": "mock Recurrent Income",
       "value": 850,
