@@ -22,7 +22,7 @@ dependencies:
   flutter_speed_dial: ^1.0.9 
   flushbar: ^1.1.2
   validate: any
-
+  flutter_cupertino_date_picker: ^0.3.0
     
 dev_dependencies:
   flutter_test: 

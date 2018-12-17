@@ -1,5 +1,6 @@
 import 'package:acoin/expense.dart';
 import 'package:acoin/db_context.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -74,11 +75,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
-                    } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
-                        return 'Numele nu poate contine alte caractere decit litere...';
-
-                      }
                     }
                   }),
               FormField<String>(
@@ -148,7 +144,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
-        onPressed: () => _submitDelete().then((value) {
+        onPressed: () => _submitDelete2().then((value) {
               if (value) Navigator.pop(context, true);
             }),
       ),
@@ -230,5 +226,29 @@ class _EditExpensePageState extends State<EditExpensePage> {
         );
       },
     );
+  }
+
+
+  Future<bool> _submitDelete2() {
+    return showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: new Text("Are you sure you want to delete ?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: new Text('No!')),
+              new FlatButton(
+                  onPressed: () {
+                    _context.deleteExpense(widget.dbId);
+                    Navigator.pop(context, true);
+                  },
+                  child: new Text('Yes!')),
+            ],
+          );
+        });
   }
 }

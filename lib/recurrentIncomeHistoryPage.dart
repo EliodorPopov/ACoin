@@ -15,11 +15,11 @@ class RecurrentIncomeHistoryPage extends StatefulWidget {
       new _RecurrentIncomeHistoryPageState();
 }
 
-class _RecurrentIncomeHistoryPageState
-    extends State<RecurrentIncomeHistoryPage> {
+class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage> {
   DbContext _context;
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  String _period = 'Today';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -38,7 +38,7 @@ class _RecurrentIncomeHistoryPageState
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readRecurrentIncome().then((list) {
+    _context.readRecurrentIncome2(_period).then((list) {
       setState(() {
         _recurrentIncomes = list;
       });
@@ -48,8 +48,56 @@ class _RecurrentIncomeHistoryPageState
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+       appBar: new AppBar(
+        title: new Theme(
+          child: new Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: Title(
+                    child: Text(widget.title),
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                child: DropdownButtonHideUnderline(
+                  child: new DropdownButton<String>(
+                    style: TextStyle(fontSize: 15),
+                    value: _period,
+                    items: <DropdownMenuItem<String>>[
+                      new DropdownMenuItem(
+                        child: new Text('Today'),
+                        value: 'Today',
+                      ),
+                      new DropdownMenuItem(
+                          child: new Text('This week'), value: 'This week'),
+                      new DropdownMenuItem(
+                          child: new Text('This month'), value: 'This month'),
+                      new DropdownMenuItem(
+                          child: new Text('Last month'), value: 'Last month'),
+                      new DropdownMenuItem(
+                          child: new Text('This year'), value: 'This year'),
+                      new DropdownMenuItem(
+                          child: new Text('All time'), value: 'All time'),
+                    ],
+                    onChanged: (String value) {
+                      _period = value;
+                      _context.readRecurrentIncome2(_period).then((list) {
+                        setState(() {
+                          _recurrentIncomes = list;
+                        });
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          data: new ThemeData.dark(),
+        ),
       ),
       body: new Center(
         child: new ListView(

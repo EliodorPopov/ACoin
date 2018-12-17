@@ -37,11 +37,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
                 validator: (input) {
                   if (input.length == 0) {
                     return 'Adaugati Valoare';
-                  } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
-                        return 'Numele nu poate contine alte caractere decit litere...';
-                      }
-                    }
+                  } 
 
                 },
               ),

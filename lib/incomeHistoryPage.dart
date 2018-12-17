@@ -18,7 +18,8 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   DbContext _context;
   List<Income> _incomes = new List<Income>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-
+  String _period = 'Today';
+  
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
       ..message = message
@@ -36,7 +37,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readIncome().then((list) {
+    _context.readIncome2(_period).then((list) {
       setState(() {
         _incomes = list;
       });
@@ -47,7 +48,55 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(widget.title),
+        title: new Theme(
+          child: new Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: Title(
+                    child: Text(widget.title),
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                child: DropdownButtonHideUnderline(
+                  child: new DropdownButton<String>(
+                    style: TextStyle(fontSize: 15),
+                    value: _period,
+                    items: <DropdownMenuItem<String>>[
+                      new DropdownMenuItem(
+                        child: new Text('Today'),
+                        value: 'Today',
+                      ),
+                      new DropdownMenuItem(
+                          child: new Text('This week'), value: 'This week'),
+                      new DropdownMenuItem(
+                          child: new Text('This month'), value: 'This month'),
+                      new DropdownMenuItem(
+                          child: new Text('Last month'), value: 'Last month'),
+                      new DropdownMenuItem(
+                          child: new Text('This year'), value: 'This year'),
+                      new DropdownMenuItem(
+                          child: new Text('All time'), value: 'All time'),
+                    ],
+                    onChanged: (String value) {
+                      _period = value;
+                      _context.readIncome2(_period).then((list) {
+                        setState(() {
+                          _incomes = list;
+                        });
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          data: new ThemeData.dark(),
+        ),
       ),
       body: new Center(
         child: new ListView(

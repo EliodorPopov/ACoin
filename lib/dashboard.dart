@@ -8,6 +8,7 @@ import 'package:acoin/incomeHistoryPage.dart';
 import 'package:acoin/recurrentIncomeHistoryPage.dart';
 import 'package:acoin/db_context.dart';
 import 'package:acoin/slide_left_transition.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:acoin/goalsPage.dart';
@@ -27,6 +28,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   ScrollController _scrollController;
   bool _dialVisible = true;
   DbContext _context;
+  String _period = 'Today';
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
@@ -96,7 +98,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               ScrollDirection.forward);
         },
       );
-
   }
 
   void calculateBalance() async {
@@ -120,7 +121,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
   }
-
 
   _setDialVisible(bool value) {
     setState(() {
@@ -170,7 +170,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadExpenses() {
-    return _context.readExpense().then((list) {
+    return _context.readExpense2(_period).then((list) {
       setState(() {
         _expenses = list;
       });
@@ -178,22 +178,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadIncome() {
-    return _context.readIncome().then((list) {
+    return _context.readIncome2(_period).then((list) {
       setState(() {
         _incomes = list;
       });
     });
   }
 
-
   Future<Null> loadRecurrentIncome() {
-    return _context.readRecurrentIncome().then((list) {
+    return _context.readRecurrentIncome2(_period).then((list) {
       setState(() {
         _recurrentIncomes = list;
       });
     });
   }
-
 
   List<charts.Series<Expense, String>> expensesListDB() {
     return [
@@ -210,7 +208,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<charts.Series<Income, String>> incomesListDB() {
     return [
       new charts.Series<Income, String>(
-
           id: 'Sales',
           domainFn: (Income sales, _) => sales.name,
           measureFn: (Income sales, _) => sales.value ?? 0,
@@ -222,7 +219,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return [
       new charts.Series<RecurrentIncome, String>(
           id: 'Sales',
-
           domainFn: (RecurrentIncome sales, _) => sales.name,
           measureFn: (RecurrentIncome sales, _) => sales.value ?? 0,
           data: _recurrentIncomes)
@@ -233,7 +229,55 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(widget.title),
+        title: new Theme(
+          child: new Row(
+            //mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: Title(
+                    child: Text(widget.title),
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              // DateRangeFilter(
+              //   onRangeChanged: (from, to) => 
+              Container(
+                alignment: Alignment.centerRight,
+                child: DropdownButtonHideUnderline(
+                  child: new DropdownButton<String>(
+                    value: _period,
+                    items: <DropdownMenuItem<String>>[
+                      new DropdownMenuItem(
+                        child: new Text('Today'),
+                        value: 'Today',
+                      ),
+                      new DropdownMenuItem(
+                          child: new Text('This week'), value: 'This week'),
+                      new DropdownMenuItem(
+                          child: new Text('This month'), value: 'This month'),
+                      new DropdownMenuItem(
+                          child: new Text('Last month'), value: 'Last month'),
+                      new DropdownMenuItem(
+                          child: new Text('This year'), value: 'This year'),
+                      new DropdownMenuItem(
+                          child: new Text('All time'), value: 'All time'),
+                    ],
+                    onChanged: (String value) {
+                      _period = value;
+                      setState(() {
+                        calculateBalance();
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          data: new ThemeData.dark(),
+        ),
       ),
       body: new Center(
         child: new ListView(
@@ -244,7 +288,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardRecurrentIncome(context),
             buildCardIncome(context),
             buildCardGoal(context),
-
           ],
         ),
       ),
@@ -326,7 +369,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           ),
                     constraints:
                         BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                    alignment: Alignment.centerRight,
+                    alignment: Alignment.center,
                   ),
                   flex: 3,
                 ),
@@ -373,8 +416,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   child: new Column(
                     children: [
                       new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
-                      new Text(
-                          "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%")
+                       new Text(
+                           "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%"),
+                      // new ListView(
+                      //   children: _recurrentIncomes.map((i) {
+                      //       return ListTile();
+                      //   }),
+                      // )
                     ],
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -482,19 +530,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 }
 
 Padding buildCardGoal(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10.0),
-      child: GestureDetector(
-        child: Card(
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-            color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
-            alignment: Alignment.centerLeft,
-            child: new GestureDetector(
-              onTap: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => GoalsPage()));
-                        },
+  return Padding(
+    padding: EdgeInsets.all(10.0),
+    child: GestureDetector(
+      child: Card(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+          color: Colors.white,
+          constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
+          alignment: Alignment.centerLeft,
+          child: new GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => GoalsPage()));
+            },
             child: Row(
               children: <Widget>[
                 Expanded(
@@ -514,13 +563,12 @@ Padding buildCardGoal(BuildContext context) {
                 ),
               ],
             ),
-           ),
           ),
         ),
       ),
-    );
+    ),
+  );
 }
-
 
 class PieOutsideLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;

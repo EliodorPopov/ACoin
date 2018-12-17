@@ -2,6 +2,8 @@ import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+
+
 class AddExpensePage extends StatefulWidget {
   AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -50,12 +52,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
-                    } else {
-
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
-                        return 'Numele nu poate contine alte caractere decit litere...';
-
-                      }
+                    
                     }
                   }),
               FormField<String>(
@@ -116,7 +113,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       onPressed: _submit,
                       child: Text('Submit'),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -129,8 +126,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.addExpense(
-          _name, int.tryParse(_value), _date, _category);
+      _context.addExpense(_name, int.tryParse(_value), _date, _category);
       Navigator.pop(context, true);
     }
   }
