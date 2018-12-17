@@ -1,4 +1,0 @@
-#Wed Dec 05 23:29:04 EET 2018
-base.0=X\:\\flutter\\acoin\\build\\app\\intermediates\\transforms\\dexMerger\\release\\0
-path.0=classes.dex
-renamed.0=classes.dex
