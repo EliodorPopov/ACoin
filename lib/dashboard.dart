@@ -170,7 +170,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadExpenses() {
-    return _context.readExpense2(_period).then((list) {
+    return _context.readExpense(_period).then((list) {
       setState(() {
         _expenses = list;
       });
@@ -178,7 +178,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadIncome() {
-    return _context.readIncome2(_period).then((list) {
+    return _context.readIncome(_period).then((list) {
       setState(() {
         _incomes = list;
       });
@@ -186,7 +186,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadRecurrentIncome() {
-    return _context.readRecurrentIncome2(_period).then((list) {
+    return _context.readRecurrentIncome(_period).then((list) {
       setState(() {
         _recurrentIncomes = list;
       });

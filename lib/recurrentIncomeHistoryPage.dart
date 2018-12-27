@@ -1,3 +1,4 @@
+import 'package:acoin/addIncomePage.dart';
 import 'package:acoin/editIncomePage.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/db_context.dart';
@@ -38,7 +39,7 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readRecurrentIncome2(_period).then((list) {
+    _context.readRecurrentIncome(_period).then((list) {
       setState(() {
         _recurrentIncomes = list;
       });
@@ -85,7 +86,7 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                     ],
                     onChanged: (String value) {
                       _period = value;
-                      _context.readRecurrentIncome2(_period).then((list) {
+                      _context.readRecurrentIncome(_period).then((list) {
                         setState(() {
                           _recurrentIncomes = list;
                         });
@@ -121,7 +122,7 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                         _showSuccessSnackBar("Deleted!", true);
                       else
                         _showSuccessSnackBar("Saved!", false);
-                    }).then((e) => _context.readRecurrentIncome().then((list) {
+                    }).then((e) => _context.readRecurrentIncome("All time").then((list) {
                           setState(() {
                             _recurrentIncomes = list;
                           });
@@ -142,6 +143,25 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
             },
           ).toList(),
         ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+        onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (c) => AddIncomePage(
+                          title: "Add Recurrent Income", isRecurrent: true,
+                        ))).then((isSuccessful) async {
+              if (isSuccessful) {
+                await _context.readRecurrentIncome(_period).then((list) {
+                  setState(() {
+                    _recurrentIncomes = list;
+                  }); 
+                });
+                _showSuccessSnackBar("Added", false);
+              }
+            }),
       ),
     );
   }

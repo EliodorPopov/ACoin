@@ -1,3 +1,4 @@
+import 'package:acoin/addExpensePage.dart';
 import 'package:acoin/db_context.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/editExpensePage.dart';
@@ -18,7 +19,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-  String _period = 'Today';
+  String _period = 'All time';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -37,7 +38,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readExpense().then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
         _expenses = list;
       });
@@ -84,7 +85,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                     ],
                     onChanged: (String value) {
                       _period = value;
-                      _context.readExpense2(_period).then((list) {
+                      _context.readExpense(_period).then((list) {
                         setState(() {
                           _expenses = list;
                         });
@@ -121,7 +122,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                       else if (isSuccessful == false)
                         _showSuccessSnackBar("Saved!", false);
                     }).then(
-                      (e) => _context.readExpense().then((list) {
+                      (e) => _context.readExpense("All time").then((list) {
                             setState(() {
                               _expenses = list;
                             });
@@ -139,6 +140,25 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
             },
           ).toList(),
         ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+        onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (c) => AddExpensePage(
+                          title: "Add Expense",
+                        ))).then((isSuccessful) async {
+              if (isSuccessful) {
+                await _context.readExpense(_period).then((list) {
+                  setState(() {
+                    _expenses = list;
+                  });
+                });
+                _showSuccessSnackBar("Added", false);
+              }
+            }),
       ),
     );
   }

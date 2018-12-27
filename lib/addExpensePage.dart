@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-
 class AddExpensePage extends StatefulWidget {
   AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
-
+  
   @override
   _AddExpensePageState createState() => new _AddExpensePageState();
 }
@@ -25,7 +24,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readExpense().then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
         _categories =
             list.map((e) => e.category).toSet().toList(growable: true);

@@ -3,7 +3,6 @@ import 'package:acoin/goal.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
-import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -13,7 +12,9 @@ class DbContext {
   static final DbContext _instance = new DbContext._internal();
   factory DbContext() => _instance;
   DbContext._internal();
-
+  int minPeriod;
+  int maxPeriod;
+  DateTime now;
   Future<Database> get db {
     if (_db == null) _db = initialize();
     return _db;
@@ -89,8 +90,8 @@ class DbContext {
     });
   }
 
-  Future<void> addIncome(String name, int value, String source,
-      DateTime date, bool isRecurrent) async {
+  Future<void> addIncome(String name, int value, String source, DateTime date,
+      bool isRecurrent) async {
     var database = await db;
     if (isRecurrent) {
       await database.insert(recurrentIncomeTable, {
@@ -110,8 +111,7 @@ class DbContext {
     }
   }
 
-  Future<void> addGoal(
-      String name,int value) async {
+  Future<void> addGoal(String name, int value) async {
     var database = await db;
     await database.insert(goalsTable, {
       "name": name,
@@ -119,8 +119,7 @@ class DbContext {
     });
   }
 
-  Future<void> addGoalTransaction(
-      int id, int value, String details) async {
+  Future<void> addGoalTransaction(int id, int value, String details) async {
     var database = await db;
     await database.insert(goalsTransactionTable, {
       "id_transaction": id,
@@ -129,102 +128,78 @@ class DbContext {
     });
   }
 
-  Future<List<RecurrentIncome>> readRecurrentIncome() async {
+  void setPeriod(String period) {
+    maxPeriod = DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day + 1)
+        .millisecondsSinceEpoch;
+    now =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    switch (period) {
+      case 'Today':
+        minPeriod =
+            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+        break;
+      case 'This week':
+        minPeriod = DateTime(now.year, now.month, now.day - now.weekday + 1)
+            .millisecondsSinceEpoch;
+        break;
+      case 'This month':
+        minPeriod = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
+        break;
+      case 'Last month':
+        minPeriod = DateTime(now.year, now.month - 1, 1).millisecondsSinceEpoch;
+        maxPeriod =
+            (DateTime(now.year, now.month - 1, 1).add(new Duration(days: 30)))
+                .millisecondsSinceEpoch;
+        //currently not possible to add 1 month, you have to do it manually for every month and take into consideration leap years
+        break;
+      case 'This year':
+        minPeriod = DateTime(now.year, 1, 1).millisecondsSinceEpoch;
+        break;
+      default:
+        minPeriod =
+            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    }
+  }
+
+  Future<List<RecurrentIncome>> readRecurrentIncome(String period) async {
     var database = await db;
-    var recurrentIncomes = await database.query(recurrentIncomeTable);
+    List<Map<String, dynamic>> recurrentIncomes;
+    if (period == 'All time')
+      recurrentIncomes = await database.query(recurrentIncomeTable);
+    else {
+      setPeriod(period);
+      recurrentIncomes = await database.rawQuery(
+          'SELECT * FROM $recurrentIncomeTable where date >= $minPeriod and date < $maxPeriod');
+    }
     return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
 
-  Future<List<RecurrentIncome>> readRecurrentIncome2(String period) async {
+  Future<List<Expense>> readExpense(String period) async {
     var database = await db;
-    int minPeriod;
-    int maxPeriod = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day+1).millisecondsSinceEpoch;
-    var now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    switch(period){
-      case 'Today': minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-        break;
-      case 'This week': minPeriod = DateTime(now.year, now.month, now.day-now.weekday+1).millisecondsSinceEpoch;
-        break;
-      case 'This month': minPeriod = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
-        break;
-      case 'Last month': minPeriod = DateTime(now.year, now.month-1, 1).millisecondsSinceEpoch;
-        maxPeriod = (DateTime(now.year, now.month-1, 1).add(new Duration(days: 30))).millisecondsSinceEpoch;
-        //currently not possible to add 1 month, you have to do it manually for every month and take into consideration leap years
-        break;
-      case 'This year': minPeriod = DateTime(now.year, 1,1).millisecondsSinceEpoch;
-        break;
-      default: minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    List<Map<String, dynamic>> expenses;
+    if (period == 'All time')
+      expenses = await database.query(expensesTable);
+    else {
+      setPeriod(period);
+      expenses = await database.rawQuery(
+          'SELECT * FROM $expensesTable where date >= $minPeriod and date < $maxPeriod');
     }
-    
-    var recurrentIncomes = await database.rawQuery('SELECT * FROM $recurrentIncomeTable where date >= $minPeriod and date < $maxPeriod');
-    if (period == 'All time') recurrentIncomes = await database.query(recurrentIncomeTable);
-    return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
-  }
-
-  Future<List<Expense>> readExpense() async {
-    var database = await db;
-    var standard = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    print(standard.millisecondsSinceEpoch);
-    var expenses = await database.query(expensesTable);
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<Expense>> readExpense2(String period) async {
+  Future<List<Income>> readIncome(String period) async {
     var database = await db;
-    int minPeriod;
-    int maxPeriod = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day+1).millisecondsSinceEpoch;
-    var now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    switch(period){
-      case 'Today': minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-        break;
-      case 'This week': minPeriod = DateTime(now.year, now.month, now.day-now.weekday+1).millisecondsSinceEpoch;
-        break;
-      case 'This month': minPeriod = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
-        break;
-      case 'Last month': minPeriod = DateTime(now.year, now.month-1, 1).millisecondsSinceEpoch;
-        maxPeriod = (DateTime(now.year, now.month-1, 1).add(new Duration(days: 30))).millisecondsSinceEpoch;
-        //currently not possible to add 1 month, you have to do it manually for every month and take into consideration leap years
-        break;
-      case 'This year': minPeriod = DateTime(now.year, 1,1).millisecondsSinceEpoch;
-        break;
-      default: minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    List<Map<String, dynamic>> incomes;
+    if (period == 'All time')
+      incomes = await database.query(incomeTable);
+    else {
+      setPeriod(period);
+      incomes = await database.rawQuery(
+          'SELECT * FROM $incomeTable where date >= $minPeriod and date < $maxPeriod');
     }
-    var expenses = await database.rawQuery('SELECT * FROM $expensesTable where date >= $minPeriod and date < $maxPeriod');
-    if (period == 'All time') expenses = await database.query(expensesTable);
-    return expenses.map((m) => Expense.fromMap(m)).toList();
-  }
-
-  Future<List<Income>> readIncome() async {
-    var database = await db;
-    var incomes = await database.query(incomeTable);
     return incomes.map((m) => Income.fromMap(m)).toList();
   }
-
-  Future<List<Income>> readIncome2(String period) async {
-    var database = await db;
-    int minPeriod;
-    int maxPeriod = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day+1).millisecondsSinceEpoch;
-    var now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    switch(period){
-      case 'Today': minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-        break;
-      case 'This week': minPeriod = DateTime(now.year, now.month, now.day-now.weekday+1).millisecondsSinceEpoch;
-        break;
-      case 'This month': minPeriod = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
-        break;
-      case 'Last month': minPeriod = DateTime(now.year, now.month-1, 1).millisecondsSinceEpoch;
-        maxPeriod = (DateTime(now.year, now.month-1, 1).add(new Duration(days: 30))).millisecondsSinceEpoch;
-        //currently not possible to add 1 month, you have to do it manually for every month and take into consideration leap years
-        break;
-      case 'This year': minPeriod = DateTime(now.year, 1,1).millisecondsSinceEpoch;
-        break;
-      default: minPeriod = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    }
-    var incomes = await database.rawQuery('SELECT * FROM $incomeTable where date >= $minPeriod and date < $maxPeriod');
-    if (period == 'All time') incomes = await database.query(incomeTable);
-    return incomes.map((m) => Income.fromMap(m)).toList();
-  }
-
 
   Future<List<Goal>> readGoals() async {
     var database = await db;

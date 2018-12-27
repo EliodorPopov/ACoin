@@ -41,7 +41,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
     bool isTrue = true;
     _category = widget.dbCategory;
     _context = new DbContext();
-    _context.readExpense().then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
         _expenses = list;
         _expenses.forEach((e) {

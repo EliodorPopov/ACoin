@@ -1,3 +1,4 @@
+import 'package:acoin/addIncomePage.dart';
 import 'package:acoin/income.dart';
 import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   List<Income> _incomes = new List<Income>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   String _period = 'Today';
-  
+
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
       ..message = message
@@ -37,7 +38,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readIncome2(_period).then((list) {
+    _context.readIncome(_period).then((list) {
       setState(() {
         _incomes = list;
       });
@@ -84,7 +85,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                     ],
                     onChanged: (String value) {
                       _period = value;
-                      _context.readIncome2(_period).then((list) {
+                      _context.readIncome(_period).then((list) {
                         setState(() {
                           _incomes = list;
                         });
@@ -120,7 +121,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                         _showSuccessSnackBar("Deleted!", true);
                       else
                         _showSuccessSnackBar("Saved!", false);
-                    }).then((e) => _context.readIncome().then((list) {
+                    }).then((e) => _context.readIncome("All time").then((list) {
                           setState(() {
                             _incomes = list;
                           });
@@ -131,13 +132,31 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                     textScaleFactor: 3.0,
                   ),
                   subtitle: Text(
-                    i.value.toString() + " MDL " + dateFormat.format(i.date)),
-
+                      i.value.toString() + " MDL " + dateFormat.format(i.date)),
                 ),
               );
             },
           ).toList(),
         ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+        onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (c) => AddIncomePage(
+                          title: "Add Income", isRecurrent: false,
+                        ))).then((isSuccessful) async {
+              if (isSuccessful) {
+                await _context.readIncome(_period).then((list) {
+                  setState(() {
+                    _incomes = list;
+                  });
+                });
+                _showSuccessSnackBar("Added", false);
+              }
+            }),
       ),
     );
   }
