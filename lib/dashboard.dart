@@ -1,3 +1,4 @@
+import 'package:acoin/category.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
 import 'package:acoin/recurrentIncome.dart';
@@ -31,6 +32,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   String _period = 'Today';
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
+  List<Category> _categories = new List<Category>();
+  List<String> _categoryList = new List<String>();
+  Category tempCat = new Category();
+  int tempTot = 0;
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
   int currentBalance = 0;
   int totalIncomes = 0;
@@ -120,6 +125,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     });
     currentBalance = totalIncomes - totalExpenses;
     print(currentBalance);
+    calculateCategories();
+  }
+
+  void calculateCategories() {
+    _categories.clear();
+    _categoryList.forEach((c) {
+      tempCat = new Category();
+      tempTot = 0;
+      tempCat.name = c.toString();
+      _expenses.forEach((e) {
+        if (e.category == c) {
+          tempTot += e.value;
+        }
+      });
+      tempCat.total = tempTot;
+      _categories.add(tempCat);
+    });
   }
 
   _setDialVisible(bool value) {
@@ -133,7 +155,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: IconThemeData(size: 22.0),
       // child: Icon(Icons.add),
-      onOpen: () => print('OPENING DIAL'),
+      onOpen: () {
+        print('OPENING DIAL');
+      },
       onClose: () {
         print('DIAL CLOSED');
         calculateBalance();
@@ -173,6 +197,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return _context.readExpense(_period).then((list) {
       setState(() {
         _expenses = list;
+        _categoryList =
+            list.map((e) => e.category).toSet().toList(growable: true);
       });
     });
   }
@@ -193,13 +219,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     });
   }
 
-  List<charts.Series<Expense, String>> expensesListDB() {
+  List<charts.Series<Category, String>> expensesListDB() {
     return [
-      new charts.Series<Expense, String>(
+      new charts.Series<Category, String>(
         id: 'Sales',
-        domainFn: (Expense sales, _) => sales.name,
-        measureFn: (Expense sales, _) => sales.value ?? 0,
-        data: _expenses,
+        domainFn: (Category sales, _) => sales.name,
+        measureFn: (Category sales, _) => sales.total ?? 0,
+        data: _categories,
         colorFn: (_, __) => charts.MaterialPalette.lime.shadeDefault,
       )
     ];
@@ -242,8 +268,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              // DateRangeFilter(
-              //   onRangeChanged: (from, to) => 
               Container(
                 alignment: Alignment.centerRight,
                 child: DropdownButtonHideUnderline(
@@ -343,21 +367,32 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 250.0, maxWidth: 200.0),
+            constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 200.0),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 new Container(
                   child: new Column(
                     children: [
                       new Text("Expenses:\n", style: TextStyle(fontSize: 20.0)),
-                      new Text(
-                          "Entertainment - 10%\nFood - 20%\nRent- 30%\nDrinks - 40%")
+                      new Container(
+                        child: new ListView.builder(
+                          itemCount: _categories.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Text(_categories.toList()[index].name +
+                                ' ' +
+                                _categories.toList()[index].total.toString() +
+                                ' lei');
+                          },
+                        ),
+                        constraints: BoxConstraints(maxHeight: 120.0, maxWidth: 100.0),
+                        
+                      ),
                     ],
-                    crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.center,
                   ),
-                  constraints: BoxConstraints(maxWidth: 300.0),
+                  constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 100.0),
+                  alignment: Alignment.topCenter,
                 ),
                 new Expanded(
                   child: new Container(
@@ -397,37 +432,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
+            constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 200.0),
             alignment: Alignment.centerLeft,
-            child: Row(
+            child: Column(
               children: [
-                new Container(
+                new Container(child: new Text('Monthly Income', textScaleFactor: 1.5,),),
+                new Expanded(
                   child: _recurrentIncomes.length > 0
                       ? HorizontalBarLabelChart(recurrentIncomesListDB())
                       : new Text(
                           "no data",
                           style: TextStyle(fontSize: 20.0),
                         ),
-                  constraints:
-                      BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                  alignment: Alignment.centerLeft,
                 ),
-                new Expanded(
-                  child: new Column(
-                    children: [
-                      new Text("Income:\n", style: TextStyle(fontSize: 20.0)),
-                       new Text(
-                           "Salary - 10%\nScholarship - 20%\nLottery- 30%\nOther - 40%"),
-                      // new ListView(
-                      //   children: _recurrentIncomes.map((i) {
-                      //       return ListTile();
-                      //   }),
-                      // )
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
-                )
               ],
             ),
           ),
@@ -444,12 +461,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 80.0, maxWidth: 180.0),
+            constraints: BoxConstraints(maxHeight: 85.0, maxWidth: 180.0),
             alignment: Alignment.centerLeft,
             child: new Column(
               children: [
                 new Text(
                   "How much you spent this month:\n",
+                  textScaleFactor: 1.3,
                 ),
                 new Container(
                   child: new LinearProgressIndicator(
@@ -465,13 +483,24 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   children: [
                     new Expanded(
                       child: new Container(
-                        child: Text(totalExpenses.toString()),
+                        child: Text(totalExpenses.toString() + " lei"),
                         padding: EdgeInsets.all(5.0),
                       ),
                     ),
                     new Expanded(
                       child: new Container(
-                        child: Text(totalIncomes.toString()),
+                        child: Text((totalIncomes > 0
+                                    ? (totalExpenses / totalIncomes) * 100
+                                    : 0)
+                                .toStringAsFixed(0) +
+                            "%"),
+                        padding: EdgeInsets.all(5.0),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                    new Expanded(
+                      child: new Container(
+                        child: Text(totalIncomes.toString() + " lei"),
                         padding: EdgeInsets.all(5.0),
                         alignment: Alignment.centerRight,
                       ),

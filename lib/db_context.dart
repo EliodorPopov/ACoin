@@ -1,4 +1,5 @@
 import 'package:acoin/GoalTransaction.dart';
+import 'package:acoin/category.dart';
 import 'package:acoin/goal.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/expense.dart';
@@ -37,7 +38,7 @@ class DbContext {
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
     await db.execute('''
-        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
+        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT)
         ''');
 
     await db.execute('''
@@ -263,5 +264,10 @@ class DbContext {
       delete from $table
       where id = $id
     ''');
+  }
+
+  Future<void> getCategoryTotals(String period) async {
+    var database = await db;
+    
   }
 }

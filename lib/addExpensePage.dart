@@ -122,12 +122,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  void _submit() {
+  void _submit() async {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _context.addExpense(
           _name, int.tryParse(_value), _date, _category);
-      Navigator.pop(context, true);
+      Navigator.pop(context, true); 
     }
   }
 
@@ -164,9 +164,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   _category = _newCategory;
                   _newCategory = null;
                   Navigator.pop(context);
-                  print("printed");
+                  print("category added: "+_category);
                 }
-                print(_newCategory);
               },
             ),
           ]),
