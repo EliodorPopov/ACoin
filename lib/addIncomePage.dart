@@ -38,7 +38,10 @@ class _AddIncomePageState extends State<AddIncomePage> {
                   if (input.length == 0) {
                     return 'Adaugati Valoare';
                   } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
+                    if(!(input.contains(new RegExp(
+                        r'[A-Z]',
+                        caseSensitive: false,
+                      )))) {
                         return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }
@@ -84,7 +87,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.updateIncomeTable(
+      _context.addIncome(
           _name, int.tryParse(_value), _source, _date, widget.isRecurrent);
       Navigator.pop(context, true);
     }

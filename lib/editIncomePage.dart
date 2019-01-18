@@ -59,7 +59,10 @@ class _EditIncomePageState extends State<EditIncomePage> {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
                     } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
+                      if(!(input.contains(new RegExp(
+                        r'[A-Z]',
+                        caseSensitive: false,
+                      )))){
                         return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }

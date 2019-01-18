@@ -487,7 +487,7 @@ Padding buildCardGoal(BuildContext context) {
             alignment: Alignment.centerLeft,
             child: new GestureDetector(
               onTap: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => goalsPage()));
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => GoalsPage()));
                         },
             child: Row(
               children: <Widget>[

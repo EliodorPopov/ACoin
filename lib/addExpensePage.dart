@@ -51,7 +51,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
                     } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
+                      if(!(input.contains(new RegExp(
+                        r'[A-Z]',
+                        caseSensitive: false,
+                      )))){
                         return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }
@@ -127,7 +130,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.updateExpenseTable(
+      _context.addExpense(
           _name, int.tryParse(_value), _date, _category);
       Navigator.pop(context, true);
     }

@@ -1,3 +1,5 @@
+import 'package:acoin/GoalTransaction.dart';
+import 'package:acoin/goal.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
@@ -27,8 +29,11 @@ class DbContext {
   final String recurrentIncomeTable = "RecurrentIncomeTable";
   final String expensesTable = "ExpensesTable";
   final String incomeTable = "IncomeTable";
+  final String goalsTable = "GoalsTable";
+  final String goalsTransactionTable = "GoalsTransactionTable";
 
   Future<void> onCreate(Database db, int version) async {
+    //CHANGE VALUES TO FLOAT
     await db.execute('''
         CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
         ''');
@@ -41,30 +46,44 @@ class DbContext {
         CREATE TABLE $incomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER)
       ''');
 
+    await db.execute('''
+        CREATE TABLE $goalsTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)
+    ''');
+
+    await db.execute('''
+        CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
+    ''');
+
+
     await db.insert(recurrentIncomeTable, {
-      "name": "bursa1",
+      "name": "mock Recurrent Income",
       "value": 850,
-      "source": "utm2",
+      "source": "mock Source",
       "date": DateTime.now().millisecondsSinceEpoch,
       "isEnabled": true
     });
 
     await db.insert(incomeTable, {
-      "name": "initial",
+      "name": "mock Income",
       "value": 1000,
-      "source": "source",
+      "source": "mock Source",
       "date": DateTime.now().millisecondsSinceEpoch,
+    });
+
+    await db.insert(goalsTable, {
+      "name": "mock goal",
+      "value": 1000,
     });
 
     await db.insert(expensesTable, {
-      "name": "drinks",
+      "name": "mock Expense",
       "value": 1000,
       "date": DateTime.now().millisecondsSinceEpoch,
-      "category": "personal",
+      "category": "mock Category",
     });
   }
 
-  Future<void> updateExpenseTable(
+  Future<void> addExpense(
       String name, int value, DateTime date, String category) async {
     var database = await db;
     await database.insert(expensesTable, {
@@ -75,7 +94,7 @@ class DbContext {
     });
   }
 
-  Future<void> updateIncomeTable(String name, int value, String source,
+  Future<void> addIncome(String name, int value, String source,
       DateTime date, bool isRecurrent) async {
     var database = await db;
     if (isRecurrent) {
@@ -96,6 +115,25 @@ class DbContext {
     }
   }
 
+  Future<void> addGoal(
+      String name,int value) async {
+    var database = await db;
+    await database.insert(goalsTable, {
+      "name": name,
+      "value": value,
+    });
+  }
+
+  Future<void> addGoalTransaction(
+      int id, int value, String details) async {
+    var database = await db;
+    await database.insert(goalsTransactionTable, {
+      "id_transaction": id,
+      "value": value,
+      "details": details,
+    });
+  }
+
   Future<List<RecurrentIncome>> readRecurrentIncome() async {
     var database = await db;
     var recurrentIncomes = await database.query(recurrentIncomeTable);
@@ -112,6 +150,18 @@ class DbContext {
     var database = await db;
     var incomes = await database.query(incomeTable);
     return incomes.map((m) => Income.fromMap(m)).toList();
+  }
+
+  Future<List<Goal>> readGoals() async {
+    var database = await db;
+    var goals = await database.query(goalsTable);
+    return goals.map((m) => Goal.fromMap(m)).toList();
+  }
+
+  Future<List<GoalTransaction>> readGoalsTransaction() async {
+    var database = await db;
+    var goalsTransaction = await database.query(goalsTransactionTable);
+    return goalsTransaction.map((m) => GoalTransaction.fromMap(m)).toList();
   }
 
   Future<dynamic> toggle(RecurrentIncome income) async {

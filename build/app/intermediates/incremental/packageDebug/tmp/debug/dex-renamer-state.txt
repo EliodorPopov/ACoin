@@ -1,4 +1,4 @@
-#Thu Dec 06 19:31:18 EET 2018
+#Fri Dec 14 11:15:12 EET 2018
 base.0=C\:\\src\\acoin\\build\\app\\intermediates\\transforms\\dexMerger\\debug\\0
 path.0=classes.dex
 renamed.0=classes.dex
