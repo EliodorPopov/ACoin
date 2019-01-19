@@ -1,4 +1,5 @@
 import 'package:acoin/GoalTransaction.dart';
+import 'package:acoin/category.dart';
 import 'package:acoin/goal.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/expense.dart';
@@ -12,7 +13,9 @@ class DbContext {
   static final DbContext _instance = new DbContext._internal();
   factory DbContext() => _instance;
   DbContext._internal();
-
+  int minPeriod;
+  int maxPeriod;
+  DateTime now;
   Future<Database> get db {
     if (_db == null) _db = initialize();
     return _db;
@@ -35,7 +38,7 @@ class DbContext {
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
     await db.execute('''
-        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT);
+        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT)
         ''');
 
     await db.execute('''
@@ -53,7 +56,6 @@ class DbContext {
     await db.execute('''
         CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
     ''');
-
 
     await db.insert(recurrentIncomeTable, {
       "name": "mock Recurrent Income",
@@ -89,8 +91,8 @@ class DbContext {
     });
   }
 
-  Future<void> addIncome(String name, int value, String source,
-      DateTime date, bool isRecurrent) async {
+  Future<void> addIncome(String name, int value, String source, DateTime date,
+      bool isRecurrent) async {
     var database = await db;
     if (isRecurrent) {
       await database.insert(recurrentIncomeTable, {
@@ -110,8 +112,7 @@ class DbContext {
     }
   }
 
-  Future<void> addGoal(
-      String name,int value) async {
+  Future<void> addGoal(String name, int value) async {
     var database = await db;
     await database.insert(goalsTable, {
       "name": name,
@@ -119,8 +120,7 @@ class DbContext {
     });
   }
 
-  Future<void> addGoalTransaction(
-      int id, int value, String details) async {
+  Future<void> addGoalTransaction(int id, int value, String details) async {
     var database = await db;
     await database.insert(goalsTransactionTable, {
       "id_transaction": id,
@@ -129,21 +129,76 @@ class DbContext {
     });
   }
 
-  Future<List<RecurrentIncome>> readRecurrentIncome() async {
+  void setPeriod(String period) {
+    maxPeriod = DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day + 1)
+        .millisecondsSinceEpoch;
+    now =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    switch (period) {
+      case 'Today':
+        minPeriod =
+            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+        break;
+      case 'This week':
+        minPeriod = DateTime(now.year, now.month, now.day - now.weekday + 1)
+            .millisecondsSinceEpoch;
+        break;
+      case 'This month':
+        minPeriod = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
+        break;
+      case 'Last month':
+        minPeriod = DateTime(now.year, now.month - 1, 1).millisecondsSinceEpoch;
+        maxPeriod =
+            (DateTime(now.year, now.month - 1, 1).add(new Duration(days: 30)))
+                .millisecondsSinceEpoch;
+        //currently not possible to add 1 month, you have to do it manually for every month and take into consideration leap years
+        break;
+      case 'This year':
+        minPeriod = DateTime(now.year, 1, 1).millisecondsSinceEpoch;
+        break;
+      default:
+        minPeriod =
+            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    }
+  }
+
+  Future<List<RecurrentIncome>> readRecurrentIncome(String period) async {
     var database = await db;
-    var recurrentIncomes = await database.query(recurrentIncomeTable);
+    List<Map<String, dynamic>> recurrentIncomes;
+    if (period == 'All time')
+      recurrentIncomes = await database.query(recurrentIncomeTable);
+    else {
+      setPeriod(period);
+      recurrentIncomes = await database.rawQuery(
+          'SELECT * FROM $recurrentIncomeTable where date >= $minPeriod and date < $maxPeriod');
+    }
     return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
 
-  Future<List<Expense>> readExpense() async {
+  Future<List<Expense>> readExpense(String period) async {
     var database = await db;
-    var expenses = await database.query(expensesTable);
+    List<Map<String, dynamic>> expenses;
+    if (period == 'All time')
+      expenses = await database.query(expensesTable);
+    else {
+      setPeriod(period);
+      expenses = await database.rawQuery(
+          'SELECT * FROM $expensesTable where date >= $minPeriod and date < $maxPeriod');
+    }
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<Income>> readIncome() async {
+  Future<List<Income>> readIncome(String period) async {
     var database = await db;
-    var incomes = await database.query(incomeTable);
+    List<Map<String, dynamic>> incomes;
+    if (period == 'All time')
+      incomes = await database.query(incomeTable);
+    else {
+      setPeriod(period);
+      incomes = await database.rawQuery(
+          'SELECT * FROM $incomeTable where date >= $minPeriod and date < $maxPeriod');
+    }
     return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
@@ -209,5 +264,10 @@ class DbContext {
       delete from $table
       where id = $id
     ''');
+  }
+
+  Future<void> getCategoryTotals(String period) async {
+    var database = await db;
+    
   }
 }

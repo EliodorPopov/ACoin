@@ -5,7 +5,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 class AddExpensePage extends StatefulWidget {
   AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
-
+  
   @override
   _AddExpensePageState createState() => new _AddExpensePageState();
 }
@@ -23,7 +23,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readExpense().then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
         _categories =
             list.map((e) => e.category).toSet().toList(growable: true);
@@ -50,12 +50,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
-                    } else {
-
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
-                        return 'Numele nu poate contine alte caractere decit litere...';
-
-                      }
+                    
                     }
                   }),
               FormField<String>(
@@ -116,7 +111,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       onPressed: _submit,
                       child: Text('Submit'),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -126,12 +121,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  void _submit() {
+  void _submit() async {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _context.addExpense(
           _name, int.tryParse(_value), _date, _category);
-      Navigator.pop(context, true);
+      Navigator.pop(context, true); 
     }
   }
 
@@ -168,9 +163,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   _category = _newCategory;
                   _newCategory = null;
                   Navigator.pop(context);
-                  print("printed");
+                  print("category added: "+_category);
                 }
-                print(_newCategory);
               },
             ),
           ]),

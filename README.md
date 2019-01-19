@@ -6,21 +6,49 @@ A new Flutter Amdaris-UTM Project.
 
 ## Tabelul Expenses:
 
-| id (int)        | name (String)       | value (int)               | date (int)      | category (String) |
-|-----------------|---------------------|---------------------------|-----------------|-------------------|
-| Id of the tuple | Name of the expense | Value of the expense(MDL) | Date            | Category          |
-
+| Column   | Type   | Description                    |
+|----------|--------|--------------------------------|
+| id       | int    | Id of the tuple                |
+| name     | String | Name of the expense            |
+| value    | int    | Value of the expense(MDL)      |
+| date     | int    | Date in millisecondsSinceEpoch |
+| category | String | Category                       |
 
 ## Tabelul RecurrentIncome
 
-| id (int) 		  | name (String) 		| value (int) 				| source (String)      | date (int) | isEnable (bool)  |
-|-----------------|---------------------|---------------------------|----------------------|------------|------------------|
-| Id of the tuple | Name of the expense | Value of the expense(MDL) | source of the income | date       | is it recurrent? |
-
+| Column   | Type   | Description                    |
+|----------|--------|--------------------------------|
+| id       | int    | Id of the tuple                |
+| name     | String | Name of the income             |
+| value    | int    | Value of the income(MDL)       |
+| source   | String | source of the income           |
+| date     | int    | date                           |
+| isEnable | bool   | is it recurrent?               |
 
 ## Tabelul Income
 
-| id (int) 		  | name (String) 		| value (int) 				| source (String)      | date (int) |
-|-----------------|---------------------|---------------------------|-----------------|-------------------|
-| Id of the tuple | Name of the expense | Value of the expense(MDL) | source of the income | date       |
+| Column   | Type   | Description                    |
+|----------|--------|--------------------------------|
+| id       | int    | Id of the tuple                |
+| name     | String | Name of the income             |
+| value    | int    | Value of the income(MDL)       |
+| source   | String | source of the income           |
+| date     | int    | date                           |
+
+## Tabelul Goals
+
+| Column   | Type   | Description                    |
+|----------|--------|--------------------------------|
+| id       | int    | Id of the tuple                |
+| name     | String | Name of the goal               |
+| value    | int    | Value of the goal(MDL)         |
+
+## Tabelul Goals
+
+| Column         | Type   | Description                    |
+|----------------|--------|--------------------------------|
+| id             | int    | Id of the tuple                |
+| id_transaction | int    | id of the connected goal       |
+| value          | int    | Value of the added money(MDL)  |
+| details        | String | details of added money         |
 

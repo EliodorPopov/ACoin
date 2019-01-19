@@ -1,5 +1,6 @@
 import 'package:acoin/expense.dart';
 import 'package:acoin/db_context.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -37,19 +38,13 @@ class _EditExpensePageState extends State<EditExpensePage> {
   @override
   initState() {
     super.initState();
-    bool isTrue = true;
     _category = widget.dbCategory;
     _context = new DbContext();
-    _context.readExpense().then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
         _expenses = list;
-        _expenses.forEach((e) {
-          _categories.forEach((f) {
-            if (f == e.category) isTrue = false;
-          });
-          if (isTrue) _categories.add(e.category);
-          isTrue = true;
-        });
+        _categories =
+            list.map((e) => e.category).toSet().toList(growable: true);
         _categories.add("Add Category");
       });
     });
@@ -74,11 +69,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
-                    } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))){
-                        return 'Numele nu poate contine alte caractere decit litere...';
-
-                      }
                     }
                   }),
               FormField<String>(
@@ -148,7 +138,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
-        onPressed: () => _submitDelete().then((value) {
+        onPressed: () => _submitDelete2().then((value) {
               if (value) Navigator.pop(context, true);
             }),
       ),
@@ -160,8 +150,13 @@ class _EditExpensePageState extends State<EditExpensePage> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       print(_name);
-      _context.editExpense(
-          widget.dbId, _name, int.tryParse(_value), _date, _category);
+      if (widget.dbName != _name ||
+          widget.dbValue != int.tryParse(_value) ||
+          widget.dbDate != _date ||
+          widget.dbCategory != _category) {
+        _context.editExpense(
+            widget.dbId, _name, int.tryParse(_value), _date, _category);
+      }
       Navigator.pop(context, false);
     }
   }
@@ -230,5 +225,28 @@ class _EditExpensePageState extends State<EditExpensePage> {
         );
       },
     );
+  }
+
+  Future<bool> _submitDelete2() {
+    return showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: new Text("Are you sure you want to delete ?"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: new Text('No!')),
+              new FlatButton(
+                  onPressed: () {
+                    _context.deleteExpense(widget.dbId);
+                    Navigator.pop(context, true);
+                  },
+                  child: new Text('Yes!')),
+            ],
+          );
+        });
   }
 }
