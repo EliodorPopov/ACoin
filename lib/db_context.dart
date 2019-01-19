@@ -34,6 +34,7 @@ class DbContext {
   final String incomeTable = "IncomeTable";
   final String goalsTable = "GoalsTable";
   final String goalsTransactionTable = "GoalsTransactionTable";
+  final String categoriesTable = "CategoriesTable";
 
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
@@ -56,6 +57,10 @@ class DbContext {
     await db.execute('''
         CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
     ''');
+    
+    await db.execute('''
+    CREATE TABLE $categoriesTable(id INTEGER PRIMARY KEY, name TEXT, path TEXT)
+    ''');
 
     await db.insert(recurrentIncomeTable, {
       "name": "mock Recurrent Income",
@@ -63,6 +68,11 @@ class DbContext {
       "source": "mock Source",
       "date": DateTime.now().millisecondsSinceEpoch,
       "isEnabled": true
+    });
+
+    await db.insert(categoriesTable, {
+      "name": "mock Category",
+      "path": "images/power.png"
     });
 
     await db.insert(incomeTable, {
@@ -126,6 +136,14 @@ class DbContext {
       "id_transaction": id,
       "value": value,
       "details": details,
+    });
+  }
+
+  Future<void> addCategory(String name, String path) async {
+    var database = await db;
+    await database.insert(categoriesTable, {
+      "name": name,
+      "path": path,
     });
   }
 
@@ -202,6 +220,12 @@ class DbContext {
     return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
+  Future<List<Category>> readCategories() async {
+    var database = await db;
+    var categories = await database.query(categoriesTable);
+    return categories.map((m) => Category.fromMap(m)).toList();
+  }
+
   Future<List<Goal>> readGoals() async {
     var database = await db;
     var goals = await database.query(goalsTable);
@@ -249,6 +273,17 @@ class DbContext {
     ''');
   }
 
+  Future<void> editCategory(int id, String name, String path) async {
+    var database = await db;
+    await database.execute('''
+      update $categoriesTable 
+      set name = '$name',
+          path = '$path'
+      where id = $id
+    ''');
+  }
+
+
   Future<void> deleteExpense(int id) async {
     var database = await db;
     await database.execute('''
@@ -266,8 +301,12 @@ class DbContext {
     ''');
   }
 
-  Future<void> getCategoryTotals(String period) async {
+  Future<void> deleteCategory(int id) async {
     var database = await db;
-    
+    await database.execute('''
+      delete from $categoriesTable
+      where id = $id
+    ''');
   }
+
 }
