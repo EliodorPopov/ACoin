@@ -135,7 +135,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       tempTot = 0;
       tempCat.name = c.toString();
       _expenses.forEach((e) {
-        if (e.category == c) {
+        if (e.categoryName == c) {
           tempTot += e.value;
         }
       });
@@ -198,7 +198,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       setState(() {
         _expenses = list;
         _categoryList =
-            list.map((e) => e.category).toSet().toList(growable: true);
+            list.map((e) => e.categoryName).toSet().toList(growable: true);
       });
     });
   }

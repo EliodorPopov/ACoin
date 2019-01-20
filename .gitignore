@@ -7,3 +7,15 @@
 build/
 
 .flutter-plugins
+
+ios/Pods/
+ios/Flutter/
+ios/.symlinks
+
+ios/Podfile
+ios/Podfile.lock
+ios/Runner.xcworkspace
+ios/Runner.xcodeproj
+ios/ServiceDefinitions.json
+
+android/local.properties
