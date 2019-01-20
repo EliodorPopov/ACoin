@@ -2,10 +2,7 @@ class Category {
   int id;
   String name;
   int total;
-
-  set setName(String newname){
-    name = newname;
-  }
+  String path;
 
   Category(){
     name = '';
@@ -16,12 +13,14 @@ class Category {
     id = map['id'];
     name = map['name'];
     total = map['total'];
+    path = map['path'];
   }
 
   Map<String, dynamic> toMap() {
     return {
       "name": name,
       "total": total,
+      "path": path,
     };
   }
 }

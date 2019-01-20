@@ -1,3 +1,5 @@
+import 'package:acoin/categoriesPage.dart';
+import 'package:acoin/category.dart';
 import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +16,7 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
-  String _name, _value, _category, _newCategory;
+  String _name, _value, _category = '', _path= 'images/noimage.png';
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
@@ -24,13 +26,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readExpense("All time").then((list) {
-      setState(() {
-        _categories =
-            list.map((e) => e.category).toSet().toList(growable: true);
-        _categories.add("Add Category");
-      });
-    });
   }
 
   @override
@@ -63,31 +58,41 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       errorText: state.hasError ? state.errorText : null,
                     ),
                     //isEmpty: _color == '',
-                    child: new DropdownButtonHideUnderline(
-                      child: new DropdownButton<String>(
-                        value: _category,
-                        isDense: true,
-                        onChanged: (e) async {
-                          if (e == "Add Category") {
-                            await _createCategory();
-                          } else
-                            _category = e;
-                          setState(() {});
-                        },
-                        items: _categories.map(
-                          (String value) {
-                            return new DropdownMenuItem<String>(
-                              value: value,
-                              child: new Text(value),
-                            );
-                          },
-                        ).toList(),
-                      ),
-                    ),
+                    child: Row(
+                        children: <Widget>[
+                          Text(_category == '' ? 'not selected' : _category),
+                          Container(
+                            constraints: BoxConstraints.expand(
+                                width: 50.0, height: 50.0),
+                            child: Image.asset(_path),
+                          ),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: RaisedButton(
+                              child: Text(
+                                'Select category',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                Map res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CategoriesPage()));
+                                if (res.toString() != 'null') {
+                                  print(res['name'] + ' ' + res['path']);
+                                  _category = res['name'];
+                                  _path = res['path'];
+                                }
+                              },
+                              color: Colors.indigo[500],
+                            ),
+                          ),
+                        ],
+                      )
                   );
                 },
                 validator: (val) {
-                  return val != _category ? null : "Please select a category";
+                  return _category != '' ? null : "Please select a category";
                 },
               ),
               TextFormField(
@@ -122,55 +127,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  void _submit() async {
+  void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _context.addExpense(
           _name, int.tryParse(_value), _date, _category);
       Navigator.pop(context, true); 
     }
-  }
-
-  Future _createCategory() {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Category"),
-          contentPadding: EdgeInsets.all(10.0),
-          content: Column(mainAxisSize: MainAxisSize.min, children: [
-            Form(
-              key: formKey2,
-              child: TextFormField(
-                decoration: InputDecoration(labelText: 'Name:'),
-                onSaved: (input) {
-                  _newCategory = input;
-                  print(input);
-                },
-                onFieldSubmitted: (e) {
-                  _newCategory = e;
-                  print(e);
-                },
-                validator: (input) => input.isEmpty ? 'enter value' : null,
-              ),
-            ),
-            RaisedButton(
-              child: Text("Add"),
-              onPressed: () {
-                if (formKey2.currentState.validate()) {
-                  formKey2.currentState.save();
-                  _categories.removeLast();
-                  _categories.add(_newCategory);
-                  _category = _newCategory;
-                  _newCategory = null;
-                  Navigator.pop(context);
-                  print("category added: "+_category);
-                }
-              },
-            ),
-          ]),
-        );
-      },
-    );
   }
 }

@@ -377,6 +377,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       new Text("Expenses:\n", style: TextStyle(fontSize: 20.0)),
                       new Container(
                         child: new ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: _categories.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Text(_categories.toList()[index].name +
@@ -385,13 +386,14 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 ' lei');
                           },
                         ),
-                        constraints: BoxConstraints(maxHeight: 120.0, maxWidth: 100.0),
-                        
+                        constraints:
+                            BoxConstraints(maxHeight: 120.0, maxWidth: 100.0),
                       ),
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
                   ),
-                  constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 100.0),
+                  constraints:
+                      BoxConstraints(maxHeight: 180.0, maxWidth: 100.0),
                   alignment: Alignment.topCenter,
                 ),
                 new Expanded(
@@ -436,7 +438,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             alignment: Alignment.centerLeft,
             child: Column(
               children: [
-                new Container(child: new Text('Monthly Income', textScaleFactor: 1.5,),),
+                new Container(
+                  child: new Text(
+                    'Monthly Income',
+                    textScaleFactor: 1.5,
+                  ),
+                  alignment: Alignment.center,
+                ),
                 new Expanded(
                   child: _recurrentIncomes.length > 0
                       ? HorizontalBarLabelChart(recurrentIncomesListDB())
@@ -466,7 +474,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             child: new Column(
               children: [
                 new Text(
-                  "How much you spent this month:\n",
+                  "How much you spent:\n",
                   textScaleFactor: 1.3,
                 ),
                 new Container(

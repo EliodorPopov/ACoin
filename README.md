@@ -2,7 +2,7 @@
 
 A new Flutter Amdaris-UTM Project.
 
-# Arhitecura bazei de date:
+# Arhitectura bazei de date:
 
 ## Tabelul Expenses:
 
@@ -52,3 +52,11 @@ A new Flutter Amdaris-UTM Project.
 | value          | int    | Value of the added money(MDL)  |
 | details        | String | details of added money         |
 
+
+## Tabelul Categories
+
+| Column   | Type   | Description                    |
+|----------|--------|--------------------------------|
+| id       | int    | Id of the tuple                |
+| name     | String | name of the category           |
+| path     | String | path for the image             |

@@ -1,8 +1,8 @@
-import 'package:acoin/expense.dart';
+import 'package:acoin/categoriesPage.dart';
+import 'package:acoin/category.dart';
 import 'package:acoin/db_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
@@ -28,26 +28,35 @@ class EditExpensePage extends StatefulWidget {
 class _EditExpensePageState extends State<EditExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
-  String _name, _value, _category, _newCategory;
+  String _name, _value, _category, _path;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
-  List<String> _categories = new List<String>();
-  List<Expense> _expenses = new List<Expense>();
+  List<Category> _categories = new List<Category>();
 
   @override
   initState() {
     super.initState();
-    _category = widget.dbCategory;
+    readCategories();
+  }
+
+  void readCategories() async {
     _context = new DbContext();
-    _context.readExpense("All time").then((list) {
+    await _context.readCategories().then((list) {
       setState(() {
-        _expenses = list;
-        _categories =
-            list.map((e) => e.category).toSet().toList(growable: true);
-        _categories.add("Add Category");
+        _categories = list;
       });
     });
+    _category = '';
+    _path = 'images/noimage.png';
+    for (var c in _categories){
+      print(c.name + ' '+ widget.dbCategory);
+      if (c.name == widget.dbCategory) {
+        _category = widget.dbCategory;
+        _path = c.path;
+        break;
+      }
+    }
   }
 
   @override
@@ -74,35 +83,45 @@ class _EditExpensePageState extends State<EditExpensePage> {
               FormField<String>(
                 builder: (FormFieldState<String> state) {
                   return InputDecorator(
-                    decoration: InputDecoration(
-                      //icon: const Icon(Icons.color_lens),
-                      labelText: 'Category',
-                      errorText: state.hasError ? state.errorText : null,
-                    ),
-                    //isEmpty: _color == '',
-                    child: new DropdownButtonHideUnderline(
-                      child: new DropdownButton<String>(
-                        value: _category,
-                        isDense: true,
-                        onChanged: (e) async {
-                          if (e == "Add Category") {
-                            await _createCategory();
-                          } else
-                            _category = e;
-                          setState(() {});
-                        },
-                        items: _categories.map((String value) {
-                          return new DropdownMenuItem<String>(
-                            value: value,
-                            child: new Text(value),
-                          );
-                        }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        
                       ),
-                    ),
-                  );
+                      child: Row(
+                        children: <Widget>[
+                          Text(_category),
+                          Container(
+                            constraints: BoxConstraints.expand(
+                                width: 50.0, height: 50.0),
+                            child: Image.asset(_path),
+                          ),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: RaisedButton(
+                              child: Text(
+                                'Select category',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: () async {
+                                Map res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CategoriesPage()));
+                                if (res.toString() != 'null') {
+                                  print(res['name'] + ' ' + res['path']);
+                                  _category = res['name'];
+                                  _path = res['path'];
+                                }
+                              },
+                              color: Colors.indigo[500],
+                            ),
+                          ),
+                        ],
+                      )
+                      );
                 },
                 validator: (val) {
-                  return val != _category ? null : "Please select a category";
+                  return _path != 'images/noimage.png' ? null : "Please select a category";
                 },
               ),
               TextFormField(
@@ -149,7 +168,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      print(_name);
       if (widget.dbName != _name ||
           widget.dbValue != int.tryParse(_value) ||
           widget.dbDate != _date ||
@@ -182,49 +200,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
             ],
           );
         });
-  }
-
-  Future _createCategory() {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Category"),
-          contentPadding: EdgeInsets.all(10.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Form(
-                key: formKey2,
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'Name:'),
-                  onSaved: (input) {
-                    _newCategory = input;
-                  },
-                  onFieldSubmitted: (e) {
-                    _newCategory = e;
-                  },
-                  validator: (input) => input.isEmpty ? 'enter value' : null,
-                ),
-              ),
-              RaisedButton(
-                child: Text("Add"),
-                onPressed: () {
-                  if (formKey2.currentState.validate()) {
-                    formKey2.currentState.save();
-                    _categories.removeLast();
-                    _categories.add(_newCategory);
-                    _category = _newCategory;
-                    _newCategory = null;
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   Future<bool> _submitDelete2() {
