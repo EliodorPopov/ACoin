@@ -1,4 +1,3 @@
-import 'package:acoin/categoriesPage.dart';
 import 'package:acoin/dashboard.dart';
 import 'package:flutter/material.dart';
 

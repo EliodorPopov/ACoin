@@ -49,8 +49,8 @@ class _EditExpensePageState extends State<EditExpensePage> {
     });
     _category = '';
     _path = 'images/noimage.png';
-    for (var c in _categories){
-      print(c.name + ' '+ widget.dbCategory);
+    for (var c in _categories) {
+      print(c.name + ' ' + widget.dbCategory);
       if (c.name == widget.dbCategory) {
         _category = widget.dbCategory;
         _path = c.path;
@@ -85,43 +85,13 @@ class _EditExpensePageState extends State<EditExpensePage> {
                   return InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Category',
-                        
                       ),
-                      child: Row(
-                        children: <Widget>[
-                          Text(_category),
-                          Container(
-                            constraints: BoxConstraints.expand(
-                                width: 50.0, height: 50.0),
-                            child: Image.asset(_path),
-                          ),
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: RaisedButton(
-                              child: Text(
-                                'Select category',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                Map res = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CategoriesPage()));
-                                if (res.toString() != 'null') {
-                                  print(res['name'] + ' ' + res['path']);
-                                  _category = res['name'];
-                                  _path = res['path'];
-                                }
-                              },
-                              color: Colors.indigo[500],
-                            ),
-                          ),
-                        ],
-                      )
-                      );
+                      child: selectCategory());
                 },
                 validator: (val) {
-                  return _path != 'images/noimage.png' ? null : "Please select a category";
+                  return _path != 'images/noimage.png'
+                      ? null
+                      : "Please select a category";
                 },
               ),
               TextFormField(
@@ -157,7 +127,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
-        onPressed: () => _submitDelete2().then((value) {
+        onPressed: () => _submitDelete().then((value) {
               if (value) Navigator.pop(context, true);
             }),
       ),
@@ -177,6 +147,70 @@ class _EditExpensePageState extends State<EditExpensePage> {
       }
       Navigator.pop(context, false);
     }
+  }
+
+  Widget selectCategory() {
+    if (_category == '')
+      return RaisedButton(
+        child: Text(
+          'Select category',
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: () async {
+          Map res = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CategoriesPage()));
+          if (res.toString() != 'null') {
+            print(res['name'] + ' ' + res['path']);
+            _category = res['name'];
+            _path = res['path'];
+          }
+        },
+        color: Colors.indigo[500],
+      );
+    else
+      return Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              child: Text(
+                _category,
+                textScaleFactor: 1.3,
+              ),
+              alignment: Alignment.centerLeft,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
+              child: Image.asset(_path),
+              alignment: Alignment.center,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              alignment: Alignment.centerRight,
+              child: RaisedButton(
+                child: Text(
+                  'Change',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () async {
+                  Map res = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CategoriesPage()));
+                  if (res.toString() != 'null') {
+                    print(res['name'] + ' ' + res['path']);
+                    _category = res['name'];
+                    _path = res['path'];
+                  }
+                },
+                color: Colors.indigo[500],
+              ),
+            ),
+          ),
+        ],
+      );
   }
 
   Future<bool> _submitDelete() {

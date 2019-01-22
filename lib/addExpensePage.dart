@@ -8,7 +8,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 class AddExpensePage extends StatefulWidget {
   AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
-  
+
   @override
   _AddExpensePageState createState() => new _AddExpensePageState();
 }
@@ -16,7 +16,7 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
-  String _name, _value, _category = '', _path= 'images/noimage.png';
+  String _name, _value, _category = '', _path = 'images/noimage.png';
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
@@ -46,50 +46,18 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   validator: (input) {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
-                    
                     }
                   }),
               FormField<String>(
                 builder: (FormFieldState<String> state) {
                   return InputDecorator(
-                    decoration: InputDecoration(
-                      //icon: const Icon(Icons.color_lens),
-                      labelText: 'Category',
-                      errorText: state.hasError ? state.errorText : null,
-                    ),
-                    //isEmpty: _color == '',
-                    child: Row(
-                        children: <Widget>[
-                          Text(_category == '' ? 'not selected' : _category),
-                          Container(
-                            constraints: BoxConstraints.expand(
-                                width: 50.0, height: 50.0),
-                            child: Image.asset(_path),
-                          ),
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: RaisedButton(
-                              child: Text(
-                                'Select category',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                Map res = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CategoriesPage()));
-                                if (res.toString() != 'null') {
-                                  print(res['name'] + ' ' + res['path']);
-                                  _category = res['name'];
-                                  _path = res['path'];
-                                }
-                              },
-                              color: Colors.indigo[500],
-                            ),
-                          ),
-                        ],
-                      )
-                  );
+                      decoration: InputDecoration(
+                        //icon: const Icon(Icons.color_lens),
+                        labelText: 'Category',
+                        errorText: state.hasError ? state.errorText : null,
+                      ),
+                      //isEmpty: _color == '',
+                      child: selectCategory());
                 },
                 validator: (val) {
                   return _category != '' ? null : "Please select a category";
@@ -130,9 +98,69 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.addExpense(
-          _name, int.tryParse(_value), _date, _category);
-      Navigator.pop(context, true); 
+      _context.addExpense(_name, int.tryParse(_value), _date, _category);
+      Navigator.pop(context, true);
     }
+  }
+
+  Widget selectCategory() {
+    if (_category == '')
+      return RaisedButton(
+        child: Text(
+          'Select category',
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: () async {
+          Map res = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CategoriesPage()));
+          if (res.toString() != 'null') {
+            print(res['name'] + ' ' + res['path']);
+            _category = res['name'];
+            _path = res['path'];
+          }
+        },
+        color: Colors.indigo[500],
+      );
+    else
+      return Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              child: Text(_category, textScaleFactor: 1.3,),
+              alignment: Alignment.centerLeft,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
+              child: Image.asset(_path),
+              alignment: Alignment.center,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              alignment: Alignment.centerRight,
+              child: RaisedButton(
+                child: Text(
+                  'Change',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () async {
+                  Map res = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CategoriesPage()));
+                  if (res.toString() != 'null') {
+                    print(res['name'] + ' ' + res['path']);
+                    _category = res['name'];
+                    _path = res['path'];
+                  }
+                },
+                color: Colors.indigo[500],
+              ),
+            ),
+          ),
+        ],
+      );
   }
 }
