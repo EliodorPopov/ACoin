@@ -17,6 +17,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
   String _name, _value, _category = '', _path= 'images/noimage.png';
+  int _categoryId;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
@@ -82,6 +83,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   print(res['name'] + ' ' + res['path']);
                                   _category = res['name'];
                                   _path = res['path'];
+                                  _categoryId = res['id'];
                                 }
                               },
                               color: Colors.indigo[500],
@@ -131,7 +133,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _context.addExpense(
-          _name, int.tryParse(_value), _date, _category);
+          _name, int.tryParse(_value), _date, _categoryId);
       Navigator.pop(context, true); 
     }
   }

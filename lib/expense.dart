@@ -3,14 +3,18 @@ class Expense {
   String name;
   int value;
   DateTime date;
-  String category;
+  int categoryId;
+  String categoryName;
+  String categoryIconPath;
 
   Expense.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
     value = map['value'];
     date = new DateTime.fromMillisecondsSinceEpoch(map['date']);
-    category = map["category"];
+    categoryId = map["categoryId"];
+    categoryName = map["categoryName"];
+    categoryIconPath = map["categoryIconPath"];
   }
 
   Map<String, dynamic> toMap() {
@@ -18,7 +22,7 @@ class Expense {
       "name": name,
       "value": value,
       "date": date.millisecondsSinceEpoch,
-      "category": category
+      "categoryId": categoryId
     };
   }
 }
