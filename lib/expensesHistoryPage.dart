@@ -18,7 +18,7 @@ class ExpensesHistoryPage extends StatefulWidget {
 class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  final dateFormat = DateFormat("dd MMM");
   String _period = 'All time';
 
   void _showSuccessSnackBar(String message, bool color) {
@@ -110,7 +110,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                         widget: EditExpensePage(
                           title: "edit expense",
                           dbId: i.id,
-                          dbCategory: i.category,
+                          dbCategory: i.categoryName,
                           dbDate: i.date,
                           dbName: i.name,
                           dbValue: i.value,
@@ -128,14 +128,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                             });
                           }),
                     ),
-                child: ListTile(
-                  title: Text(
-                    i.name + " [" + i.category + "]",
-                    textScaleFactor: 3.0,
-                  ),
-                  subtitle: Text(
-                      i.value.toString() + " MDL " + dateFormat.format(i.date)),
-                ),
+                child: buildListTile(i),
               );
             },
           ).toList(),
@@ -161,5 +154,36 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
             }),
       ),
     );
+  }
+
+  Widget buildListTile(Expense i) {
+    return Card(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Container(child: Image.asset(i.categoryIconPath), height: 50.0),
+          SizedBox(width: 15.0,),
+
+          Expanded(child: Text(
+            i.name,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          )),
+          Text("-${i.value.toString()} MDL",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              )),
+          SizedBox(width: 15.0,),
+          Text(
+            dateFormat.format(i.date),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+      ),
+    ));
   }
 }

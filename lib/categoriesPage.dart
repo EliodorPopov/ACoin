@@ -73,7 +73,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void selectCategory(Category cat) {
-    Navigator.pop(context, {'name': cat.name, 'path': cat.path});
+    Navigator.pop(context, {'name': cat.name, 'path': cat.path, 'id': cat.id});
   }
 
   void addCategory(bool editPage, Category currentCategory) async {

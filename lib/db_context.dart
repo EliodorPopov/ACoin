@@ -38,12 +38,24 @@ class DbContext {
 
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
+    
+    await db.execute('''
+    CREATE TABLE $categoriesTable(id INTEGER PRIMARY KEY, name TEXT, path TEXT)
+    ''');
+
     await db.execute('''
         CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT)
         ''');
 
     await db.execute('''
-        CREATE TABLE $expensesTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date INTEGER, category TEXT)
+        CREATE TABLE $expensesTable (
+          id INTEGER PRIMARY KEY, 
+          name TEXT, 
+          value INTEGER, 
+          date INTEGER, 
+          categoryId INTEGER,
+          FOREIGN KEY(categoryId) REFERENCES $categoriesTable(id)
+          )
       ''');
 
     await db.execute('''
@@ -56,10 +68,6 @@ class DbContext {
 
     await db.execute('''
         CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
-    ''');
-    
-    await db.execute('''
-    CREATE TABLE $categoriesTable(id INTEGER PRIMARY KEY, name TEXT, path TEXT)
     ''');
 
     await db.insert(recurrentIncomeTable, {
@@ -86,18 +94,18 @@ class DbContext {
       "name": "mock Expense",
       "value": 1000,
       "date": DateTime.now().millisecondsSinceEpoch,
-      "category": "mock Category",
+      "categoryId": 1,
     });
   }
 
   Future<void> addExpense(
-      String name, int value, DateTime date, String category) async {
+      String name, int value, DateTime date, int categoryId) async {
     var database = await db;
     await database.insert(expensesTable, {
       "name": name,
       "value": value,
       "date": date.millisecondsSinceEpoch,
-      "category": category,
+      "categoryId": categoryId,
     });
   }
 
@@ -198,11 +206,21 @@ class DbContext {
     var database = await db;
     List<Map<String, dynamic>> expenses;
     if (period == 'All time')
-      expenses = await database.query(expensesTable);
+      expenses = await database.rawQuery(
+          '''
+          SELECT e.*, c.name as categoryName, c.path as categoryIconPath 
+          FROM $expensesTable e
+          JOIN $categoriesTable c 
+          ON e.categoryId = c.id''');
     else {
       setPeriod(period);
       expenses = await database.rawQuery(
-          'SELECT * FROM $expensesTable where date >= $minPeriod and date < $maxPeriod');
+          '''
+          SELECT e.*, c.name as categoryName, c.path as categoryIconPath 
+          FROM $expensesTable e
+          JOIN $categoriesTable c 
+          ON e.categoryId = c.id
+          where e.date >= $minPeriod and e.date < $maxPeriod''');
     }
     return expenses.map((m) => Expense.fromMap(m)).toList();
   }
