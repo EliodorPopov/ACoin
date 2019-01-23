@@ -1,3 +1,4 @@
+import 'package:acoin/DebtPage.dart';
 import 'package:acoin/category.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
@@ -34,7 +35,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<Income> _incomes = new List<Income>();
   List<Category> _categoryTableList = new List<Category>();
   List<Category> _categories = new List<Category>();
-  List<String> _categoryList = new List<String>();
+  List<int> _categoryList = new List<int>();
   Category tempCat = new Category();
   int tempTot = 0;
   List<RecurrentIncome> _recurrentIncomesTemp = new List<RecurrentIncome>();
@@ -127,31 +128,35 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     calculateCategories();
   }
 
-  void calculateCategories() {
+  void calculateCategories() async {
     _categories.clear();
+    
+    var c = new List<Category>();
+
+
+    _expenses.fold(c, (List<Category> val, Expense curr) {
+
+    });
     _categoryList.forEach((c) {
       tempCat = new Category();
-      tempTot = 0;
-      tempCat.name = c.toString();
-      _expenses.forEach((e) {
-        if (e.categoryName == c) {
-          tempTot += e.value;
-        }
-      });
-      tempCat.total = tempTot;
+      tempCat.id = c;
+      tempCat.total = _expenses.fold(0, (val, e) => val + (e.categoryId == c ?  e.value : 0));
       _categories.add(tempCat);
     });
-    _context.readCategories(1).then((list) {
+
+    await _context.readCategories(1).then((list) {
       setState(() {
         _categoryTableList = list;
       });
     });
     _categories.forEach((c){
-      _categoryTableList.forEach((t){
-        if (c.name == t.name) c.path = t.path;
+      // _categoryTableList.forEach((t){
+      //   if (c.name == t.name) c.path = t.path;
+      // });
+      _expenses.forEach((e){
+        if (e.categoryId == c.id) c.path = e.categoryIconPath;
       });
     });
-
   }
 
   _setDialVisible(bool value) {
@@ -208,7 +213,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       setState(() {
         _expenses = list;
         _categoryList =
-            list.map((e) => e.categoryName).toSet().toList(growable: true);
+            list.map((e) => e.categoryId).toSet().toList(growable: true);
       });
     });
   }
@@ -237,11 +242,14 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   List<charts.Series<Category, String>> expensesListDB() {
+    var colors = 
+      charts.MaterialPalette.blue.makeShades(5);
     return [
       new charts.Series<Category, String>(
         id: 'Sales',
         domainFn: (Category sales, _) => sales.name,
         measureFn: (Category sales, _) => sales.total ?? 0,
+        //colorFn: (c, e) => charts.MaterialPalette.blue.shadeDefault,
         data: _categories,
       )
     ];
@@ -328,6 +336,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardRecurrentIncome(context),
             buildCardIncome(context),
             buildCardGoal(context),
+            buildCardDebt(context),
           ],
         ),
       ),
@@ -354,11 +363,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   padding: EdgeInsets.all(7.0),
                   child: new Text("Last incomes", style: TextStyle(fontSize: 20.0))),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+                  margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
                   color: Colors.white,
                   constraints: BoxConstraints(
                       maxHeight:
-                          _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 60.0,
+                          _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 48.0,
                       maxWidth: 400.0),
                   child: new ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
@@ -379,15 +388,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                     child: Image.asset(
                                         _incomes.elementAt(index).sourcePath),
                                     height: 30.0),
-                                Container(
-                                  width: 100.0,
-                                  child: Text(
-                                    _incomes.elementAt(index).name,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text(
+                                      _incomes.elementAt(index).name,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                                 Container(
                                   alignment: Alignment.centerRight,
+                                  padding: EdgeInsets.only(right: 5.0),
                                   child: Text(
                                       "+${_incomes.elementAt(index).value.toString()} MDL",
                                       style: TextStyle(
@@ -682,6 +695,46 @@ Padding buildCardGoal(BuildContext context) {
   );
 }
 
+
+Padding buildCardDebt(BuildContext context) {
+  return Padding(
+    padding: EdgeInsets.all(10.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => DebtPage()));
+      },
+      child: Card(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+          color: Colors.white,
+          constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
+          alignment: Alignment.centerLeft,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: new Container(
+                  child: Text(
+                    "Your Debts",
+                    textScaleFactor: 2.0,
+                  ),
+                  padding: EdgeInsets.all(5.0),
+                ),
+              ),
+              Expanded(
+                child: new Container(
+                  child: Icon(Icons.assignment_late),
+                  padding: EdgeInsets.fromLTRB(5.0, 12.0, 12.0, 12.0),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 class PieOutsideLabelChart extends StatelessWidget {
   final List<charts.Series> seriesList;
   final bool animate;
@@ -696,7 +749,6 @@ class PieOutsideLabelChart extends StatelessWidget {
             new charts.ArcLabelDecorator(
                 labelPosition: charts.ArcLabelPosition.auto),
           ],
-          startAngle: 0.5,
         ));
   }
 }

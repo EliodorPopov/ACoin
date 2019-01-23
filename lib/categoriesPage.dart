@@ -106,6 +106,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         size: 28.0,
         color: color ? Colors.green : Colors.red,
       )
+      ..isDismissible = false
       ..duration = Duration(seconds: 2)
       ..leftBarIndicatorColor = color ? Colors.green : Colors.red
       ..show(context);
