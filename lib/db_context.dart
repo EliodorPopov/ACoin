@@ -75,7 +75,7 @@ class DbContext {
       ''');
 
     await db.execute('''
-        CREATE TABLE $goalsTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER)
+        CREATE TABLE $goalsTable (id INTEGER PRIMARY KEY, name TEXT, target INTEGER, value INTEGER)
     ''');
 
     await db.execute('''
@@ -119,6 +119,9 @@ class DbContext {
       "date": DateTime.now().millisecondsSinceEpoch,
       "categoryId": 1,
     });
+
+    await db.insert(
+        goalsTable, {"name": "mock goal", "value": 1000, "target": 5000});
   }
 
   Future<void> addExpense(
@@ -153,12 +156,10 @@ class DbContext {
     }
   }
 
-  Future<void> addGoal(String name, int value) async {
+  Future<void> addGoal(String name, int target) async {
     var database = await db;
-    await database.insert(goalsTable, {
-      "name": name,
-      "value": value,
-    });
+    await database
+        .insert(goalsTable, {"name": name, "target": target, "value": 0});
   }
 
   Future<void> addGoalTransaction(int id, int value, String details) async {
@@ -293,7 +294,6 @@ class DbContext {
           SELECT * 
           FROM $categoriesTable
           where categoryStatus = $categoryStatus''');
-    // var categories = await database.query(categoriesTable);
     return categories.map((m) => Category.fromMap(m)).toList();
   }
 
@@ -352,8 +352,7 @@ class DbContext {
   }
 
   Future<void> editCategory(
-    int id, String name, String path, int categoryStatus) async {
-        
+      int id, String name, String path, int categoryStatus) async {
     var database = await db;
     await database.execute('''
       update $categoriesTable 
@@ -362,10 +361,9 @@ class DbContext {
           categoryStatus = $categoryStatus
     ''');
   }
-  
+
   Future<void> editDebt(int id, String pname, int debtvalue, DateTime date,
       DateTime deadlinedate) async {
-
     var database = await db;
     await database.execute('''
     update $debtTable 
@@ -375,7 +373,26 @@ class DbContext {
           deadlinedate = $deadlinedate,
       where id = $id
     ''');
-      }
+  }
+
+  Future<void> editGoals(int id, String name, int value, int target) async {
+    var database = await db;
+    await database.execute('''
+      update $goalsTable 
+      set name = '$name',
+          target = $target
+      where id = $id
+    ''');
+  }
+
+  Future<void> chageGoalsValue(int id, int value) async {
+    var database = await db;
+    await database.execute('''
+      update $goalsTable 
+      set value = $value
+      where id = $id
+    ''');
+  }
 
   Future<void> deleteExpense(int id) async {
     var database = await db;
@@ -393,7 +410,7 @@ class DbContext {
       where id = $id
     ''');
   }
-  
+
   Future<void> deleteDebt(int id) async {
     var database = await db;
     await database.execute('''
@@ -411,7 +428,11 @@ class DbContext {
     ''');
   }
 
-  Future<void> getCategoryTotals(String period) async {
+  Future<void> deleteGoal(int id) async {
     var database = await db;
+    await database.execute('''
+      delete from $goalsTable
+      where id = $id
+    ''');
   }
 }
