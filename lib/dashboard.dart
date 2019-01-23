@@ -36,6 +36,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<String> _categoryList = new List<String>();
   Category tempCat = new Category();
   int tempTot = 0;
+  List<RecurrentIncome> _recurrentIncomesTemp = new List<RecurrentIncome>();
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
   int currentBalance = 0;
   int totalIncomes = 0;
@@ -204,7 +205,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return _context.readIncome(_period).then((list) {
       setState(() {
         _incomes = list;
-        _incomes.sort((a,b) => b.date.millisecondsSinceEpoch.compareTo(a.date.millisecondsSinceEpoch));
+        _incomes.sort((a, b) => b.date.millisecondsSinceEpoch
+            .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -212,7 +214,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   Future<Null> loadRecurrentIncome() {
     return _context.readRecurrentIncome(_period).then((list) {
       setState(() {
-        _recurrentIncomes = list;
+        _recurrentIncomesTemp = list;
+        _recurrentIncomes.clear();
+        _recurrentIncomesTemp.forEach((i) {
+          print(i.name + ' ' + i.isEnabled.toString());
+          if (i.isEnabled) _recurrentIncomes.add(i);
+        });
       });
     });
   }
@@ -319,16 +326,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardIncome(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(3.0),
         child: Card(
+          shape: BeveledRectangleBorder(),
           child: GestureDetector(
             onTap: () => Navigator.push(
-              context,
-              SlideLeftRoute(
-                  widget: IncomeHistoryPage(title: "Income History")),
-            ).then((context) async {
-              calculateBalance();
-            }),
+                  context,
+                  SlideLeftRoute(
+                      widget: IncomeHistoryPage(title: "Income History")),
+                ).then((context) async {
+                  calculateBalance();
+                }),
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
               color: Colors.white,
@@ -341,9 +349,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   itemCount: _incomes.length > 5 ? 5 : _incomes.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      color: Colors.blue[200],
                       elevation: 0.5,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.max,
                           children: <Widget>[
@@ -380,7 +392,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardExpenses(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(3.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
               context,
@@ -391,6 +403,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               calculateBalance();
             }),
         child: Card(
+          shape: BeveledRectangleBorder(),
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             color: Colors.white,
@@ -448,7 +461,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardRecurrentIncome(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(3.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
               context,
@@ -458,6 +471,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               calculateBalance();
             }),
         child: Card(
+          shape: BeveledRectangleBorder(),
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
@@ -490,9 +504,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardProgress(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(3.0),
       child: new GestureDetector(
         child: Card(
+          shape: BeveledRectangleBorder(),
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
@@ -552,9 +567,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardBalance(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(3.0),
       child: GestureDetector(
         child: Card(
+          shape: BeveledRectangleBorder(),
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
@@ -595,9 +611,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
 Padding buildCardGoal(BuildContext context) {
   return Padding(
-    padding: EdgeInsets.all(10.0),
+    padding: EdgeInsets.all(3.0),
     child: GestureDetector(
       child: Card(
+        shape: BeveledRectangleBorder(),
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
           color: Colors.white,

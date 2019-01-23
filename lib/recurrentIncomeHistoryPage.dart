@@ -198,7 +198,7 @@ class _RecurrentIncomeHistoryPageState
   }
 
   toggleIncome(bool value, RecurrentIncome item) {
-    this._context.toggle(item);
+    _context.toggle(item);
     setState(() {
       item.isEnabled = value;
     });
