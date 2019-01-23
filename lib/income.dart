@@ -2,14 +2,18 @@ class Income {
   int id;
   String name;
   int value;
-  String source;
+  String sourceName;
   DateTime date;
+  int sourceId;
+  String sourcePath;
 
   Income.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
     value = map['value'];
-    source = map['source'];
+    sourceName = map['sourceName'];
+    sourceId = map['sourceId'];
+    sourcePath = map['sourcePath'];
     date = new DateTime.fromMillisecondsSinceEpoch(map['date']);
   }
 
@@ -17,7 +21,7 @@ class Income {
     return {
       "name": name,
       "value": value,
-      "source": source,
+      "sourceId": sourceId,
       "date": date.millisecondsSinceEpoch,
     };
   }

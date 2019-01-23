@@ -2,40 +2,40 @@
 
 A new Flutter Amdaris-UTM Project.
 
-# Arhitectura bazei de date:
+# Database in SQFlite architecture:
 
-## Tabelul Expenses:
+## Expenses Table:
 
-| Column   | Type   | Description                    |
-|----------|--------|--------------------------------|
-| id       | int    | Id of the tuple                |
-| name     | String | Name of the expense            |
-| value    | int    | Value of the expense(MDL)      |
-| date     | int    | Date in millisecondsSinceEpoch |
-| category | String | Category                       |
+| Column     | Type   | Description                    |
+|------------|--------|--------------------------------|
+| id         | int    | Id of the tuple                |
+| name       | String | Name of the expense            |
+| value      | int    | Value of the expense(MDL)      |
+| date       | int    | Date in millisecondsSinceEpoch |
+| categoryID | int    | FK in categoriesTable          |
 
-## Tabelul RecurrentIncome
+## RecurrentIncome Table
 
 | Column   | Type   | Description                    |
 |----------|--------|--------------------------------|
 | id       | int    | Id of the tuple                |
 | name     | String | Name of the income             |
 | value    | int    | Value of the income(MDL)       |
-| source   | String | source of the income           |
+| sourceId | int    | FK to categoriesTable          |
 | date     | int    | date                           |
 | isEnable | bool   | is it recurrent?               |
 
-## Tabelul Income
+## Income Table
 
 | Column   | Type   | Description                    |
 |----------|--------|--------------------------------|
 | id       | int    | Id of the tuple                |
 | name     | String | Name of the income             |
 | value    | int    | Value of the income(MDL)       |
-| source   | String | source of the income           |
+| sourceId | int    | FK to categoriesTable          |
 | date     | int    | date                           |
 
-## Tabelul Goals
+## Goals Table
 
 | Column   | Type   | Description                    |
 |----------|--------|--------------------------------|
@@ -43,7 +43,7 @@ A new Flutter Amdaris-UTM Project.
 | name     | String | Name of the goal               |
 | value    | int    | Value of the goal(MDL)         |
 
-## Tabelul Goals
+## GoalsTransactions Table
 
 | Column         | Type   | Description                    |
 |----------------|--------|--------------------------------|
@@ -53,7 +53,7 @@ A new Flutter Amdaris-UTM Project.
 | details        | String | details of added money         |
 
 
-## Tabelul Categories
+## Categories Table
 
 | Column   | Type   | Description                    |
 |----------|--------|--------------------------------|

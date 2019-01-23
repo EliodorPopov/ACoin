@@ -19,7 +19,7 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   DbContext _context;
   List<Expense> _expenses = new List<Expense>();
   final dateFormat = DateFormat("dd MMM");
-  String _period = 'All time';
+  String _period = 'All time', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -41,6 +41,8 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
     _context.readExpense("All time").then((list) {
       setState(() {
         _expenses = list;
+        _expenses.sort((a, b) => b.date.millisecondsSinceEpoch
+            .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -82,14 +84,37 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                           child: new Text('This year'), value: 'This year'),
                       new DropdownMenuItem(
                           child: new Text('All time'), value: 'All time'),
+                      new DropdownMenuItem(
+                          child: new Text(
+                              sort == 'Ascending' ? 'Descending' : 'Ascending',
+                              style: TextStyle(color: Colors.green)),
+                          value: 'sort')
                     ],
                     onChanged: (String value) {
-                      _period = value;
-                      _context.readExpense(_period).then((list) {
-                        setState(() {
-                          _expenses = list;
+                      if (value != 'sort') {
+                        _period = value;
+                        _context.readExpense(_period).then((list) {
+                          setState(() {
+                            _expenses = list;
+                          });
                         });
-                      });
+                      } else {
+                        if (sort == 'Ascending') {
+                          setState(() {
+                            _expenses.sort((a, b) => b
+                                .date.millisecondsSinceEpoch
+                                .compareTo(a.date.millisecondsSinceEpoch));
+                            sort = 'Descending';
+                          });
+                        } else {
+                          setState(() {
+                            _expenses.sort((a, b) => a
+                                .date.millisecondsSinceEpoch
+                                .compareTo(b.date.millisecondsSinceEpoch));
+                            sort = 'Ascending';
+                          });
+                        }
+                      }
                     },
                   ),
                 ),
@@ -110,7 +135,9 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                         widget: EditExpensePage(
                           title: "edit expense",
                           dbId: i.id,
-                          dbCategory: i.categoryName,
+                          dbCategoryId: i.categoryId,
+                          dbCategoryName: i.categoryName,
+                          dbCategoryPath: i.categoryIconPath,
                           dbDate: i.date,
                           dbName: i.name,
                           dbValue: i.value,
@@ -163,9 +190,11 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
       child: Row(
         children: <Widget>[
           Container(child: Image.asset(i.categoryIconPath), height: 50.0),
-          SizedBox(width: 15.0,),
-
-          Expanded(child: Text(
+          SizedBox(
+            width: 15.0,
+          ),
+          Expanded(
+              child: Text(
             i.name,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           )),
@@ -173,7 +202,9 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               )),
-          SizedBox(width: 15.0,),
+          SizedBox(
+            width: 15.0,
+          ),
           Text(
             dateFormat.format(i.date),
             style: TextStyle(

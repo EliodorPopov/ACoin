@@ -5,7 +5,8 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
 class CategoriesPage extends StatefulWidget {
-  CategoriesPage({Key key}) : super(key: key);
+  CategoriesPage({Key key, this.categoryStatus}) : super(key: key);
+  final int categoryStatus;
 
   @override
   _CategoriesPageState createState() => new _CategoriesPageState();
@@ -13,13 +14,15 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   DbContext _context;
+  int categoryStatus;
   List<Category> categories = new List<Category>();
 
   @override
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readCategories().then((list) {
+    categoryStatus = widget.categoryStatus;
+    _context.readCategories(widget.categoryStatus).then((list) {
       setState(() {
         categories = list;
       });
@@ -30,7 +33,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Categories"),
+        title: new Text(categoryStatus == 1 ? "Categories" : "Sources"),
       ),
       body: new GridView.builder(
           itemCount: categories.length,
@@ -39,7 +42,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
               onLongPress: () =>
-                  addCategory(true, categories.toList().elementAt(index)),
+                  addCategory(categories.toList().elementAt(index), categories.toList().elementAt(index).categoryStatus),
               onTap: () => selectCategory(categories.toList().elementAt(index)),
               child: Card(
                 elevation: 3.0,
@@ -67,7 +70,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Colors.blue,
-        onPressed: () => addCategory(false, null),
+        onPressed: () => addCategory(null, categoryStatus),
       ),
     );
   }
@@ -76,17 +79,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
     Navigator.pop(context, {'name': cat.name, 'path': cat.path, 'id': cat.id});
   }
 
-  void addCategory(bool editPage, Category currentCategory) async {
+  void addCategory(Category currentCategory, int categoryStatus) async {
     var route = MaterialPageRoute(
       builder: (context) => AddCategoryPage(
           currentCategory: currentCategory,
-          editPage: editPage,
+          categoryStatus: categoryStatus,
           categories: categories),
     );
     final response = await Navigator.push(context, route);
     if (response.toString() != 'null') {
       print(response.toString());
-      await _context.readCategories().then((list) {
+      await _context.readCategories(widget.categoryStatus).then((list) {
         setState(() {
           categories = list;
         });

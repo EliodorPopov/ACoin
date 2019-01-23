@@ -1,3 +1,4 @@
+import 'package:acoin/categoriesPage.dart';
 import 'package:acoin/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,12 +14,14 @@ class EditIncomePage extends StatefulWidget {
       this.dbName,
       this.dbValue,
       this.dbDate,
-      this.dbSource,
+      this.dbSourceId,
+      this.dbSourceName,
+      this.dbSourcePath,
       this.isRecurrent})
       : super(key: key);
   final String title;
-  final int dbId, dbValue;
-  final String dbName, dbSource;
+  final int dbId, dbValue, dbSourceId;
+  final String dbName, dbSourceName, dbSourcePath;
   final DateTime dbDate;
   final bool isRecurrent;
 
@@ -28,7 +31,8 @@ class EditIncomePage extends StatefulWidget {
 
 class _EditIncomePageState extends State<EditIncomePage> {
   final formKey = GlobalKey<FormState>();
-  String _name, _source, _value;
+  String _name, _sourceName, _value, _sourcePath;
+  int _sourceId;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
 
@@ -36,6 +40,9 @@ class _EditIncomePageState extends State<EditIncomePage> {
   @override
   initState() {
     super.initState();
+    _sourceId = widget.dbSourceId;
+    _sourcePath = widget.dbSourcePath;
+    _sourceName = widget.dbSourceName;
     _context = new DbContext();
   }
 
@@ -59,7 +66,7 @@ class _EditIncomePageState extends State<EditIncomePage> {
                     if (input.length == 0) {
                       return 'Adaugati Valoare';
                     } else {
-                      if(!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
+                      if (!(input.contains(new RegExp(r'[A-Z][a-z]')))) {
                         return 'Numele nu poate contine alte caractere decit litere...';
                       }
                     }
@@ -78,11 +85,19 @@ class _EditIncomePageState extends State<EditIncomePage> {
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Source:'),
-                initialValue: widget.dbSource,
-                onSaved: (input) => _source = input,
-                validator: (input) => input.isEmpty ? 'enter value' : null,
+              FormField<String>(
+                builder: (FormFieldState<String> state) {
+                  return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Source',
+                      ),
+                      child: selectSource());
+                },
+                validator: (val) {
+                  return _sourcePath != 'images/noimage.png'
+                      ? null
+                      : "Please select a category";
+                },
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -115,7 +130,7 @@ class _EditIncomePageState extends State<EditIncomePage> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _context.editIncome(widget.dbId, _name, int.tryParse(_value), _date,
-          _source, widget.isRecurrent);
+          _sourceId, widget.isRecurrent);
       Navigator.pop(context, false);
     }
   }
@@ -142,6 +157,55 @@ class _EditIncomePageState extends State<EditIncomePage> {
           ],
         );
       },
+    );
+  }
+
+  Widget selectSource() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            child: Text(
+              _sourceName,
+              textScaleFactor: 1.3,
+            ),
+            alignment: Alignment.centerLeft,
+          ),
+        ),
+        Expanded(
+          child: Container(
+            constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
+            child: Image.asset(_sourcePath),
+            alignment: Alignment.center,
+          ),
+        ),
+        Expanded(
+          child: Container(
+            alignment: Alignment.centerRight,
+            child: RaisedButton(
+              child: Text(
+                'Change',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                Map res = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CategoriesPage(
+                              categoryStatus: 2,
+                            )));
+                if (res.toString() != 'null') {
+                  print(res['name'] + ' ' + res['path']);
+                  _sourceName = res['name'];
+                  _sourcePath = res['path'];
+                  _sourceId = res['id'];
+                }
+              },
+              color: Colors.indigo[500],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

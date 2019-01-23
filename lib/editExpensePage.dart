@@ -14,10 +14,12 @@ class EditExpensePage extends StatefulWidget {
     this.dbName,
     this.dbValue,
     this.dbDate,
-    this.dbCategory,
+    this.dbCategoryId,
+    this.dbCategoryName,
+    this.dbCategoryPath
   }) : super(key: key);
-  final int dbId, dbValue;
-  final String dbName, dbCategory;
+  final int dbId, dbValue, dbCategoryId;
+  final String dbName, dbCategoryName, dbCategoryPath;
   final DateTime dbDate;
   final String title;
 
@@ -28,35 +30,19 @@ class EditExpensePage extends StatefulWidget {
 class _EditExpensePageState extends State<EditExpensePage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
-  String _name, _value, _category, _path;
+  String _name, _value, _category = '', _path = 'images/noimage.png';
+  int _categoryId;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
-  List<Category> _categories = new List<Category>();
 
   @override
   initState() {
     super.initState();
-    readCategories();
-  }
-
-  void readCategories() async {
     _context = new DbContext();
-    await _context.readCategories().then((list) {
-      setState(() {
-        _categories = list;
-      });
-    });
-    _category = '';
-    _path = 'images/noimage.png';
-    for (var c in _categories){
-      print(c.name + ' '+ widget.dbCategory);
-      if (c.name == widget.dbCategory) {
-        _category = widget.dbCategory;
-        _path = c.path;
-        break;
-      }
-    }
+    _category = widget.dbCategoryName;
+    _path = widget.dbCategoryPath;
+    _categoryId = widget.dbCategoryId;
   }
 
   @override
@@ -85,43 +71,13 @@ class _EditExpensePageState extends State<EditExpensePage> {
                   return InputDecorator(
                       decoration: InputDecoration(
                         labelText: 'Category',
-                        
                       ),
-                      child: Row(
-                        children: <Widget>[
-                          Text(_category),
-                          Container(
-                            constraints: BoxConstraints.expand(
-                                width: 50.0, height: 50.0),
-                            child: Image.asset(_path),
-                          ),
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: RaisedButton(
-                              child: Text(
-                                'Select category',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                Map res = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CategoriesPage()));
-                                if (res.toString() != 'null') {
-                                  print(res['name'] + ' ' + res['path']);
-                                  _category = res['name'];
-                                  _path = res['path'];
-                                }
-                              },
-                              color: Colors.indigo[500],
-                            ),
-                          ),
-                        ],
-                      )
-                      );
+                      child: selectCategory());
                 },
                 validator: (val) {
-                  return _path != 'images/noimage.png' ? null : "Please select a category";
+                  return _path != 'images/noimage.png'
+                      ? null
+                      : "Please select a category";
                 },
               ),
               TextFormField(
@@ -157,7 +113,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
       floatingActionButton: new FloatingActionButton(
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
-        onPressed: () => _submitDelete2().then((value) {
+        onPressed: () => _submitDelete().then((value) {
               if (value) Navigator.pop(context, true);
             }),
       ),
@@ -171,12 +127,59 @@ class _EditExpensePageState extends State<EditExpensePage> {
       if (widget.dbName != _name ||
           widget.dbValue != int.tryParse(_value) ||
           widget.dbDate != _date ||
-          widget.dbCategory != _category) {
+          widget.dbCategoryId != _categoryId) {
         _context.editExpense(
-            widget.dbId, _name, int.tryParse(_value), _date, _category);
+            widget.dbId, _name, int.tryParse(_value), _date, _categoryId);
       }
       Navigator.pop(context, false);
     }
+  }
+
+  Widget selectCategory() {
+      return Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              child: Text(
+                _category,
+                textScaleFactor: 1.3,
+              ),
+              alignment: Alignment.centerLeft,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
+              child: Image.asset(_path),
+              alignment: Alignment.center,
+            ),
+          ),
+          Expanded(
+            child: Container(
+              alignment: Alignment.centerRight,
+              child: RaisedButton(
+                child: Text(
+                  'Change',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () async {
+                  Map res = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CategoriesPage(categoryStatus: 1,)));
+                  if (res.toString() != 'null') {
+                    print(res['name'] + ' ' + res['path']);
+                    _category = res['name'];
+                    _path = res['path'];
+                    _categoryId = res['id'];
+                  }
+                },
+                color: Colors.indigo[500],
+              ),
+            ),
+          ),
+        ],
+      );
   }
 
   Future<bool> _submitDelete() {
@@ -184,29 +187,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text("Are you sure you want to delete ?"),
-            actions: <Widget>[
-              new FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context, false);
-                  },
-                  child: new Text('No!')),
-              new FlatButton(
-                  onPressed: () {
-                    _context.deleteExpense(widget.dbId);
-                    Navigator.pop(context, true);
-                  },
-                  child: new Text('Yes!')),
-            ],
-          );
-        });
-  }
-
-  Future<bool> _submitDelete2() {
-    return showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
             title: new Text("Are you sure you want to delete ?"),
             actions: <Widget>[
               new FlatButton(
