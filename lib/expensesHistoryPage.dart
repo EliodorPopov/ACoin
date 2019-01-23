@@ -110,7 +110,9 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
                         widget: EditExpensePage(
                           title: "edit expense",
                           dbId: i.id,
-                          dbCategory: i.categoryName,
+                          dbCategoryId: i.categoryId,
+                          dbCategoryName: i.categoryName,
+                          dbCategoryPath: i.categoryIconPath,
                           dbDate: i.date,
                           dbName: i.name,
                           dbValue: i.value,

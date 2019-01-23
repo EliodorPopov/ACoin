@@ -60,7 +60,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             AddIncomePage(title: "Add Recurrent Income", isRecurrent: true));
     Navigator.push(context, route).then((isSuccessful) async {
       if (isSuccessful) {
-        await loadRecurrentIncome();
         calculateBalance();
         _showSuccessSnackBar();
       }
@@ -72,7 +71,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         builder: (c) => AddIncomePage(title: "Add Income", isRecurrent: false));
     Navigator.push(context, route).then((isSuccessful) async {
       if (isSuccessful) {
-        await loadIncome();
         calculateBalance();
         _showSuccessSnackBar();
       }
@@ -82,9 +80,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   _addExpense(BuildContext context) {
     var route =
         MaterialPageRoute(builder: (c) => AddExpensePage(title: "Add Expense"));
-    Navigator.push(context, route).then((isSuccessful) async {
+    Navigator.push(context, route).then((isSuccessful) {
       if (isSuccessful == true) {
-        await loadExpenses();
         calculateBalance();
         _showSuccessSnackBar();
       }
@@ -321,33 +318,63 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   Padding buildCardIncome(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: new GestureDetector(
-        onTap: () => Navigator.push(
+        padding: const EdgeInsets.all(10.0),
+        child: Card(
+          child: GestureDetector(
+            onTap: () => Navigator.push(
               context,
               SlideLeftRoute(
                   widget: IncomeHistoryPage(title: "Income History")),
             ).then((context) async {
-              await loadIncome();
               calculateBalance();
             }),
-        child: Card(
-          child: Column(
-            children: [
-              Text("Incomes"),
-              new Container(
-                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
-                color: Colors.white,
-                constraints: BoxConstraints.expand(width: 300.0, height: 300.0),
-                child: _incomes.length > 0
-                    ? PieOutsideLabelChart(incomesListDB())
-                    : new Text("No Data"),
-              ),
-            ],
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+              color: Colors.white,
+              constraints: BoxConstraints(
+                  maxHeight:
+                      _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 60.0,
+                  maxWidth: 200.0),
+              child: new ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: _incomes.length > 5 ? 5 : _incomes.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      elevation: 0.5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Container(
+                                child: Image.asset(
+                                    _incomes.elementAt(index).sourcePath),
+                                height: 30.0),
+                            Container(
+                              width: 100.0,
+                              child: Text(
+                                _incomes.elementAt(index).name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                  "+${_incomes.elementAt(index).value.toString()} MDL",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                        ),
+                      ),
+                    );
+                  }),
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Padding buildCardExpenses(BuildContext context) {
@@ -359,8 +386,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               SlideLeftRoute(
                 widget: ExpensesHistoryPage(title: "Expenses history"),
               ),
-            ).then((context) async {
-              await loadExpenses();
+            ).then((context) {
               calculateBalance();
             }),
         child: Card(
@@ -378,7 +404,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       new Container(
                         child: new ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: _categories.length,
+                          itemCount:
+                              _categories.length > 5 ? 5 : _categories.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Text(_categories.toList()[index].name +
                                 ' ' +
@@ -426,8 +453,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               context,
               SlideLeftRoute(
                   widget: RecurrentIncomeHistoryPage(title: "Income")),
-            ).then((context) async {
-              await loadRecurrentIncome();
+            ).then((context) {
               calculateBalance();
             }),
         child: Card(

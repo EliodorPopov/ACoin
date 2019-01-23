@@ -21,7 +21,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
   DbContext _context;
-  List<String> _categories = new List<String>();
 
   @override
   initState() {
@@ -114,11 +113,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
         ),
         onPressed: () async {
           Map res = await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CategoriesPage()));
+              MaterialPageRoute(builder: (context) => CategoriesPage(categoryStatus: 1,)));
           if (res.toString() != 'null') {
             print(res['name'] + ' ' + res['path']);
             _category = res['name'];
             _path = res['path'];
+            _categoryId = res['id'];
           }
         },
         color: Colors.indigo[500],
@@ -151,11 +151,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   Map res = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CategoriesPage()));
+                          builder: (context) => CategoriesPage(categoryStatus: 1,)));
                   if (res.toString() != 'null') {
                     print(res['name'] + ' ' + res['path']);
                     _category = res['name'];
                     _path = res['path'];
+                    _categoryId = res['id'];
                   }
                 },
                 color: Colors.indigo[500],

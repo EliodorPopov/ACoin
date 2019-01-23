@@ -2,15 +2,19 @@ class RecurrentIncome {
   int id;
   String name;
   int value;
-  String source;
+  String sourceName;
   DateTime date;
+  int sourceId;
+  String sourcePath;
   bool isEnabled;
 
   RecurrentIncome.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
     value = map['value'];
-    source = map['source'];
+    sourceName = map['sourceName'];
+    sourceId = map['sourceId'];
+    sourcePath = map['sourcePath'];
     date = new DateTime.fromMillisecondsSinceEpoch(map['date']);
     isEnabled = map['isEnabled'] == 1;
   }
@@ -19,7 +23,7 @@ class RecurrentIncome {
     return {
       "name": name,
       "value": value,
-      "source": source,
+      "sourceId": sourceId,
       "date": date.millisecondsSinceEpoch,
       "isEnabled": isEnabled
     };

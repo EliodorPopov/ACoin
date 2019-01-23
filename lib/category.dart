@@ -3,6 +3,7 @@ class Category {
   String name;
   int total;
   String path;
+  int categoryStatus;
 
   Category(){
     name = '';
@@ -14,6 +15,7 @@ class Category {
     name = map['name'];
     total = map['total'];
     path = map['path'];
+    categoryStatus = map['categoryStatus'];
   }
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class Category {
       "name": name,
       "total": total,
       "path": path,
+      "categoryStatus": categoryStatus,
     };
   }
 }
