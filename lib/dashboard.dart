@@ -130,32 +130,25 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void calculateCategories() async {
     _categories.clear();
-    
-    var c = new List<Category>();
 
-
-    _expenses.fold(c, (List<Category> val, Expense curr) {
-
-    });
     _categoryList.forEach((c) {
       tempCat = new Category();
       tempCat.id = c;
-      tempCat.total = _expenses.fold(0, (val, e) => val + (e.categoryId == c ?  e.value : 0));
+      tempCat.total = _expenses.fold(
+          0, (val, e) => val + (e.categoryId == c ? e.value : 0));
       _categories.add(tempCat);
     });
 
-    await _context.readCategories(1).then((list) {
-      setState(() {
-        _categoryTableList = list;
+    _categories.forEach((c) {
+      _expenses.forEach((e) {
+        if (e.categoryId == c.id) {
+          c.path = e.categoryIconPath;
+          c.name = e.categoryName;
+        }
       });
     });
-    _categories.forEach((c){
-      // _categoryTableList.forEach((t){
-      //   if (c.name == t.name) c.path = t.path;
-      // });
-      _expenses.forEach((e){
-        if (e.categoryId == c.id) c.path = e.categoryIconPath;
-      });
+    setState(() {
+      _categories = _categories.toList();
     });
   }
 
@@ -269,6 +262,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           id: 'Sales',
           domainFn: (RecurrentIncome sales, _) => sales.name,
           measureFn: (RecurrentIncome sales, _) => sales.value ?? 0,
+          colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
           data: _recurrentIncomes)
     ];
   }
@@ -358,14 +352,16 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.all(7.0),
-                  child: new Text("Last incomes", style: TextStyle(fontSize: 20.0))),
+                    padding: EdgeInsets.all(7.0),
+                    child: new Text("Last incomes",
+                        style: TextStyle(fontSize: 20.0))),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
                   color: Colors.white,
                   constraints: BoxConstraints(
-                      maxHeight:
-                          _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 48.0,
+                      maxHeight: _incomes.length > 5
+                          ? 5 * 60.0
+                          : _incomes.length * 48.0,
                       maxWidth: 400.0),
                   child: new ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
@@ -388,11 +384,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                     height: 30.0),
                                 Expanded(
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
                                     child: Text(
                                       _incomes.elementAt(index).name,
                                       textAlign: TextAlign.left,
-                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -444,29 +442,36 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   child: new Column(
                     children: [
                       Container(
-                        padding: EdgeInsets.only(bottom: 5.0),
-                        child: new Text("Expenses", textScaleFactor: 1.5,)),
+                          padding: EdgeInsets.only(bottom: 5.0),
+                          child: new Text(
+                            "Expenses",
+                            textScaleFactor: 1.5,
+                          )),
                       new Container(
                         child: new ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount:
                               _categories.length > 5 ? 5 : _categories.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return Row(children: <Widget>[
-                              Container(
-                                padding: EdgeInsets.only(bottom: 2.0), 
-                                child: Image.asset(
+                            return Row(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 2.0),
+                                  child: Image.asset(
                                     _categories[index].path),
                                 height: 30.0),
-                            Container(
-                              padding: EdgeInsets.only(left: 5.0),
-                              width: 100.0,
-                              child: Text( 
-                               _categories[index].total.toString() + ' lei',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            ],);
+                                Container(
+                                  padding: EdgeInsets.only(left: 5.0),
+                                  width: 100.0,
+                                  child: Text(
+                                    _categories[index].total.toString() +
+                                        ' lei',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            );
                           },
                         ),
                         constraints:
@@ -482,7 +487,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 new Expanded(
                   child: new Container(
                     padding: EdgeInsets.all(0.0),
-                    child: _expenses.length > 0
+                    child: _categories.length > 0
                         ? PieOutsideLabelChart(expensesListDB())
                         : new Text(
                             "no data",
@@ -692,7 +697,6 @@ Padding buildCardGoal(BuildContext context) {
     ),
   );
 }
-
 
 Padding buildCardDebt(BuildContext context) {
   return Padding(
