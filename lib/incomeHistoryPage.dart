@@ -18,7 +18,7 @@ class IncomeHistoryPage extends StatefulWidget {
 class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   DbContext _context;
   List<Income> _incomes = new List<Income>();
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  final dateFormat = DateFormat("dd MMM");
   String _period = 'Today', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
@@ -153,14 +153,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                             _incomes = list;
                           });
                         })),
-                child: ListTile(
-                  title: Text(
-                    i.name,
-                    textScaleFactor: 3.0,
-                  ),
-                  subtitle: Text(
-                      i.value.toString() + " MDL " + dateFormat.format(i.date)),
-                ),
+                child: buildListTile(i),
               );
             },
           ).toList(),
@@ -187,5 +180,40 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
             }),
       ),
     );
+  }
+
+   Widget buildListTile(Income i) {
+    return Card(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Container(child: Image.asset(i.sourcePath), height: 50.0),
+          SizedBox(
+            width: 15.0,
+          ),
+          Expanded(
+              child: Text(
+            i.name,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          )),
+          Text("-${i.value.toString()} MDL",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              )),
+          SizedBox(
+            width: 15.0,
+          ),
+          Text(
+            dateFormat.format(i.date),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+      ),
+    ));
   }
 }
