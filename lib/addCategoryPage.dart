@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 
 class AddCategoryPage extends StatefulWidget {
   AddCategoryPage(
-      {Key key, this.editPage, this.currentCategory, this.categories})
+      {Key key, this.currentCategory, this.categories, this.categoryStatus})
       : super(key: key);
-  final bool editPage;
+  final int categoryStatus;
   final Category currentCategory;
   final List<Category> categories;
 
@@ -25,7 +25,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    if (widget.editPage) {
+    if (widget.currentCategory != null) {
       _path = widget.currentCategory.path;
       _name = widget.currentCategory.name;
     } else {
@@ -38,7 +38,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Add Category'),
+        title: new Text(widget.categoryStatus == 1 ? _name == '' ?  'Add Category' : 'Edit Category' : _name == '' ? 'Add Source' : 'Edit Source'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -55,9 +55,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                 validator: (input) {
                   nameExists = false;
                   for (var c in widget.categories) {
-                    if (_name == c.name &&
-                        _name != widget.currentCategory.name) {
+                    if (_name == c.name) {
                       nameExists = true;
+                      if (_name == widget.currentCategory.name) {
+                        nameExists = false;
+                        break;
+                      }
                       break;
                     }
                   }
@@ -120,20 +123,20 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       _showSnackBar('Please select an icon');
     else if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      if (widget.editPage) {
+      if (widget.currentCategory != null) {
         if (widget.currentCategory.name != _name ||
             widget.currentCategory.path != _path)
-          _context.editCategory(widget.currentCategory.id, _name, _path);
+          _context.editCategory(widget.currentCategory.id, _name, _path, widget.categoryStatus);
         Navigator.pop(context, true);
       } else {
-        _context.addCategory(_name, _path);
+        _context.addCategory(_name, _path, widget.categoryStatus);
         Navigator.pop(context, true);
       }
     }
   }
 
   Widget buildDeleteButton() {
-    if (widget.editPage) {
+    if (widget.currentCategory != null) {
       return new Padding(
         padding: EdgeInsets.all(20.0),
         child: RaisedButton(

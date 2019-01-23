@@ -59,7 +59,7 @@ class _CategoriesIconsPageState extends State<CategoriesIconsPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Categories"),
+        title: new Text("Select Icon"),
       ),
       body: new GridView.builder(
         itemCount: iconList.length,

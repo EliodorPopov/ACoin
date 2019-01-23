@@ -38,13 +38,18 @@ class DbContext {
 
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
-    
+
     await db.execute('''
-    CREATE TABLE $categoriesTable(id INTEGER PRIMARY KEY, name TEXT, path TEXT)
+    CREATE TABLE $categoriesTable(id INTEGER PRIMARY KEY, name TEXT, path TEXT, categoryStatus INTEGER)
     ''');
 
     await db.execute('''
-        CREATE TABLE $recurrentIncomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER, isEnabled BIT)
+        CREATE TABLE $recurrentIncomeTable (
+          id INTEGER PRIMARY KEY, 
+          name TEXT, value INTEGER, 
+          sourceId INTEGER, date INTEGER, 
+          isEnabled BIT, 
+          FOREIGN KEY(sourceId) REFERENCES $categoriesTable(id))
         ''');
 
     await db.execute('''
@@ -54,12 +59,17 @@ class DbContext {
           value INTEGER, 
           date INTEGER, 
           categoryId INTEGER,
-          FOREIGN KEY(categoryId) REFERENCES $categoriesTable(id)
-          )
+          FOREIGN KEY(categoryId) REFERENCES $categoriesTable(id))
       ''');
 
     await db.execute('''
-        CREATE TABLE $incomeTable (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, source TEXT, date INTEGER)
+        CREATE TABLE $incomeTable (
+          id INTEGER PRIMARY KEY, 
+          name TEXT, 
+          value INTEGER, 
+          sourceId INTEGER, 
+          date INTEGER,
+          FOREIGN KEY(sourceId) REFERENCES $categoriesTable(id))
       ''');
 
     await db.execute('''
@@ -70,23 +80,30 @@ class DbContext {
         CREATE TABLE $goalsTransactionTable(id INTEGER PRIMARY KEY, id_transaction INTEGER, value INTEGER, details TEXT)
     ''');
 
-    await db.insert(recurrentIncomeTable, {
-      "name": "mock Recurrent Income",
-      "value": 850,
-      "source": "mock Source",
-      "date": DateTime.now().millisecondsSinceEpoch,
-      "isEnabled": true
+    await db.insert(categoriesTable, {
+      "name": "mock Category",
+      "path": "images/power.png",
+      "categoryStatus": "1"
     });
 
     await db.insert(categoriesTable, {
-      "name": "mock Category",
-      "path": "images/power.png"
+      "name": "mock Category2",
+      "path": "images/power.png",
+      "categoryStatus": "2"
+    });
+
+    await db.insert(recurrentIncomeTable, {
+      "name": "mock Recurrent Income",
+      "value": 850,
+      "sourceId": 2,
+      "date": DateTime.now().millisecondsSinceEpoch,
+      "isEnabled": true
     });
 
     await db.insert(incomeTable, {
       "name": "mock Income",
       "value": 1000,
-      "source": "mock Source",
+      "sourceId": 2,
       "date": DateTime.now().millisecondsSinceEpoch,
     });
 
@@ -109,14 +126,14 @@ class DbContext {
     });
   }
 
-  Future<void> addIncome(String name, int value, String source, DateTime date,
+  Future<void> addIncome(String name, int value, int sourceId, DateTime date,
       bool isRecurrent) async {
     var database = await db;
     if (isRecurrent) {
       await database.insert(recurrentIncomeTable, {
         "name": name,
         "value": value,
-        "source": source,
+        "sourceId": sourceId,
         "date": date.millisecondsSinceEpoch,
         "isEnabled": true
       });
@@ -124,7 +141,7 @@ class DbContext {
       await database.insert(incomeTable, {
         "name": name,
         "value": value,
-        "source": source,
+        "sourceId": sourceId,
         "date": date.millisecondsSinceEpoch,
       });
     }
@@ -147,11 +164,12 @@ class DbContext {
     });
   }
 
-  Future<void> addCategory(String name, String path) async {
+  Future<void> addCategory(String name, String path, int categoryStatus) async {
     var database = await db;
     await database.insert(categoriesTable, {
       "name": name,
       "path": path,
+      "categoryStatus": categoryStatus,
     });
   }
 
@@ -193,11 +211,19 @@ class DbContext {
     var database = await db;
     List<Map<String, dynamic>> recurrentIncomes;
     if (period == 'All time')
-      recurrentIncomes = await database.query(recurrentIncomeTable);
+      recurrentIncomes = await database.rawQuery('''
+          SELECT i.*, c.name as sourceName, c.path as sourcePath, c.categoryStatus as sourceStatus 
+          FROM $recurrentIncomeTable i
+          JOIN $categoriesTable c 
+          ON i.sourceId = c.id''');
     else {
       setPeriod(period);
-      recurrentIncomes = await database.rawQuery(
-          'SELECT * FROM $recurrentIncomeTable where date >= $minPeriod and date < $maxPeriod');
+      recurrentIncomes = await database.rawQuery('''
+          SELECT i.*, c.name as sourceName, c.path as sourcePath, c.categoryStatus as sourceStatus 
+          FROM $recurrentIncomeTable i
+          JOIN $categoriesTable c 
+          ON i.sourceId = c.id
+          where date >= $minPeriod and date < $maxPeriod''');
     }
     return recurrentIncomes.map((m) => RecurrentIncome.fromMap(m)).toList();
   }
@@ -206,17 +232,15 @@ class DbContext {
     var database = await db;
     List<Map<String, dynamic>> expenses;
     if (period == 'All time')
-      expenses = await database.rawQuery(
-          '''
-          SELECT e.*, c.name as categoryName, c.path as categoryIconPath 
+      expenses = await database.rawQuery('''
+          SELECT e.*, c.name as categoryName, c.path as categoryIconPath, c.categoryStatus as categoryStatus 
           FROM $expensesTable e
           JOIN $categoriesTable c 
           ON e.categoryId = c.id''');
     else {
       setPeriod(period);
-      expenses = await database.rawQuery(
-          '''
-          SELECT e.*, c.name as categoryName, c.path as categoryIconPath 
+      expenses = await database.rawQuery('''
+          SELECT e.*, c.name as categoryName, c.path as categoryIconPath, c.categoryStatus as categoryStatus 
           FROM $expensesTable e
           JOIN $categoriesTable c 
           ON e.categoryId = c.id
@@ -229,18 +253,30 @@ class DbContext {
     var database = await db;
     List<Map<String, dynamic>> incomes;
     if (period == 'All time')
-      incomes = await database.query(incomeTable);
+      incomes = await database.rawQuery('''
+          SELECT i.*, c.name as sourceName, c.path as sourcePath, c.categoryStatus as sourceStatus 
+          FROM $incomeTable i
+          JOIN $categoriesTable c 
+          ON i.sourceId = c.id''');
     else {
       setPeriod(period);
       incomes = await database.rawQuery(
-          'SELECT * FROM $incomeTable where date >= $minPeriod and date < $maxPeriod');
+          '''SELECT i.*, c.name as sourceName, c.path as sourcePath, c.categoryStatus as sourceStatus 
+          FROM $incomeTable i
+          JOIN $categoriesTable c 
+          ON i.sourceId = c.id where date >= $minPeriod and date < $maxPeriod''');
     }
     return incomes.map((m) => Income.fromMap(m)).toList();
   }
 
-  Future<List<Category>> readCategories() async {
+  Future<List<Category>> readCategories(int categoryStatus) async {
     var database = await db;
-    var categories = await database.query(categoriesTable);
+    List<Map<String, dynamic>> categories;
+    categories = await database.rawQuery('''
+          SELECT * 
+          FROM $categoriesTable
+          where categoryStatus = $categoryStatus''');
+    // var categories = await database.query(categoriesTable);
     return categories.map((m) => Category.fromMap(m)).toList();
   }
 
@@ -263,7 +299,7 @@ class DbContext {
   }
 
   Future<void> editExpense(
-      int id, String name, int value, DateTime date, String category) async {
+      int id, String name, int value, DateTime date, int categoryId) async {
     var database = await db;
     int date2 = date.millisecondsSinceEpoch;
     await database.execute('''
@@ -271,13 +307,13 @@ class DbContext {
       set name = '$name',
           value = $value,
           date = $date2,
-          category = '$category'
+          categoryId = '$categoryId'
       where id = $id
     ''');
   }
 
   Future<void> editIncome(int id, String name, int value, DateTime date,
-      String source, bool isRecurrent) async {
+      int sourceId, bool isRecurrent) async {
     var database = await db;
     int date2 = date.millisecondsSinceEpoch;
     final String table = isRecurrent ? recurrentIncomeTable : incomeTable;
@@ -286,21 +322,22 @@ class DbContext {
       set name = '$name',
           value = $value,
           date = $date2,
-          source = '$source'
+          source = $sourceId
       where id = $id
     ''');
   }
 
-  Future<void> editCategory(int id, String name, String path) async {
+  Future<void> editCategory(
+      int id, String name, String path, int categoryStatus) async {
     var database = await db;
     await database.execute('''
       update $categoriesTable 
       set name = '$name',
-          path = '$path'
+          path = '$path',
+          categoryStatus = $categoryStatus
       where id = $id
     ''');
   }
-
 
   Future<void> deleteExpense(int id) async {
     var database = await db;
@@ -322,9 +359,11 @@ class DbContext {
   Future<void> deleteCategory(int id) async {
     var database = await db;
     await database.execute('''
-      delete from $categoriesTable
+    update $categoriesTable 
+      set categoryStatus = 0
       where id = $id
     ''');
   }
+
 
 }

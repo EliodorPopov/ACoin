@@ -16,11 +16,12 @@ class RecurrentIncomeHistoryPage extends StatefulWidget {
       new _RecurrentIncomeHistoryPageState();
 }
 
-class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage> {
+class _RecurrentIncomeHistoryPageState
+    extends State<RecurrentIncomeHistoryPage> {
   DbContext _context;
   List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-  String _period = 'Today';
+  String _period = 'Today', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -42,6 +43,9 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
     _context.readRecurrentIncome(_period).then((list) {
       setState(() {
         _recurrentIncomes = list;
+        _recurrentIncomes
+          ..sort((a, b) => b.date.millisecondsSinceEpoch
+              .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -49,7 +53,7 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-       appBar: new AppBar(
+      appBar: new AppBar(
         title: new Theme(
           child: new Row(
             children: <Widget>[
@@ -83,14 +87,37 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                           child: new Text('This year'), value: 'This year'),
                       new DropdownMenuItem(
                           child: new Text('All time'), value: 'All time'),
+                      new DropdownMenuItem(
+                          child: new Text(
+                              sort == 'Ascending' ? 'Descending' : 'Ascending',
+                              style: TextStyle(color: Colors.green)),
+                          value: 'sort')
                     ],
                     onChanged: (String value) {
-                      _period = value;
-                      _context.readRecurrentIncome(_period).then((list) {
-                        setState(() {
-                          _recurrentIncomes = list;
+                      if (value != 'sort') {
+                        _period = value;
+                        _context.readRecurrentIncome(_period).then((list) {
+                          setState(() {
+                            _recurrentIncomes = list;
+                          });
                         });
-                      });
+                      } else {
+                        if (sort == 'Ascending') {
+                          setState(() {
+                            _recurrentIncomes.sort((a, b) => b
+                                .date.millisecondsSinceEpoch
+                                .compareTo(a.date.millisecondsSinceEpoch));
+                            sort = 'Descending';
+                          });
+                        } else {
+                          setState(() {
+                            _recurrentIncomes.sort((a, b) => a
+                                .date.millisecondsSinceEpoch
+                                .compareTo(b.date.millisecondsSinceEpoch));
+                            sort = 'Ascending';
+                          });
+                        }
+                      }
                     },
                   ),
                 ),
@@ -112,7 +139,9 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                             title: "edit expense",
                             dbId: i.id,
                             dbDate: i.date,
-                            dbSource: i.source,
+                            dbSourceId: i.sourceId,
+                            dbSourceName: i.sourceName,
+                            dbSourcePath: i.sourcePath,
                             dbName: i.name,
                             dbValue: i.value,
                             isRecurrent: true,
@@ -122,7 +151,8 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                         _showSuccessSnackBar("Deleted!", true);
                       else
                         _showSuccessSnackBar("Saved!", false);
-                    }).then((e) => _context.readRecurrentIncome("All time").then((list) {
+                    }).then((e) =>
+                        _context.readRecurrentIncome("All time").then((list) {
                           setState(() {
                             _recurrentIncomes = list;
                           });
@@ -151,13 +181,14 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
                 context,
                 MaterialPageRoute(
                     builder: (c) => AddIncomePage(
-                          title: "Add Recurrent Income", isRecurrent: true,
+                          title: "Add Recurrent Income",
+                          isRecurrent: true,
                         ))).then((isSuccessful) async {
               if (isSuccessful) {
                 await _context.readRecurrentIncome(_period).then((list) {
                   setState(() {
                     _recurrentIncomes = list;
-                  }); 
+                  });
                 });
                 _showSuccessSnackBar("Added", false);
               }
@@ -167,7 +198,7 @@ class _RecurrentIncomeHistoryPageState extends State<RecurrentIncomeHistoryPage>
   }
 
   toggleIncome(bool value, RecurrentIncome item) {
-    this._context.toggle(item);
+    _context.toggle(item);
     setState(() {
       item.isEnabled = value;
     });
