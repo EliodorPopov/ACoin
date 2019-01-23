@@ -338,11 +338,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   calculateBalance();
                 }),
             child: Container(
-              margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
               color: Colors.white,
               constraints: BoxConstraints(
                   maxHeight:
-                      _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 60.0,
+                      _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 48.0,
                   maxWidth: 200.0),
               child: new ListView.builder(
                   physics: NeverScrollableScrollPhysics(),
@@ -363,15 +363,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 child: Image.asset(
                                     _incomes.elementAt(index).sourcePath),
                                 height: 30.0),
-                            Container(
-                              width: 100.0,
-                              child: Text(
-                                _incomes.elementAt(index).name,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  _incomes.elementAt(index).name,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                             Container(
                               alignment: Alignment.centerRight,
+                              padding: EdgeInsets.only(right: 5.0),
                               child: Text(
                                   "+${_incomes.elementAt(index).value.toString()} MDL",
                                   style: TextStyle(
@@ -511,7 +515,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 85.0, maxWidth: 180.0),
             alignment: Alignment.centerLeft,
             child: new Column(
               children: [

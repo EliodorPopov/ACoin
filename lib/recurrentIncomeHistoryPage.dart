@@ -160,7 +160,8 @@ class _RecurrentIncomeHistoryPageState
                 child: ListTile(
                   title: Text(
                     i.name,
-                    textScaleFactor: 3.0,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    //textScaleFactor: 1.0,
                   ),
                   subtitle: Text(
                       i.value.toString() + " MDL " + dateFormat.format(i.date)),
