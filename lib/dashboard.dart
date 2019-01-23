@@ -32,6 +32,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   String _period = 'Today';
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
+  List<Category> _categoryTableList = new List<Category>();
   List<Category> _categories = new List<Category>();
   List<String> _categoryList = new List<String>();
   Category tempCat = new Category();
@@ -140,6 +141,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       tempCat.total = tempTot;
       _categories.add(tempCat);
     });
+    _context.readCategories(1).then((list) {
+      setState(() {
+        _categoryTableList = list;
+      });
+    });
+    _categories.forEach((c){
+      _categoryTableList.forEach((t){
+        if (c.name == t.name) c.path = t.path;
+      });
+    });
+
   }
 
   _setDialVisible(bool value) {
@@ -212,7 +224,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   Future<Null> loadRecurrentIncome() {
-    return _context.readRecurrentIncome(_period).then((list) {
+    return _context.readRecurrentIncome('All time').then((list) {
       setState(() {
         _recurrentIncomesTemp = list;
         _recurrentIncomes.clear();
@@ -231,7 +243,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         domainFn: (Category sales, _) => sales.name,
         measureFn: (Category sales, _) => sales.total ?? 0,
         data: _categories,
-        colorFn: (_, __) => charts.MaterialPalette.lime.shadeDefault,
       )
     ];
   }
@@ -337,54 +348,61 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 ).then((context) async {
                   calculateBalance();
                 }),
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
-              color: Colors.white,
-              constraints: BoxConstraints(
-                  maxHeight:
-                      _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 60.0,
-                  maxWidth: 200.0),
-              child: new ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: _incomes.length > 5 ? 5 : _incomes.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      color: Colors.blue[200],
-                      elevation: 0.5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Container(
-                                child: Image.asset(
-                                    _incomes.elementAt(index).sourcePath),
-                                height: 30.0),
-                            Container(
-                              width: 100.0,
-                              child: Text(
-                                _incomes.elementAt(index).name,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: new Text("Last incomes", style: TextStyle(fontSize: 20.0))),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+                  color: Colors.white,
+                  constraints: BoxConstraints(
+                      maxHeight:
+                          _incomes.length > 5 ? 5 * 60.0 : _incomes.length * 60.0,
+                      maxWidth: 400.0),
+                  child: new ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _incomes.length > 5 ? 5 : _incomes.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          color: Colors.blue[200],
+                          elevation: 0.5,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Container(
+                                    child: Image.asset(
+                                        _incomes.elementAt(index).sourcePath),
+                                    height: 30.0),
+                                Container(
+                                  width: 100.0,
+                                  child: Text(
+                                    _incomes.elementAt(index).name,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Container(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                      "+${_incomes.elementAt(index).value.toString()} MDL",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                             ),
-                            Container(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                  "+${_incomes.elementAt(index).value.toString()} MDL",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                            ),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                        ),
-                      ),
-                    );
-                  }),
+                          ),
+                        );
+                      }),
+                ),
+              ],
             ),
           ),
         ));
@@ -405,7 +423,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         child: Card(
           shape: BeveledRectangleBorder(),
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
+            margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
             color: Colors.white,
             constraints: BoxConstraints(maxHeight: 180.0, maxWidth: 200.0),
             child: Row(
@@ -414,31 +432,45 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 new Container(
                   child: new Column(
                     children: [
-                      new Text("Expenses:\n", style: TextStyle(fontSize: 20.0)),
+                      Container(
+                        padding: EdgeInsets.only(bottom: 5.0),
+                        child: new Text("Expenses", textScaleFactor: 1.5,)),
                       new Container(
                         child: new ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount:
                               _categories.length > 5 ? 5 : _categories.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return Text(_categories.toList()[index].name +
-                                ' ' +
-                                _categories.toList()[index].total.toString() +
-                                ' lei');
+                            return Row(children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.only(bottom: 2.0), 
+                                child: Image.asset(
+                                    _categories[index].path),
+                                height: 30.0),
+                            Container(
+                              padding: EdgeInsets.only(left: 5.0),
+                              width: 100.0,
+                              child: Text( 
+                               _categories[index].total.toString() + ' lei',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            ],);
                           },
                         ),
                         constraints:
-                            BoxConstraints(maxHeight: 120.0, maxWidth: 100.0),
+                            BoxConstraints(maxHeight: 120.0, maxWidth: 130.0),
                       ),
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
                   ),
                   constraints:
-                      BoxConstraints(maxHeight: 180.0, maxWidth: 100.0),
-                  alignment: Alignment.topCenter,
+                      BoxConstraints(maxHeight: 180.0, maxWidth: 130.0),
+                  alignment: Alignment.topLeft,
                 ),
                 new Expanded(
                   child: new Container(
+                    padding: EdgeInsets.all(0.0),
                     child: _expenses.length > 0
                         ? PieOutsideLabelChart(expensesListDB())
                         : new Text(
@@ -446,10 +478,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             style: TextStyle(fontSize: 20.0),
                           ),
                     constraints:
-                        BoxConstraints(maxHeight: 180.0, maxWidth: 180.0),
-                    alignment: Alignment.center,
+                        BoxConstraints(maxHeight: 180.0, maxWidth: 160.0),
+                    alignment: Alignment.centerRight,
                   ),
-                  flex: 3,
+                  flex: 2,
                 ),
               ],
             ),
@@ -511,12 +543,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           child: new Container(
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
             color: Colors.white,
-            constraints: BoxConstraints(maxHeight: 85.0, maxWidth: 180.0),
             alignment: Alignment.centerLeft,
             child: new Column(
               children: [
                 new Text(
-                  "How much you spent:\n",
+                  "How much you spent\n",
                   textScaleFactor: 1.3,
                 ),
                 new Container(
@@ -524,7 +555,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     value: totalIncomes > totalExpenses
                         ? totalExpenses / totalIncomes
                         : 1.0,
-                    backgroundColor: Colors.amber,
+                    backgroundColor: Colors.indigo[100],
                     valueColor: null,
                   ),
                   padding: EdgeInsets.all(5.0),
