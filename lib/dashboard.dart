@@ -1,3 +1,4 @@
+import 'package:acoin/DebtPage.dart';
 import 'package:acoin/category.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
@@ -317,6 +318,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardRecurrentIncome(context),
             buildCardIncome(context),
             buildCardGoal(context),
+            buildCardDebt(context),
           ],
         ),
       ),
@@ -647,6 +649,46 @@ Padding buildCardGoal(BuildContext context) {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
+Padding buildCardDebt(BuildContext context) {
+  return Padding(
+    padding: EdgeInsets.all(10.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => DebtPage()));
+      },
+      child: Card(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+          color: Colors.white,
+          constraints: BoxConstraints(maxHeight: 50.0, maxWidth: 180.0),
+          alignment: Alignment.centerLeft,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: new Container(
+                  child: Text(
+                    "Your Debts",
+                    textScaleFactor: 2.0,
+                  ),
+                  padding: EdgeInsets.all(5.0),
+                ),
+              ),
+              Expanded(
+                child: new Container(
+                  child: Icon(Icons.assignment_late),
+                  padding: EdgeInsets.fromLTRB(5.0, 12.0, 12.0, 12.0),
+                ),
+              ),
+            ],
           ),
         ),
       ),

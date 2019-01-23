@@ -1,6 +1,7 @@
 import 'package:acoin/GoalTransaction.dart';
 import 'package:acoin/category.dart';
 import 'package:acoin/goal.dart';
+import 'package:acoin/debt.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
@@ -35,6 +36,7 @@ class DbContext {
   final String goalsTable = "GoalsTable";
   final String goalsTransactionTable = "GoalsTransactionTable";
   final String categoriesTable = "CategoriesTable";
+  final String debtTable = "Debt";
 
   Future<void> onCreate(Database db, int version) async {
     //CHANGE VALUES TO FLOAT
@@ -91,6 +93,10 @@ class DbContext {
       "path": "images/power.png",
       "categoryStatus": "2"
     });
+
+    await db.execute('''
+        CREATE TABLE $debtTable (id INTEGER PRIMARY KEY, pname TEXT, debtvalue INTEGER, date INTEGER, deadlinedate INTEGER)
+        ''');
 
     await db.insert(recurrentIncomeTable, {
       "name": "mock Recurrent Income",
@@ -170,6 +176,17 @@ class DbContext {
       "name": name,
       "path": path,
       "categoryStatus": categoryStatus,
+    });
+  }
+
+  Future<void> addDebt(
+      String pname, int debtvalue, DateTime date, DateTime deadlinedate) async {
+    var database = await db;
+    await database.insert(debtTable, {
+      "pname": pname,
+      "debtvalue": debtvalue,
+      "date": date.millisecondsSinceEpoch,
+      "deadlinedate": deadlinedate.millisecondsSinceEpoch,
     });
   }
 
@@ -292,6 +309,13 @@ class DbContext {
     return goalsTransaction.map((m) => GoalTransaction.fromMap(m)).toList();
   }
 
+  Future<List<Debt>> readDebts() async {
+    var database = await db;
+    List<Map<String, dynamic>> debts;
+    debts = await database.rawQuery('SELECT * FROM $debtTable');
+    return debts.map((m) => Debt.fromMap(m)).toList();
+  }
+
   Future<dynamic> toggle(RecurrentIncome income) async {
     var database = await db;
     await database.update(recurrentIncomeTable, income.toMap(),
@@ -328,16 +352,30 @@ class DbContext {
   }
 
   Future<void> editCategory(
-      int id, String name, String path, int categoryStatus) async {
+    int id, String name, String path, int categoryStatus) async {
+        
     var database = await db;
     await database.execute('''
       update $categoriesTable 
       set name = '$name',
           path = '$path',
           categoryStatus = $categoryStatus
-      where id = $id
     ''');
   }
+  
+  Future<void> editDebt(int id, String pname, int debtvalue, DateTime date,
+      DateTime deadlinedate) async {
+
+    var database = await db;
+    await database.execute('''
+    update $debtTable 
+      set pname = '$pname',
+          debtvalue = $debtvalue,
+          date = $date,
+          deadlinedate = $deadlinedate,
+      where id = $id
+    ''');
+      }
 
   Future<void> deleteExpense(int id) async {
     var database = await db;
@@ -355,6 +393,14 @@ class DbContext {
       where id = $id
     ''');
   }
+  
+  Future<void> deleteDebt(int id) async {
+    var database = await db;
+    await database.execute('''
+      delete from $debtTable
+      where id = $id
+    ''');
+  }
 
   Future<void> deleteCategory(int id) async {
     var database = await db;
@@ -365,5 +411,7 @@ class DbContext {
     ''');
   }
 
-
+  Future<void> getCategoryTotals(String period) async {
+    var database = await db;
+  }
 }
