@@ -242,8 +242,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   List<charts.Series<Category, String>> expensesListDB() {
-    var colors = 
-      charts.MaterialPalette.blue.makeShades(5);
     return [
       new charts.Series<Category, String>(
         id: 'Sales',
