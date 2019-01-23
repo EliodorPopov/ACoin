@@ -19,7 +19,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   DbContext _context;
   List<Income> _incomes = new List<Income>();
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
-  String _period = 'Today';
+  String _period = 'Today', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(flushbarPosition: FlushbarPosition.TOP)
@@ -41,6 +41,8 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
     _context.readIncome(_period).then((list) {
       setState(() {
         _incomes = list;
+        _incomes.sort((a, b) => b.date.millisecondsSinceEpoch
+            .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -82,14 +84,37 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                           child: new Text('This year'), value: 'This year'),
                       new DropdownMenuItem(
                           child: new Text('All time'), value: 'All time'),
+                      new DropdownMenuItem(
+                          child: new Text(
+                              sort == 'Ascending' ? 'Descending' : 'Ascending',
+                              style: TextStyle(color: Colors.green)),
+                          value: 'sort')
                     ],
                     onChanged: (String value) {
-                      _period = value;
-                      _context.readIncome(_period).then((list) {
-                        setState(() {
-                          _incomes = list;
+                      if (value != 'sort') {
+                        _period = value;
+                        _context.readIncome(_period).then((list) {
+                          setState(() {
+                            _incomes = list;
+                          });
                         });
-                      });
+                      } else {
+                        if (sort == 'Ascending') {
+                          setState(() {
+                            _incomes.sort((a, b) => b
+                                .date.millisecondsSinceEpoch
+                                .compareTo(a.date.millisecondsSinceEpoch));
+                            sort = 'Descending';
+                          });
+                        } else {
+                          setState(() {
+                            _incomes.sort((a, b) => a
+                                .date.millisecondsSinceEpoch
+                                .compareTo(b.date.millisecondsSinceEpoch));
+                            sort = 'Ascending';
+                          });
+                        }
+                      }
                     },
                   ),
                 ),
@@ -148,7 +173,8 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                 context,
                 MaterialPageRoute(
                     builder: (c) => AddIncomePage(
-                          title: "Add Income", isRecurrent: false,
+                          title: "Add Income",
+                          isRecurrent: false,
                         ))).then((isSuccessful) async {
               if (isSuccessful) {
                 await _context.readIncome(_period).then((list) {

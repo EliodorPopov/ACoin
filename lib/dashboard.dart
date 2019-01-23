@@ -204,6 +204,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return _context.readIncome(_period).then((list) {
       setState(() {
         _incomes = list;
+        _incomes.sort((a,b) => b.date.millisecondsSinceEpoch.compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -384,7 +385,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         onTap: () => Navigator.push(
               context,
               SlideLeftRoute(
-                widget: ExpensesHistoryPage(title: "Expenses history"),
+                widget: ExpensesHistoryPage(title: "Expenses"),
               ),
             ).then((context) {
               calculateBalance();
