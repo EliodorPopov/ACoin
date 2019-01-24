@@ -359,6 +359,7 @@ class DbContext {
       set name = '$name',
           path = '$path',
           categoryStatus = $categoryStatus
+      where id = $id
     ''');
   }
 

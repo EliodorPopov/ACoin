@@ -52,6 +52,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         size: 28.0,
         color: Colors.green,
       )
+      ..isDismissible = false
       ..duration = Duration(seconds: 2)
       ..leftBarIndicatorColor = Colors.green
       ..show(context);
