@@ -346,7 +346,7 @@ class DbContext {
       set name = '$name',
           value = $value,
           date = $date2,
-          source = $sourceId
+          sourceId = $sourceId
       where id = $id
     ''');
   }
