@@ -31,6 +31,7 @@ class _RecurrentIncomeHistoryPageState
         size: 28.0,
         color: color ? Colors.red : Colors.green,
       )
+      ..isDismissible = false
       ..duration = Duration(seconds: 2)
       ..leftBarIndicatorColor = color ? Colors.red : Colors.green
       ..show(context);
