@@ -20,7 +20,6 @@ class _SplashScrState extends State<SplashScr> {
           ? Navigator.of(context).pushReplacement(SlideLeftRoute(widget: MyApp()))
            : Navigator.of(context).pushReplacement(SlideLeftRoute(widget: LoginPage()));
       isLoggedIn = res;
-      print(res);
     });
     return new SplashScreen(
         seconds: 5,

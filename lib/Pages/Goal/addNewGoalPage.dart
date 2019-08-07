@@ -69,7 +69,6 @@ class _AddNewGoalPageState extends State<AddNewGoalPage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      print(_name + ' ' + _target.toString() );
       _context.addGoal(_name,int.tryParse(_target));
       Navigator.pop(context, true);
     }

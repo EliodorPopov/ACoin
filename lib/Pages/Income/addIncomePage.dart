@@ -112,7 +112,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
                         categoryStatus: 2,
                       )));
           if (res.toString() != 'null') {
-            print(res['name'] + ' ' + res['path']);
             _sourceName = res['name'];
             _sourcePath = res['path'];
             _sourceId = res['id'];
@@ -155,7 +154,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
                                 categoryStatus: 2,
                               )));
                   if (res.toString() != 'null') {
-                    print(res['name'] + ' ' + res['path']);
                     _sourceName = res['name'];
                     _sourcePath = res['path'];
                     _sourceId = res['id'];

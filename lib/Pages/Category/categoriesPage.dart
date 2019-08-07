@@ -89,7 +89,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
     final response = await Navigator.push(context, route);
     if (response.toString() != 'null') {
-      print(response.toString());
       await _context.readCategories(widget.categoryStatus).then((list) {
         setState(() {
           categories = list;

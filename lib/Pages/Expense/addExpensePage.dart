@@ -114,7 +114,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
           Map res = await Navigator.push(context,
               MaterialPageRoute(builder: (context) => CategoriesPage(categoryStatus: 1,)));
           if (res.toString() != 'null') {
-            print(res['name'] + ' ' + res['path']);
             _category = res['name'];
             _path = res['path'];
             _categoryId = res['id'];
@@ -152,7 +151,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       MaterialPageRoute(
                           builder: (context) => CategoriesPage(categoryStatus: 1,)));
                   if (res.toString() != 'null') {
-                    print(res['name'] + ' ' + res['path']);
                     _category = res['name'];
                     _path = res['path'];
                     _categoryId = res['id'];

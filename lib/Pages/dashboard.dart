@@ -129,7 +129,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       }
     });
     currentBalance = totalIncomes - totalExpenses;
-    print(currentBalance);
     calculateCategories();
   }
 
@@ -169,10 +168,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       animatedIconTheme: IconThemeData(size: 22.0),
       // child: Icon(Icons.add),
       onOpen: () {
-        print('OPENING DIAL');
       },
       onClose: () {
-        print('DIAL CLOSED');
         calculateBalance();
       },
       visible: _dialVisible,
@@ -232,7 +229,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         _recurrentIncomesTemp = list;
         _recurrentIncomes.clear();
         _recurrentIncomesTemp.forEach((i) {
-          print(i.name + ' ' + i.isEnabled.toString());
           if (i.isEnabled) _recurrentIncomes.add(i);
         });
       });

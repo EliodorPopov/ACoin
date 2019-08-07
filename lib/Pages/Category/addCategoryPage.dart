@@ -115,7 +115,6 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
     final path = await Navigator.push(context, route);
     _path = path.toString();
     if (_path == 'null') _path = 'images/noimage.png';
-    print(_path + ' yay');
   }
 
   void _submit() {

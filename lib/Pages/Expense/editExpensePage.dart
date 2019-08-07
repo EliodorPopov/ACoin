@@ -167,7 +167,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
                       MaterialPageRoute(
                           builder: (context) => CategoriesPage(categoryStatus: 1,)));
                   if (res.toString() != 'null') {
-                    print(res['name'] + ' ' + res['path']);
                     _category = res['name'];
                     _path = res['path'];
                     _categoryId = res['id'];

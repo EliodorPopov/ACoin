@@ -31,7 +31,6 @@ class DatabaseHelper {
     // When creating the db, create the table
     await db.execute(
         "CREATE TABLE User(id INTEGER PRIMARY KEY, username TEXT, authToken TEXT)");
-    print("Created tables");
   }
 
   Future<int> saveUser(User user) async {

@@ -195,7 +195,6 @@ class _EditIncomePageState extends State<EditIncomePage> {
                               categoryStatus: 2,
                             )));
                 if (res.toString() != 'null') {
-                  print(res['name'] + ' ' + res['path']);
                   _sourceName = res['name'];
                   _sourcePath = res['path'];
                   _sourceId = res['id'];

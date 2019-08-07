@@ -147,7 +147,6 @@ class _EditDebtPageState extends State<EditDebtPage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      print(_pname);
       if (widget.dbPName != _pname ||
           widget.dbDebtValue != int.tryParse(_debtvalue) ||
           widget.dbDate != _date ||
