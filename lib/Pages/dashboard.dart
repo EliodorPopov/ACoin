@@ -36,7 +36,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   String _period = 'Today';
   List<Expense> _expenses = new List<Expense>();
   List<Income> _incomes = new List<Income>();
-  List<Category> _categoryTableList = new List<Category>();
   List<Category> _categories = new List<Category>();
   List<int> _categoryList = new List<int>();
   Category tempCat = new Category();
@@ -335,16 +334,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardIncome(context),
             buildCardGoal(context),
             buildCardDebt(context),
-            new Padding(
-                padding: EdgeInsets.all(3.0),
-                child: new Card(
-                    child: new FlatButton(
-                        child: new Text('Log out'),
-                        onPressed: () {
-                          _db.deleteUsers();
-                          Navigator.pushReplacement(
-                              context, SlideLeftRoute(widget: LoginPage()));
-                        })))
+            buildCardLogOut(context)
           ],
         ),
       ),
@@ -359,12 +349,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           shape: BeveledRectangleBorder(),
           child: GestureDetector(
             onTap: () => Navigator.push(
-                  context,
-                  SlideLeftRoute(
-                      widget: IncomeHistoryPage(title: "Income History")),
-                ).then((context) async {
-                  calculateBalance();
-                }),
+              context,
+              SlideLeftRoute(
+                  widget: IncomeHistoryPage(title: "Income History")),
+            ).then((context) async {
+              calculateBalance();
+            }),
             child: Column(
               children: <Widget>[
                 Container(
@@ -438,13 +428,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(3.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
-              context,
-              SlideLeftRoute(
-                widget: ExpensesHistoryPage(title: "Expenses"),
-              ),
-            ).then((context) {
-              calculateBalance();
-            }),
+          context,
+          SlideLeftRoute(
+            widget: ExpensesHistoryPage(title: "Expenses"),
+          ),
+        ).then((context) {
+          calculateBalance();
+        }),
         child: Card(
           shape: BeveledRectangleBorder(),
           child: Container(
@@ -527,12 +517,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(3.0),
       child: new GestureDetector(
         onTap: () => Navigator.push(
-              context,
-              SlideLeftRoute(
-                  widget: RecurrentIncomeHistoryPage(title: "Income")),
-            ).then((context) {
-              calculateBalance();
-            }),
+          context,
+          SlideLeftRoute(widget: RecurrentIncomeHistoryPage(title: "Income")),
+        ).then((context) {
+          calculateBalance();
+        }),
         child: Card(
           shape: BeveledRectangleBorder(),
           child: Container(
@@ -666,6 +655,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Padding buildCardLogOut(context) {
+    return new Padding(
+      padding: EdgeInsets.all(3.0),
+      child: new Card(
+        child: new FlatButton(
+            child: new Text('Log out'),
+            onPressed: () {
+              _db.deleteUsers();
+              Navigator.pushReplacement(
+                  context, SlideLeftRoute(widget: LoginPage()));
+            }),
       ),
     );
   }

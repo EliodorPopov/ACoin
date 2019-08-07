@@ -9,13 +9,17 @@ class RestDatasource {
   static final LOGIN_URL = "https://10.0.2.2:5696/Identity/Account/Login";
   String reqVerificationToken = '';
   String _cookie = '';
+
   Future<User> login(String username, String password) async {
+    //Step 1: Get Antiforgery Tokens from Login Page
     HttpClient client = new HttpClient();
     client.badCertificateCallback =
         ((X509Certificate cert, String host, int port) => true);
     HttpClientRequest getCookiesRequest =
         await client.getUrl(Uri.parse(LOGIN_URL));
     HttpClientResponse getCookiesResponse = await getCookiesRequest.close();
+
+    //Step 2: Extract verificationToken from body and from cookies
     var responseText = await getCookiesResponse.transform(utf8.decoder).join();
     reqVerificationToken = responseText.substring(responseText.indexOf(
             'name="__RequestVerificationToken" type="hidden" value="') +
@@ -23,9 +27,8 @@ class RestDatasource {
     reqVerificationToken =
         reqVerificationToken.substring(0, reqVerificationToken.indexOf('"'));
     _cookie = getCookiesResponse.headers['set-cookie'][1];
-    print('reqver:' + reqVerificationToken);
-    print('cookie:' + _cookie);
-    //await client.postUrl(Uri.parse(LOGIN_URL));
+
+    //Step 3: Send request for login to get permanent authToken
     HttpClient client2 = new HttpClient();
     client2.badCertificateCallback =
         ((X509Certificate cert, String host, int port) => true);
@@ -42,12 +45,10 @@ class RestDatasource {
         password +
         "&Input.RemeberMe=true";
     authentificateRequest.write(body);
-    print(authentificateRequest.cookies);
     HttpClientResponse authentificateResponse =
         await authentificateRequest.close();
-    print(authentificateResponse.headers == null
-        ? authentificateResponse.headers['set-cookie'][0]
-        : 'log in failed');
+
+    //Step 4: Check if successful and create user
     if (authentificateResponse.headers == null) {
       return null;
     } else {
