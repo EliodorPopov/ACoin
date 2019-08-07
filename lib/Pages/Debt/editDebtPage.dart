@@ -4,6 +4,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:acoin/utils/cupertinoDate.dart';
 
 class EditDebtPage extends StatefulWidget {
   EditDebtPage({
@@ -28,11 +29,13 @@ class _EditDebtPageState extends State<EditDebtPage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
   String _pname, _debtvalue;
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  final dateFormat = DateFormat("EE, MMMM d, yyyy, k:mm");
   DateTime _date = DateTime.now();
   DateTime _deadlinedate;
   DbContext _context;
   List<Debt> _debts = new List<Debt>();
+  var dateController = new TextEditingController();
+  var deadlineDateController = new TextEditingController(text: "");
   List<DropdownMenuItem<String>> dropList = [
     new DropdownMenuItem<String>(value: 'Yes', child: new Text('Yes')),
     new DropdownMenuItem<String>(value: 'No', child: new Text('No'))
@@ -41,6 +44,8 @@ class _EditDebtPageState extends State<EditDebtPage> {
   initState() {
     super.initState();
     _context = new DbContext();
+    dateController.text = dateFormat.format(widget.dbDate);
+    deadlineDateController.text = dateFormat.format(widget.dbDeadlineDate);
     _context.readDebts().then((list) {
       setState(() {
         _debts = list;
@@ -78,19 +83,39 @@ class _EditDebtPageState extends State<EditDebtPage> {
                 validator: (input) =>
                     input.isEmpty ? 'enter value please' : null,
               ),
-              DateTimePickerFormField(
-                format: dateFormat,
-                initialValue: widget.dbDate,
-                editable: false,
-                decoration: InputDecoration(labelText: 'Date'),
-                onChanged: (dt) => setState(() => _date = dt),
+              GestureDetector(
+                onTap: () {
+                  getCupertinoDate(context, dateController, _date, dateFormat)
+                      .then((newDate) {
+                    _date = newDate;
+                  });
+                },
+                child: Container(
+                  color: Colors.white10,
+                  child: IgnorePointer(
+                    child: TextFormField(
+                        controller: dateController,
+                        decoration: InputDecoration(labelText: 'Date')),
+                  ),
+                ),
               ),
-              DateTimePickerFormField(
-                format: dateFormat,
-                initialValue: widget.dbDeadlineDate,
-                editable: false,
-                decoration: InputDecoration(labelText: 'Deadline Date'),
-                onChanged: (dt) => setState(() => _deadlinedate = dt),
+              GestureDetector(
+                onTap: () {
+                  getCupertinoDate(
+                          context, deadlineDateController, null, dateFormat)
+                      .then((newDate) {
+                    _deadlinedate = newDate;
+                  });
+                },
+                child: Container(
+                  color: Colors.white10,
+                  child: IgnorePointer(
+                    child: TextFormField(
+                        controller: deadlineDateController,
+                        decoration:
+                            InputDecoration(labelText: 'Deadline Date')),
+                  ),
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -112,8 +137,8 @@ class _EditDebtPageState extends State<EditDebtPage> {
         child: Icon(Icons.delete_sweep),
         backgroundColor: Colors.red,
         onPressed: () => _submitDelete().then((value) {
-              if (value) Navigator.pop(context, true);
-            }),
+          if (value) Navigator.pop(context, true);
+        }),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -132,7 +157,7 @@ class _EditDebtPageState extends State<EditDebtPage> {
           _pname,
           int.tryParse(_debtvalue),
           _date,
-          _deadlinedate,
+          _deadlinedate ?? DateTime(2030,1,1),
         );
       }
       Navigator.pop(context, false);

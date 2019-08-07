@@ -9,7 +9,7 @@ class Debt {
     pname = map['pname'];
     debtvalue = map['debtvalue'];
     date = new DateTime.fromMillisecondsSinceEpoch(map['date']);
-    deadlinedate = new DateTime.fromMillisecondsSinceEpoch(map['deadlinedate']);
+    deadlinedate = new DateTime.fromMillisecondsSinceEpoch(map['deadlinedate'] ?? DateTime(30,1,1).millisecondsSinceEpoch);
   }
 
   Map<String, dynamic> toMap() {

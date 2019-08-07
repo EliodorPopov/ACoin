@@ -3,7 +3,7 @@ import 'package:acoin/Models/debt.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:acoin/utils/cupertinoDate.dart';
 
 class AddDebtPage extends StatefulWidget {
   AddDebtPage({Key key, this.title}) : super(key: key);
@@ -22,6 +22,7 @@ class _AddDebtPageState extends State<AddDebtPage> {
   DbContext _context;
   List<Debt> _debts = new List<Debt>();
   var dateController = new TextEditingController();
+  var deadlineDateController = new TextEditingController(text: "");
   List<DropdownMenuItem<String>> dropList = [
     new DropdownMenuItem<String>(value: 'Yes', child: new Text('Yes')),
     new DropdownMenuItem<String>(value: 'No', child: new Text('No'))
@@ -68,65 +69,35 @@ class _AddDebtPageState extends State<AddDebtPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (BuildContext builder) {
-                        return Container(
-                            height:
-                                MediaQuery.of(context).copyWith().size.height /
-                                    3,
-                            child: CupertinoDatePicker(
-                              initialDateTime: _date,
-                              onDateTimeChanged: (DateTime newdate) {
-                                _date = newdate;
-                              },
-                              use24hFormat: true,
-                              maximumDate: new DateTime(2020, 12, 30),
-                              minimumYear: 2010,
-                              maximumYear: 2020,
-                              minuteInterval: 1,
-                              mode: CupertinoDatePickerMode.dateAndTime,
-                            ));
-                      }).then((_) {
-                    dateController.text = dateFormat.format(_date);
+                  getCupertinoDate(context, dateController, _date, dateFormat)
+                      .then((newDate) {
+                    _date = newDate;
                   });
                 },
                 child: Container(
                   color: Colors.white10,
                   child: IgnorePointer(
                     child: TextFormField(
-                      enabled: true,
-                      controller: dateController,
-                      //initialValue: dateFormat.format(_date),
-                      decoration: InputDecoration(labelText: 'Date'),
-                      onFieldSubmitted: (f) => f = dateFormat.format(_date),
-                      autovalidate: true,
-                      validator: (val) {
-                        if (val != dateFormat.format(_date))
-                          val = dateFormat.format(_date);
-                      },
-                    ),
+                        controller: dateController,
+                        decoration: InputDecoration(labelText: 'Date')),
                   ),
                 ),
               ),
-              DateTimePickerFormField(
-                inputType: InputType.both,
-                format: dateFormat,
-                initialValue: _date,
-                editable: false,
-                decoration: InputDecoration(labelText: 'Date'),
-                onChanged: (dt) => setState(() => _date = dt),
-              ),
-              DateTimePickerFormField(
-                // autofocus: false,
-                keyboardType: TextInputType.url,
-                autofocus: false,
-                // focusNode: ,
-                inputType: InputType.both,
-                format: dateFormat,
-                editable: false,
-                decoration: InputDecoration(labelText: 'Deadline Date'),
-                onChanged: (dt) => setState(() => _deadlinedate = dt),
+              GestureDetector(
+                onTap: () {
+                  getCupertinoDate(context, deadlineDateController, null, dateFormat)
+                      .then((newDate) {
+                    _deadlinedate = newDate;
+                  });
+                },
+                child: Container(
+                  color: Colors.white10,
+                  child: IgnorePointer(
+                    child: TextFormField(
+                        controller: deadlineDateController,
+                        decoration: InputDecoration(labelText: 'Deadline Date')),
+                  ),
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -154,7 +125,7 @@ class _AddDebtPageState extends State<AddDebtPage> {
         _pname,
         int.tryParse(_debtvalue),
         _date,
-        _deadlinedate,
+        _deadlinedate ?? DateTime(2030,01,01),
       );
       Navigator.pop(context, true);
     }

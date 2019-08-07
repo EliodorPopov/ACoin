@@ -183,6 +183,7 @@ class DbContext {
   Future<void> addDebt(
       String pname, int debtvalue, DateTime date, DateTime deadlinedate) async {
     var database = await db;
+    deadlinedate ?? DateTime(2030,1,1);
     await database.insert(debtTable, {
       "pname": pname,
       "debtvalue": debtvalue,
@@ -370,8 +371,8 @@ class DbContext {
     update $debtTable 
       set pname = '$pname',
           debtvalue = $debtvalue,
-          date = $date,
-          deadlinedate = $deadlinedate,
+          date = ${date.millisecondsSinceEpoch},
+          deadlinedate = ${deadlinedate.millisecondsSinceEpoch}
       where id = $id
     ''');
   }
