@@ -1,7 +1,9 @@
 import 'package:acoin/DebtPage.dart';
 import 'package:acoin/category.dart';
+import 'package:acoin/data/database_helper.dart';
 import 'package:acoin/expense.dart';
 import 'package:acoin/income.dart';
+import 'package:acoin/loginPage.dart';
 import 'package:acoin/recurrentIncome.dart';
 import 'package:acoin/addExpensePage.dart';
 import 'package:acoin/addIncomePage.dart';
@@ -27,6 +29,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+  DatabaseHelper _db;
   ScrollController _scrollController;
   bool _dialVisible = true;
   DbContext _context;
@@ -45,16 +48,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int totalExpenses = 0;
 
   void _showSuccessSnackBar() {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = 'Information submitted!'
-      ..icon = Icon(
-        Icons.done,
-        size: 28.0,
-        color: Colors.green,
-      )
-      ..isDismissible = false
-      ..duration = Duration(seconds: 2)
-      ..leftBarIndicatorColor = Colors.green
+    Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        message: 'Information submitted!',
+        icon: Icon(
+          Icons.done,
+          size: 28.0,
+          color: Colors.green,
+        ),
+        isDismissible: false,
+        duration: Duration(seconds: 2),
+        leftBarIndicatorColor: Colors.green)
       ..show(context);
   }
 
@@ -95,6 +99,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   @override
   initState() {
     super.initState();
+    _db = new DatabaseHelper();
     _context = new DbContext();
     calculateBalance();
     _scrollController = ScrollController()
@@ -330,6 +335,16 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             buildCardIncome(context),
             buildCardGoal(context),
             buildCardDebt(context),
+            new Padding(
+                padding: EdgeInsets.all(3.0),
+                child: new Card(
+                    child: new FlatButton(
+                        child: new Text('Log out'),
+                        onPressed: () {
+                          _db.deleteUsers();
+                          Navigator.pushReplacement(
+                              context, SlideLeftRoute(widget: LoginPage()));
+                        })))
           ],
         ),
       ),
@@ -457,10 +472,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             return Row(
                               children: <Widget>[
                                 Container(
-                                  padding: EdgeInsets.only(bottom: 2.0),
-                                  child: Image.asset(
-                                    _categories[index].path),
-                                height: 30.0),
+                                    padding: EdgeInsets.only(bottom: 2.0),
+                                    child: Image.asset(_categories[index].path),
+                                    height: 30.0),
                                 Container(
                                   padding: EdgeInsets.only(left: 5.0),
                                   width: 100.0,

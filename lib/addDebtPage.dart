@@ -1,8 +1,10 @@
 import 'package:acoin/db_context.dart';
 import 'package:acoin/debt.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:sqflite/sqflite.dart';
 
 class AddDebtPage extends StatefulWidget {
   AddDebtPage({Key key, this.title}) : super(key: key);
@@ -16,10 +18,11 @@ class _AddDebtPageState extends State<AddDebtPage> {
   final formKey = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
   String _pname, _debtvalue;
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  final dateFormat = DateFormat("EE, MMMM d, yyyy, k:mm");
   DateTime _date = DateTime.now(), _deadlinedate;
   DbContext _context;
   List<Debt> _debts = new List<Debt>();
+  var dateController = new TextEditingController();
   List<DropdownMenuItem<String>> dropList = [
     new DropdownMenuItem<String>(value: 'Yes', child: new Text('Yes')),
     new DropdownMenuItem<String>(value: 'No', child: new Text('No'))
@@ -33,6 +36,7 @@ class _AddDebtPageState extends State<AddDebtPage> {
         _debts = list;
       });
     });
+    dateController.text = dateFormat.format(_date);
   }
 
   @override
@@ -63,7 +67,51 @@ class _AddDebtPageState extends State<AddDebtPage> {
                 validator: (input) =>
                     input.isEmpty ? 'enter value please' : null,
               ),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext builder) {
+                        return Container(
+                            height:
+                                MediaQuery.of(context).copyWith().size.height /
+                                    3,
+                            child: CupertinoDatePicker(
+                              initialDateTime: _date,
+                              onDateTimeChanged: (DateTime newdate) {
+                                _date = newdate;
+                              },
+                              use24hFormat: true,
+                              maximumDate: new DateTime(2020, 12, 30),
+                              minimumYear: 2010,
+                              maximumYear: 2020,
+                              minuteInterval: 1,
+                              mode: CupertinoDatePickerMode.dateAndTime,
+                            ));
+                      }).then((_) {
+                    dateController.text = dateFormat.format(_date);
+                  });
+                },
+                child: Container(
+                  color: Colors.white10,
+                  child: IgnorePointer(
+                    child: TextFormField(
+                      enabled: true,
+                      controller: dateController,
+                      //initialValue: dateFormat.format(_date),
+                      decoration: InputDecoration(labelText: 'Date'),
+                      onFieldSubmitted: (f) => f = dateFormat.format(_date),
+                      autovalidate: true,
+                      validator: (val) {
+                        if (val != dateFormat.format(_date))
+                          val = dateFormat.format(_date);
+                      },
+                    ),
+                  ),
+                ),
+              ),
               DateTimePickerFormField(
+                inputType: InputType.both,
                 format: dateFormat,
                 initialValue: _date,
                 editable: false,
@@ -71,6 +119,11 @@ class _AddDebtPageState extends State<AddDebtPage> {
                 onChanged: (dt) => setState(() => _date = dt),
               ),
               DateTimePickerFormField(
+                // autofocus: false,
+                keyboardType: TextInputType.url,
+                autofocus: false,
+                // focusNode: ,
+                inputType: InputType.both,
                 format: dateFormat,
                 editable: false,
                 decoration: InputDecoration(labelText: 'Deadline Date'),

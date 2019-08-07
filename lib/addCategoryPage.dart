@@ -156,15 +156,16 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   }
 
   void _showSnackBar(String message) {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = message
-      ..icon = Icon(
+    Flushbar(
+      flushbarPosition: FlushbarPosition.TOP, 
+    message: message,
+    icon: Icon(
         Icons.warning,
         size: 28.0,
         color: Colors.red,
-      )
-      ..duration = Duration(seconds: 3)
-      ..leftBarIndicatorColor = Colors.red
+      ),
+      duration: Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red)
       ..show(context);
   }
 }

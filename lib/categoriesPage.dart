@@ -41,8 +41,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
               new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
-              onLongPress: () =>
-                  addCategory(categories.toList().elementAt(index), categories.toList().elementAt(index).categoryStatus),
+              onLongPress: () => addCategory(
+                  categories.toList().elementAt(index),
+                  categories.toList().elementAt(index).categoryStatus),
               onTap: () => selectCategory(categories.toList().elementAt(index)),
               child: Card(
                 elevation: 3.0,
@@ -99,16 +100,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void _showSuccessSnackBar(String message, bool color) {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = message
-      ..icon = Icon(
-        Icons.done,
-        size: 28.0,
-        color: color ? Colors.green : Colors.red,
-      )
-      ..isDismissible = false
-      ..duration = Duration(seconds: 2)
-      ..leftBarIndicatorColor = color ? Colors.green : Colors.red
+    Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        message: message,
+        icon: Icon(
+          Icons.done,
+          size: 28.0,
+          color: color ? Colors.green : Colors.red,
+        ),
+        isDismissible: false,
+        duration: Duration(seconds: 2),
+        leftBarIndicatorColor: color ? Colors.green : Colors.red)
       ..show(context);
   }
 }

@@ -22,16 +22,17 @@ class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   String _period = 'All time', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = message
-      ..icon = Icon(
-        Icons.done,
-        size: 28.0,
-        color: color ? Colors.red : Colors.green,
-      )
-      ..isDismissible = false
-      ..duration = Duration(seconds: 2)
-      ..leftBarIndicatorColor = color ? Colors.red : Colors.green
+    Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        message: message,
+        icon: Icon(
+          Icons.done,
+          size: 28.0,
+          color: color ? Colors.red : Colors.green,
+        ),
+        isDismissible: false,
+        duration: Duration(seconds: 2),
+        leftBarIndicatorColor: color ? Colors.red : Colors.green)
       ..show(context);
   }
 

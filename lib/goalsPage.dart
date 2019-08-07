@@ -17,19 +17,20 @@ class _GoalsPageState extends State<GoalsPage> {
   DbContext _context;
   double duelCommandment = 1.0;
   List<Goal> _goals = new List<Goal>();
-  int value,target;
+  int value, target;
 
   void _showSuccessSnackBar(String message, bool color) {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = message
-      ..icon = Icon(
-        Icons.done,
-        size: 28.0,
-        color: color ? Colors.red : Colors.green,
-      )
-      ..isDismissible = false
-      ..duration = Duration(seconds: 2)
-      ..leftBarIndicatorColor = color ? Colors.red : Colors.green
+    Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        message: message,
+        icon: Icon(
+          Icons.done,
+          size: 28.0,
+          color: color ? Colors.red : Colors.green,
+        ),
+        isDismissible: false,
+        duration: Duration(seconds: 2),
+        leftBarIndicatorColor: color ? Colors.red : Colors.green)
       ..show(context);
   }
 
@@ -94,7 +95,7 @@ class _GoalsPageState extends State<GoalsPage> {
                           ),
                           new Container(
                             child: new LinearProgressIndicator(
-                              value: (i.value/i.target).clamp(0.0, 1.0),
+                              value: (i.value / i.target).clamp(0.0, 1.0),
                               backgroundColor: Colors.indigo[200],
                               valueColor: null,
                             ),
@@ -110,8 +111,8 @@ class _GoalsPageState extends State<GoalsPage> {
                               ),
                               new Expanded(
                                 child: new Container(
-                                  child: Text(
-                                              (i.value / i.target * 100).toStringAsFixed(0) +
+                                  child: Text((i.value / i.target * 100)
+                                          .toStringAsFixed(0) +
                                       "%"),
                                   padding: EdgeInsets.all(5.0),
                                   alignment: Alignment.center,

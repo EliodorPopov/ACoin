@@ -22,16 +22,17 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   String _period = 'Today', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
-    Flushbar(flushbarPosition: FlushbarPosition.TOP)
-      ..message = message
-      ..icon = Icon(
-        Icons.done,
-        size: 28.0,
-        color: color ? Colors.red : Colors.green,
-      )
-      ..isDismissible = false
-      ..duration = Duration(seconds: 2)
-      ..leftBarIndicatorColor = color ? Colors.red : Colors.green
+    Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        message: message,
+        icon: Icon(
+          Icons.done,
+          size: 28.0,
+          color: color ? Colors.red : Colors.green,
+        ),
+        isDismissible: false,
+        duration: Duration(seconds: 2),
+        leftBarIndicatorColor: color ? Colors.red : Colors.green)
       ..show(context);
   }
 
@@ -183,7 +184,7 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
     );
   }
 
-   Widget buildListTile(Income i) {
+  Widget buildListTile(Income i) {
     return Card(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
