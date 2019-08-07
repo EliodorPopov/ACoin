@@ -1,6 +1,5 @@
-import 'package:acoin/data/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:acoin/myApp.dart';
+import 'package:acoin/Pages/myApp.dart';
 import 'package:acoin/data/rest_ds.dart';
 import 'package:flushbar/flushbar.dart';
 
@@ -15,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final api = new RestDatasource();
   String _email;
   String _password;
-  // DatabaseHelper _db = new DatabaseHelper();
+
   @override
   Widget build(BuildContext context) {
     final logo = Hero(
@@ -30,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
     final email = TextFormField(
       keyboardType: TextInputType.emailAddress,
       autofocus: false,
-      //initialValue: 'email',
       validator: (input) =>
           input.isEmpty || !input.contains('@') || !input.contains('.')
               ? "Please enter a valid email"
@@ -52,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
       validator: (input) {
         if (input.isEmpty) return "Please enter a password";
         if (input.length < 5) return "Minimium length: 5";
+        return null;
       },
       decoration: InputDecoration(
         hintText: 'Password',
@@ -70,17 +69,6 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(24),
         ),
         onPressed: () => _submit(),
-        // {
-        //   final api = new RestDatasource();
-        //   var x;
-        //   api.login(_email, _password).then((onValue) {
-        //     print(onValue);
-        //     x = onValue;
-        //   }).whenComplete(() {
-        //     Navigator.push(context, MaterialPageRoute(builder: (c) => MyApp()));
-        //     print(x);
-        //   });
-        // },
         padding: EdgeInsets.all(12),
         color: Colors.lightBlueAccent,
         child: Text('Log In', style: TextStyle(color: Colors.white)),
@@ -123,8 +111,9 @@ class _LoginPageState extends State<LoginPage> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var res = await api.login(_email, _password);
-      if(res != null) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (c) => MyApp()));
+      if (res != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (c) => MyApp()));
       } else {
         _showFailedSnackBar('Login failed');
       }
@@ -135,11 +124,7 @@ class _LoginPageState extends State<LoginPage> {
     Flushbar(
         flushbarPosition: FlushbarPosition.TOP,
         message: message,
-        icon: Icon(
-          Icons.done,
-          size: 28.0,
-          color: Colors.red
-        ),  
+        icon: Icon(Icons.done, size: 28.0, color: Colors.red),
         isDismissible: false,
         duration: Duration(seconds: 2),
         leftBarIndicatorColor: Colors.red)

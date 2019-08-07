@@ -1,10 +1,9 @@
-import 'package:acoin/db_context.dart';
-import 'package:acoin/debt.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Models/debt.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:sqflite/sqflite.dart';
 
 class AddDebtPage extends StatefulWidget {
   AddDebtPage({Key key, this.title}) : super(key: key);

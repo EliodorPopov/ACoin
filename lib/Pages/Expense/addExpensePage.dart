@@ -1,25 +1,31 @@
-import 'package:acoin/categoriesPage.dart';
-import 'package:acoin/db_context.dart';
+import 'package:acoin/Pages/Category/categoriesPage.dart';
+import 'package:acoin/utils/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class AddIncomePage extends StatefulWidget {
-  AddIncomePage({Key key, this.title, this.isRecurrent}) : super(key: key);
+class AddExpensePage extends StatefulWidget {
+  AddExpensePage({Key key, this.title}) : super(key: key);
   final String title;
-  final bool isRecurrent;
 
   @override
-  _AddIncomePageState createState() => new _AddIncomePageState();
+  _AddExpensePageState createState() => new _AddExpensePageState();
 }
 
-class _AddIncomePageState extends State<AddIncomePage> {
+class _AddExpensePageState extends State<AddExpensePage> {
   final formKey = GlobalKey<FormState>();
-  String _name, _sourceName = '', _value, _sourcePath = 'images/noimage.png';
-  int _sourceId;
+  final formKey2 = GlobalKey<FormState>();
+  String _name, _value, _category = '', _path = 'images/noimage.png';
+  int _categoryId;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
-  DbContext _context = new DbContext();
+  DbContext _context;
+
+  @override
+  initState() {
+    super.initState();
+    _context = new DbContext();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +40,30 @@ class _AddIncomePageState extends State<AddIncomePage> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name:'),
-                onSaved: (input) => _name = input,
-                validator: (input) {
-                  if (input.length == 0) {
-                    return 'Adaugati Valoare';
-                  }
+                  decoration: InputDecoration(labelText: 'Name:'),
+                  onSaved: (input) => _name = input,
+                  validator: (input) {
+                    if (input.length == 0) {
+                      return 'Adaugati Valoare';
+                    }
+                  }),
+              FormField<String>(
+                builder: (FormFieldState<String> state) {
+                  return InputDecorator(
+                      decoration: InputDecoration(
+                        //icon: const Icon(Icons.color_lens),
+                        labelText: 'Category',
+                        errorText: state.hasError ? state.errorText : null,
+                      ),
+                      //isEmpty: _color == '',
+                      child: selectCategory());
+                },
+                validator: (val) {
+                  return _category != '' ? null : "Please select a category";
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Value: (MDL)'),
+                decoration: InputDecoration(labelText: 'Value:'),
                 onSaved: (input) => _value = input,
                 keyboardType: TextInputType.number,
                 validator: (input) => input.isEmpty ? 'enter value' : null,
@@ -55,32 +75,18 @@ class _AddIncomePageState extends State<AddIncomePage> {
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
               ),
-              FormField<String>(
-                builder: (FormFieldState<String> state) {
-                  return InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: 'Source',
-                      ),
-                      child: selectSource());
-                },
-                validator: (val) {
-                  return _sourcePath != 'images/noimage.png'
-                      ? null
-                      : "Please select a category";
-                },
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: RaisedButton(
                       onPressed: _submit,
                       child: Text('Submit'),
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -91,31 +97,27 @@ class _AddIncomePageState extends State<AddIncomePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.addIncome(
-          _name, int.tryParse(_value), _sourceId, _date, widget.isRecurrent);
-      Navigator.pop(context, true);
+      _context.addExpense(
+          _name, int.tryParse(_value), _date, _categoryId);
+      Navigator.pop(context, true); 
     }
   }
 
-  Widget selectSource() {
-    if (_sourceName == '')
+  Widget selectCategory() {
+    if (_category == '')
       return RaisedButton(
         child: Text(
-          'Select source',
+          'Select category',
           style: TextStyle(color: Colors.white),
         ),
         onPressed: () async {
-          Map res = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => CategoriesPage(
-                        categoryStatus: 2,
-                      )));
+          Map res = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CategoriesPage(categoryStatus: 1,)));
           if (res.toString() != 'null') {
             print(res['name'] + ' ' + res['path']);
-            _sourceName = res['name'];
-            _sourcePath = res['path'];
-            _sourceId = res['id'];
+            _category = res['name'];
+            _path = res['path'];
+            _categoryId = res['id'];
           }
         },
         color: Colors.indigo[500],
@@ -125,17 +127,14 @@ class _AddIncomePageState extends State<AddIncomePage> {
         children: <Widget>[
           Expanded(
             child: Container(
-              child: Text(
-                _sourceName,
-                textScaleFactor: 1.3,
-              ),
+              child: Text(_category, textScaleFactor: 1.3,),
               alignment: Alignment.centerLeft,
             ),
           ),
           Expanded(
             child: Container(
               constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
-              child: Image.asset(_sourcePath),
+              child: Image.asset(_path),
               alignment: Alignment.center,
             ),
           ),
@@ -151,14 +150,12 @@ class _AddIncomePageState extends State<AddIncomePage> {
                   Map res = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CategoriesPage(
-                                categoryStatus: 2,
-                              )));
+                          builder: (context) => CategoriesPage(categoryStatus: 1,)));
                   if (res.toString() != 'null') {
                     print(res['name'] + ' ' + res['path']);
-                    _sourceName = res['name'];
-                    _sourcePath = res['path'];
-                    _sourceId = res['id'];
+                    _category = res['name'];
+                    _path = res['path'];
+                    _categoryId = res['id'];
                   }
                 },
                 color: Colors.indigo[500],

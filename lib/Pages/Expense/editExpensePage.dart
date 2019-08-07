@@ -1,6 +1,5 @@
-import 'package:acoin/categoriesPage.dart';
-import 'package:acoin/category.dart';
-import 'package:acoin/db_context.dart';
+import 'package:acoin/Pages/Category/categoriesPage.dart';
+import 'package:acoin/utils/db_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

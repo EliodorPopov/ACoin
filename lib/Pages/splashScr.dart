@@ -1,8 +1,7 @@
-import 'package:acoin/dashboard.dart';
 import 'package:acoin/data/database_helper.dart';
-import 'package:acoin/loginPage.dart';
-import 'package:acoin/myApp.dart';
-import 'package:acoin/slide_left_transition.dart';
+import 'package:acoin/Pages/Identity/loginPage.dart';
+import 'package:acoin/Pages/myApp.dart';
+import 'package:acoin/utils/slide_left_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
 

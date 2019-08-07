@@ -1,10 +1,10 @@
-import 'package:acoin/db_context.dart';
-import 'package:acoin/editGoalsPage.dart';
-import 'package:acoin/goal.dart';
-import 'package:acoin/slide_left_transition.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Pages/Goal/editGoalsPage.dart';
+import 'package:acoin/Models/goal.dart';
+import 'package:acoin/utils/slide_left_transition.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:acoin/AddNewGoalPage.dart';
+import 'package:acoin/Pages/Goal/AddNewGoalPage.dart';
 
 class GoalsPage extends StatefulWidget {
   GoalsPage({Key key}) : super(key: key);

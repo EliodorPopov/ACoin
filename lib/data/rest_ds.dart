@@ -2,13 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:acoin/data/database_helper.dart';
-
-import 'package:acoin/utils/network_util.dart';
 import 'package:acoin/Identity/User.dart';
 
 class RestDatasource {
   DatabaseHelper _db = new DatabaseHelper();
-  NetworkUtil _netUtil = new NetworkUtil();
   static final LOGIN_URL = "https://10.0.2.2:5696/Identity/Account/Login";
   String reqVerificationToken = '';
   String _cookie = '';

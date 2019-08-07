@@ -1,4 +1,4 @@
-import 'package:acoin/db_context.dart';
+import 'package:acoin/utils/db_context.dart';
 import 'package:flutter/material.dart';
 
 class AddNewGoalPage extends StatefulWidget {

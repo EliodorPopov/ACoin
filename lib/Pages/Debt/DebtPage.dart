@@ -1,8 +1,8 @@
-import 'package:acoin/addDebtPage.dart';
-import 'package:acoin/db_context.dart';
-import 'package:acoin/debt.dart';
-import 'package:acoin/editDebtPage.dart';
-import 'package:acoin/slide_left_transition.dart';
+import 'package:acoin/Pages/Debt/addDebtPage.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Models/debt.dart';
+import 'package:acoin/Pages/Debt/editDebtPage.dart';
+import 'package:acoin/utils/slide_left_transition.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

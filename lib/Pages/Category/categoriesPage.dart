@@ -1,6 +1,6 @@
-import 'package:acoin/addCategoryPage.dart';
-import 'package:acoin/category.dart';
-import 'package:acoin/db_context.dart';
+import 'package:acoin/Pages/Category/addCategoryPage.dart';
+import 'package:acoin/Models/category.dart';
+import 'package:acoin/utils/db_context.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 

@@ -1,10 +1,10 @@
-import 'package:acoin/GoalTransaction.dart';
-import 'package:acoin/category.dart';
-import 'package:acoin/goal.dart';
-import 'package:acoin/debt.dart';
-import 'package:acoin/recurrentIncome.dart';
-import 'package:acoin/expense.dart';
-import 'package:acoin/income.dart';
+import 'package:acoin/Models/GoalTransaction.dart';
+import 'package:acoin/Models/category.dart';
+import 'package:acoin/Models/goal.dart';
+import 'package:acoin/Models/debt.dart';
+import 'package:acoin/Models/recurrentIncome.dart';
+import 'package:acoin/Models/expense.dart';
+import 'package:acoin/Models/income.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';

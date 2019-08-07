@@ -1,25 +1,25 @@
-import 'package:acoin/addIncomePage.dart';
-import 'package:acoin/income.dart';
-import 'package:acoin/db_context.dart';
+import 'package:acoin/Pages/Expense/addExpensePage.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Models/expense.dart';
+import 'package:acoin/Pages/Expense/editExpensePage.dart';
+import 'package:acoin/utils/slide_left_transition.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:acoin/editIncomePage.dart';
-import 'package:acoin/slide_left_transition.dart';
-import 'package:flushbar/flushbar.dart';
 
-class IncomeHistoryPage extends StatefulWidget {
-  IncomeHistoryPage({Key key, this.title}) : super(key: key);
+class ExpensesHistoryPage extends StatefulWidget {
+  ExpensesHistoryPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _IncomeHistoryPageState createState() => new _IncomeHistoryPageState();
+  _ExpensesHistoryPageState createState() => new _ExpensesHistoryPageState();
 }
 
-class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
+class _ExpensesHistoryPageState extends State<ExpensesHistoryPage> {
   DbContext _context;
-  List<Income> _incomes = new List<Income>();
+  List<Expense> _expenses = new List<Expense>();
   final dateFormat = DateFormat("dd MMM");
-  String _period = 'Today', sort = 'Descending';
+  String _period = 'All time', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
     Flushbar(
@@ -40,10 +40,10 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readIncome(_period).then((list) {
+    _context.readExpense("All time").then((list) {
       setState(() {
-        _incomes = list;
-        _incomes.sort((a, b) => b.date.millisecondsSinceEpoch
+        _expenses = list;
+        _expenses.sort((a, b) => b.date.millisecondsSinceEpoch
             .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
@@ -95,22 +95,22 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
                     onChanged: (String value) {
                       if (value != 'sort') {
                         _period = value;
-                        _context.readIncome(_period).then((list) {
+                        _context.readExpense(_period).then((list) {
                           setState(() {
-                            _incomes = list;
+                            _expenses = list;
                           });
                         });
                       } else {
                         if (sort == 'Ascending') {
                           setState(() {
-                            _incomes.sort((a, b) => b
+                            _expenses.sort((a, b) => b
                                 .date.millisecondsSinceEpoch
                                 .compareTo(a.date.millisecondsSinceEpoch));
                             sort = 'Descending';
                           });
                         } else {
                           setState(() {
-                            _incomes.sort((a, b) => a
+                            _expenses.sort((a, b) => a
                                 .date.millisecondsSinceEpoch
                                 .compareTo(b.date.millisecondsSinceEpoch));
                             sort = 'Ascending';
@@ -128,33 +128,35 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
       ),
       body: new Center(
         child: new ListView(
-          children: _incomes.map(
+          children: _expenses.map(
             (i) {
               return GestureDetector(
                 onTap: () => Navigator.push(
-                        context,
-                        SlideLeftRoute(
-                          widget: EditIncomePage(
-                            title: "edit expense",
-                            dbId: i.id,
-                            dbDate: i.date,
-                            dbSourceName: i.sourceName,
-                            dbSourcePath: i.sourcePath,
-                            dbSourceId: i.sourceId,
-                            dbName: i.name,
-                            dbValue: i.value,
-                            isRecurrent: false,
-                          ),
-                        )).then((isSuccessful) {
-                      if (isSuccessful)
+                      context,
+                      SlideLeftRoute(
+                        widget: EditExpensePage(
+                          title: "edit expense",
+                          dbId: i.id,
+                          dbCategoryId: i.categoryId,
+                          dbCategoryName: i.categoryName,
+                          dbCategoryPath: i.categoryIconPath,
+                          dbDate: i.date,
+                          dbName: i.name,
+                          dbValue: i.value,
+                        ),
+                      ),
+                    ).then((isSuccessful) {
+                      if (isSuccessful == true)
                         _showSuccessSnackBar("Deleted!", true);
-                      else
+                      else if (isSuccessful == false)
                         _showSuccessSnackBar("Saved!", false);
-                    }).then((e) => _context.readIncome("All time").then((list) {
-                          setState(() {
-                            _incomes = list;
-                          });
-                        })),
+                    }).then(
+                      (e) => _context.readExpense("All time").then((list) {
+                            setState(() {
+                              _expenses = list;
+                            });
+                          }),
+                    ),
                 child: buildListTile(i),
               );
             },
@@ -167,14 +169,13 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
         onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (c) => AddIncomePage(
-                          title: "Add Income",
-                          isRecurrent: false,
+                    builder: (c) => AddExpensePage(
+                          title: "Add Expense",
                         ))).then((isSuccessful) async {
               if (isSuccessful) {
-                await _context.readIncome(_period).then((list) {
+                await _context.readExpense(_period).then((list) {
                   setState(() {
-                    _incomes = list;
+                    _expenses = list;
                   });
                 });
                 _showSuccessSnackBar("Added", false);
@@ -184,13 +185,13 @@ class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
     );
   }
 
-  Widget buildListTile(Income i) {
+  Widget buildListTile(Expense i) {
     return Card(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: <Widget>[
-          Container(child: Image.asset(i.sourcePath), height: 50.0),
+          Container(child: Image.asset(i.categoryIconPath), height: 50.0),
           SizedBox(
             width: 15.0,
           ),

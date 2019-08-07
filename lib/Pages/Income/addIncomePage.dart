@@ -1,32 +1,25 @@
-import 'package:acoin/categoriesPage.dart';
-import 'package:acoin/category.dart';
-import 'package:acoin/db_context.dart';
+import 'package:acoin/Pages/Category/categoriesPage.dart';
+import 'package:acoin/utils/db_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-class AddExpensePage extends StatefulWidget {
-  AddExpensePage({Key key, this.title}) : super(key: key);
+class AddIncomePage extends StatefulWidget {
+  AddIncomePage({Key key, this.title, this.isRecurrent}) : super(key: key);
   final String title;
+  final bool isRecurrent;
 
   @override
-  _AddExpensePageState createState() => new _AddExpensePageState();
+  _AddIncomePageState createState() => new _AddIncomePageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class _AddIncomePageState extends State<AddIncomePage> {
   final formKey = GlobalKey<FormState>();
-  final formKey2 = GlobalKey<FormState>();
-  String _name, _value, _category = '', _path = 'images/noimage.png';
-  int _categoryId;
+  String _name, _sourceName = '', _value, _sourcePath = 'images/noimage.png';
+  int _sourceId;
   final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
   DateTime _date = DateTime.now();
-  DbContext _context;
-
-  @override
-  initState() {
-    super.initState();
-    _context = new DbContext();
-  }
+  DbContext _context = new DbContext();
 
   @override
   Widget build(BuildContext context) {
@@ -41,30 +34,16 @@ class _AddExpensePageState extends State<AddExpensePage> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                  decoration: InputDecoration(labelText: 'Name:'),
-                  onSaved: (input) => _name = input,
-                  validator: (input) {
-                    if (input.length == 0) {
-                      return 'Adaugati Valoare';
-                    }
-                  }),
-              FormField<String>(
-                builder: (FormFieldState<String> state) {
-                  return InputDecorator(
-                      decoration: InputDecoration(
-                        //icon: const Icon(Icons.color_lens),
-                        labelText: 'Category',
-                        errorText: state.hasError ? state.errorText : null,
-                      ),
-                      //isEmpty: _color == '',
-                      child: selectCategory());
-                },
-                validator: (val) {
-                  return _category != '' ? null : "Please select a category";
+                decoration: InputDecoration(labelText: 'Name:'),
+                onSaved: (input) => _name = input,
+                validator: (input) {
+                  if (input.length == 0) {
+                    return 'Adaugati Valoare';
+                  }
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Value:'),
+                decoration: InputDecoration(labelText: 'Value: (MDL)'),
                 onSaved: (input) => _value = input,
                 keyboardType: TextInputType.number,
                 validator: (input) => input.isEmpty ? 'enter value' : null,
@@ -76,18 +55,32 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 decoration: InputDecoration(labelText: 'Date'),
                 onChanged: (dt) => setState(() => _date = dt),
               ),
+              FormField<String>(
+                builder: (FormFieldState<String> state) {
+                  return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Source',
+                      ),
+                      child: selectSource());
+                },
+                validator: (val) {
+                  return _sourcePath != 'images/noimage.png'
+                      ? null
+                      : "Please select a category";
+                },
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(10.0),
                     child: RaisedButton(
                       onPressed: _submit,
                       child: Text('Submit'),
                     ),
                   ),
                 ],
-              ),
+              )
             ],
           ),
         ),
@@ -98,27 +91,31 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _context.addExpense(
-          _name, int.tryParse(_value), _date, _categoryId);
-      Navigator.pop(context, true); 
+      _context.addIncome(
+          _name, int.tryParse(_value), _sourceId, _date, widget.isRecurrent);
+      Navigator.pop(context, true);
     }
   }
 
-  Widget selectCategory() {
-    if (_category == '')
+  Widget selectSource() {
+    if (_sourceName == '')
       return RaisedButton(
         child: Text(
-          'Select category',
+          'Select source',
           style: TextStyle(color: Colors.white),
         ),
         onPressed: () async {
-          Map res = await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CategoriesPage(categoryStatus: 1,)));
+          Map res = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CategoriesPage(
+                        categoryStatus: 2,
+                      )));
           if (res.toString() != 'null') {
             print(res['name'] + ' ' + res['path']);
-            _category = res['name'];
-            _path = res['path'];
-            _categoryId = res['id'];
+            _sourceName = res['name'];
+            _sourcePath = res['path'];
+            _sourceId = res['id'];
           }
         },
         color: Colors.indigo[500],
@@ -128,14 +125,17 @@ class _AddExpensePageState extends State<AddExpensePage> {
         children: <Widget>[
           Expanded(
             child: Container(
-              child: Text(_category, textScaleFactor: 1.3,),
+              child: Text(
+                _sourceName,
+                textScaleFactor: 1.3,
+              ),
               alignment: Alignment.centerLeft,
             ),
           ),
           Expanded(
             child: Container(
               constraints: BoxConstraints.expand(width: 50.0, height: 50.0),
-              child: Image.asset(_path),
+              child: Image.asset(_sourcePath),
               alignment: Alignment.center,
             ),
           ),
@@ -151,12 +151,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   Map res = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CategoriesPage(categoryStatus: 1,)));
+                          builder: (context) => CategoriesPage(
+                                categoryStatus: 2,
+                              )));
                   if (res.toString() != 'null') {
                     print(res['name'] + ' ' + res['path']);
-                    _category = res['name'];
-                    _path = res['path'];
-                    _categoryId = res['id'];
+                    _sourceName = res['name'];
+                    _sourcePath = res['path'];
+                    _sourceId = res['id'];
                   }
                 },
                 color: Colors.indigo[500],

@@ -1,26 +1,24 @@
-import 'package:acoin/addIncomePage.dart';
-import 'package:acoin/editIncomePage.dart';
-import 'package:acoin/recurrentIncome.dart';
-import 'package:acoin/db_context.dart';
-import 'package:acoin/slide_left_transition.dart';
-import 'package:flushbar/flushbar.dart';
+import 'package:acoin/Pages/Income/addIncomePage.dart';
+import 'package:acoin/Models/income.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Pages/Income/editIncomePage.dart';
+import 'package:acoin/utils/slide_left_transition.dart';
 import 'package:flutter/material.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:intl/intl.dart';
 
-class RecurrentIncomeHistoryPage extends StatefulWidget {
-  RecurrentIncomeHistoryPage({Key key, this.title}) : super(key: key);
+class IncomeHistoryPage extends StatefulWidget {
+  IncomeHistoryPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _RecurrentIncomeHistoryPageState createState() =>
-      new _RecurrentIncomeHistoryPageState();
+  _IncomeHistoryPageState createState() => new _IncomeHistoryPageState();
 }
 
-class _RecurrentIncomeHistoryPageState
-    extends State<RecurrentIncomeHistoryPage> {
+class _IncomeHistoryPageState extends State<IncomeHistoryPage> {
   DbContext _context;
-  List<RecurrentIncome> _recurrentIncomes = new List<RecurrentIncome>();
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
+  List<Income> _incomes = new List<Income>();
+  final dateFormat = DateFormat("dd MMM");
   String _period = 'Today', sort = 'Descending';
 
   void _showSuccessSnackBar(String message, bool color) {
@@ -42,12 +40,11 @@ class _RecurrentIncomeHistoryPageState
   initState() {
     super.initState();
     _context = new DbContext();
-    _context.readRecurrentIncome(_period).then((list) {
+    _context.readIncome(_period).then((list) {
       setState(() {
-        _recurrentIncomes = list;
-        _recurrentIncomes
-          ..sort((a, b) => b.date.millisecondsSinceEpoch
-              .compareTo(a.date.millisecondsSinceEpoch));
+        _incomes = list;
+        _incomes.sort((a, b) => b.date.millisecondsSinceEpoch
+            .compareTo(a.date.millisecondsSinceEpoch));
       });
     });
   }
@@ -98,22 +95,22 @@ class _RecurrentIncomeHistoryPageState
                     onChanged: (String value) {
                       if (value != 'sort') {
                         _period = value;
-                        _context.readRecurrentIncome(_period).then((list) {
+                        _context.readIncome(_period).then((list) {
                           setState(() {
-                            _recurrentIncomes = list;
+                            _incomes = list;
                           });
                         });
                       } else {
                         if (sort == 'Ascending') {
                           setState(() {
-                            _recurrentIncomes.sort((a, b) => b
+                            _incomes.sort((a, b) => b
                                 .date.millisecondsSinceEpoch
                                 .compareTo(a.date.millisecondsSinceEpoch));
                             sort = 'Descending';
                           });
                         } else {
                           setState(() {
-                            _recurrentIncomes.sort((a, b) => a
+                            _incomes.sort((a, b) => a
                                 .date.millisecondsSinceEpoch
                                 .compareTo(b.date.millisecondsSinceEpoch));
                             sort = 'Ascending';
@@ -131,7 +128,7 @@ class _RecurrentIncomeHistoryPageState
       ),
       body: new Center(
         child: new ListView(
-          children: _recurrentIncomes.map(
+          children: _incomes.map(
             (i) {
               return GestureDetector(
                 onTap: () => Navigator.push(
@@ -141,37 +138,24 @@ class _RecurrentIncomeHistoryPageState
                             title: "edit expense",
                             dbId: i.id,
                             dbDate: i.date,
-                            dbSourceId: i.sourceId,
                             dbSourceName: i.sourceName,
                             dbSourcePath: i.sourcePath,
+                            dbSourceId: i.sourceId,
                             dbName: i.name,
                             dbValue: i.value,
-                            isRecurrent: true,
+                            isRecurrent: false,
                           ),
                         )).then((isSuccessful) {
                       if (isSuccessful)
                         _showSuccessSnackBar("Deleted!", true);
                       else
                         _showSuccessSnackBar("Saved!", false);
-                    }).then((e) =>
-                        _context.readRecurrentIncome("All time").then((list) {
+                    }).then((e) => _context.readIncome("All time").then((list) {
                           setState(() {
-                            _recurrentIncomes = list;
+                            _incomes = list;
                           });
                         })),
-                child: ListTile(
-                  title: Text(
-                    i.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    //textScaleFactor: 1.0,
-                  ),
-                  subtitle: Text(
-                      i.value.toString() + " MDL " + dateFormat.format(i.date)),
-                  trailing: Switch(
-                    value: i.isEnabled,
-                    onChanged: (v) => toggleIncome(v, i),
-                  ),
-                ),
+                child: buildListTile(i),
               );
             },
           ).toList(),
@@ -184,13 +168,13 @@ class _RecurrentIncomeHistoryPageState
                 context,
                 MaterialPageRoute(
                     builder: (c) => AddIncomePage(
-                          title: "Add Recurrent Income",
-                          isRecurrent: true,
+                          title: "Add Income",
+                          isRecurrent: false,
                         ))).then((isSuccessful) async {
               if (isSuccessful) {
-                await _context.readRecurrentIncome(_period).then((list) {
+                await _context.readIncome(_period).then((list) {
                   setState(() {
-                    _recurrentIncomes = list;
+                    _incomes = list;
                   });
                 });
                 _showSuccessSnackBar("Added", false);
@@ -200,10 +184,38 @@ class _RecurrentIncomeHistoryPageState
     );
   }
 
-  toggleIncome(bool value, RecurrentIncome item) {
-    _context.toggle(item);
-    setState(() {
-      item.isEnabled = value;
-    });
+  Widget buildListTile(Income i) {
+    return Card(
+        child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Container(child: Image.asset(i.sourcePath), height: 50.0),
+          SizedBox(
+            width: 15.0,
+          ),
+          Expanded(
+              child: Text(
+            i.name,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          )),
+          Text("-${i.value.toString()} MDL",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              )),
+          SizedBox(
+            width: 15.0,
+          ),
+          Text(
+            dateFormat.format(i.date),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+      ),
+    ));
   }
 }

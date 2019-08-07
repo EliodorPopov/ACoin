@@ -1,5 +1,5 @@
-import 'package:acoin/db_context.dart';
-import 'package:acoin/debt.dart';
+import 'package:acoin/utils/db_context.dart';
+import 'package:acoin/Models/debt.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

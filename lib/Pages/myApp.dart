@@ -1,4 +1,4 @@
-import 'package:acoin/dashboard.dart';
+import 'package:acoin/Pages/dashboard.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
